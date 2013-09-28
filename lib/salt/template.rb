@@ -6,7 +6,7 @@ module Salt
 
     def initialize(path)
       @slug = File.basename(path, File.extname(path))
-      @contents = read_with_yaml(path)
+      @contents, @metadata = read_with_yaml(path)
     end
 
     def render(contents, context = {})
@@ -15,7 +15,7 @@ module Salt
       context['site'] ||= site
 
       output = Erubis::Eruby.new(@contents).evaluate(context) { contents }
-      output = site.render_template(@layout, output, context) if @layout
+      output = site.render_template(@metadata['layout'], output, context) if @metadata['layout']
 
       output
     end
