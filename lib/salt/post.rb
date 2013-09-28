@@ -14,7 +14,7 @@ module Salt
     end
 
     def output_path(parent_path)
-      File.join(parent_path, @slug)
+      File.join(parent_path, 'posts', @slug)
     end
   end
 end
