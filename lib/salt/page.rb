@@ -6,6 +6,8 @@ module Salt
 
     def initialize(path = nil)
       @path = path
+      @extension = '.html'
+      @layout = false
 
       if path
         @contents = read_with_yaml(path)
@@ -14,9 +16,6 @@ module Salt
         @contents = ''
         @filename = 'index'
       end
-
-      @extension = '.html'
-      @layout = false
     end
 
     def render
