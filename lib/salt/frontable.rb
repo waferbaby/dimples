@@ -6,13 +6,11 @@ module Salt
       if parts = contents.match(/^(-{3}\n.*?\n?)^(-{3}*$\n?)/m)
         metadata = YAML::load(parts[1])
         contents = parts.post_match.strip!
-
-        metadata.each_pair do |key, value|
-          instance_variable_set("@#{key}", value) unless instance_variable_get("@#{key}")
-        end
+      else
+        metadata = {}
       end
 
-      contents
+      [contents, metadata]
     end
   end
 end
