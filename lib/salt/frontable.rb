@@ -8,7 +8,7 @@ module Salt
         contents = parts.post_match.strip!
 
         metadata.each_pair do |key, value|
-          instance_variable_set("@#{key}", value) unless respond_to?(key)
+          instance_variable_set("@#{key}", value) unless instance_variable_get("@#{key}")
         end
       end
 
