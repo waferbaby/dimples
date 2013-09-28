@@ -9,18 +9,13 @@ module Salt
       @contents = read_with_yaml(path)
     end
 
-    def render(context, contents)
+    def render(contents, context = {})
       site = Site.instance
       
       context['site'] ||= site
 
-      output = Erubis::Eruby.new(@contents).evaluate(context) {
-          contents
-      }
-
-      if responds_to?(@layout) && site.templates[@layout]
-        output = site.templates[@layout].render(context, output)
-      end
+      output = Erubis::Eruby.new(@contents).evaluate(context) { contents }
+      output = site.render_template(@layout, output, context) if @layout
 
       output
     end
