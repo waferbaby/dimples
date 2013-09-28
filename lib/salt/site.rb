@@ -27,7 +27,7 @@ module Salt
 
       %w{pages posts templates site}.each do |path|
         path_symbol = path.to_sym
-        @paths[path_symbol] = File.join(@paths[:source], config[path_symbol] || path)
+        @paths[path_symbol] = File.join(@paths[:source], path)
 
         self.class.instance_eval do
           define_method("#{path}_path") do
@@ -83,7 +83,7 @@ module Salt
 
       begin
         @posts.each do |post|
-          post.write(File.join(@paths[:site], 'posts'))
+          post.write(@paths[:site])
         end
       rescue Exception => e
         @error = "Failed to render a post (#{e})"
