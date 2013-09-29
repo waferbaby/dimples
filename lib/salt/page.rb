@@ -2,9 +2,10 @@ module Salt
   class Page
     include Frontable
 
-    attr_accessor :path, :contents, :metadata, :filename, :extension
+    attr_accessor :site, :path, :contents, :metadata, :filename, :extension
 
-    def initialize(path = nil)
+    def initialize(site, path = nil)
+      @site = site
       @path = path
       @extension = '.html'
 
@@ -19,7 +20,7 @@ module Salt
     end
 
     def render
-      Site.instance.render_template(@metadata['layout'], @contents, @metadata)
+      @site.render_template(@metadata['layout'], @contents, @metadata)
     end
 
     def output_file(extension = nil)
@@ -27,7 +28,7 @@ module Salt
     end
 
     def output_path(parent_path)
-      File.join(parent_path, File.dirname(@path).gsub(Site.instance.pages_path, ''))
+      File.join(parent_path, File.dirname(@path).gsub(@site.path(:pages), ''))
     end
 
     def write(path, extension = nil)
