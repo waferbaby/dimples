@@ -1,17 +1,18 @@
 module Salt
   class Site
-    def self.instance
-      @instance ||= new
-    end
+    def initialize(path = nil)
+      @paths, @templates, @pages, @posts = {}, {}, [], []
 
-    def initialize
-      @paths, @templates, @settings, @pages, @posts, @error = {}, {}, {}, [], [], nil
+      @paths[:source] = path ? File.expand_path(path) : Dir.pwd
+      @paths[:site] = File.join(@paths[:source], 'site')
+      @paths[:pages] = File.join(@paths[:source], 'pages')
+      @paths[:posts] = File.join(@paths[:source], 'posts')
+      @paths[:templates] = File.join(@paths[:source], 'templates')
 
       @klasses = {
         page: Salt::Page,
         post: Salt::Post,
       }
-
     end
 
     def register(klass)
@@ -22,33 +23,22 @@ module Salt
       end
     end
 
-    def setup(config = {})
-      @paths[:source] = File.expand_path(config[:source] || Dir.pwd)
-
-      %w{pages posts templates site}.each do |path|
-        path_symbol = path.to_sym
-        @paths[path_symbol] = File.join(@paths[:source], path)
-
-        self.class.instance_eval do
-          define_method("#{path}_path") do
-            @paths[path_symbol]
-          end
-        end
-      end
+    def path(key)
+      @paths[key]
     end
 
     def scan_files
       Dir.glob(File.join(@paths[:templates], '*.*')).each do |path|
-        template = Salt::Template.new(path)
+        template = Salt::Template.new(self, path)
         @templates[template.slug] = template
       end
 
       Dir.glob(File.join(@paths[:pages], '**', '*.*')).each do |path|
-        @pages << @klasses[:page].new(path)
+        @pages << @klasses[:page].new(self, path)
       end
 
       Dir.glob(File.join(@paths[:posts], '*.*')).each do |path|
-        @posts << @klasses[:post].new(path)
+        @posts << @klasses[:post].new(self, path)
       end
 
       @posts.reverse!
