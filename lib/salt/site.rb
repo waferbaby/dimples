@@ -15,11 +15,10 @@ module Salt
 
     def setup(path = nil)
       @paths[:source] = path ? File.expand_path(path) : Dir.pwd
-      @paths[:site] = File.join(@paths[:source], 'site')
-      @paths[:pages] = File.join(@paths[:source], 'pages')
-      @paths[:posts] = File.join(@paths[:source], 'posts')
-      @paths[:templates] = File.join(@paths[:source], 'templates')
-      @paths[:public] = File.join(@paths[:source], 'public')
+
+      %w{site pages posts templates public}.each do |path|
+        @paths[path.to_sym] = File.join(@paths[:source], path)
+      end
     end
 
     def register(klass)
@@ -51,12 +50,55 @@ module Salt
       @posts.reverse!
     end
 
-    def render_template(key, contents, context = Object.new)
+    def render_template(key, contents, context = {})
       unless @templates.include?(key)
         return contents
       end
 
       @templates[key].render(contents, context)
+    end
+
+    def paginate(posts, sub_paths = [])
+      per_page = 10
+      pages = (posts.length.to_f / per_page.to_i).ceil
+
+      for index in 0...pages
+        range = posts.slice(index * per_page, per_page)
+
+        page = Page.new
+        paths = [@paths[:site]]
+
+        if sub_paths.length > 0
+          paths.concat(sub_paths)
+          url_path = "/#{sub_paths.join('/')}/"
+        else
+          url_path = '/'
+        end
+
+        paths.push("page#{index + 1}") if index > 0
+
+        pagination = {
+          page: index + 1,
+          pages: pages,
+          total: posts.length,
+          path: url_path
+        }
+
+        if (pagination[:page] - 1) > 0
+          pagination[:previous_page] = pagination[:page] - 1
+        end
+
+        if (pagination[:page] + 1) <= pagination[:pages]
+          pagination[:next_page] = pagination[:page] + 1
+        end
+
+        page.add_metadata(:layout, @klasses[:post].path)
+
+        page.write(File.join(paths), {
+          posts: range,
+          pagination: pagination
+        })
+      end
     end
 
     def generate
@@ -84,6 +126,13 @@ module Salt
         end
       rescue Exception => e
         puts "Failed to render a post (#{e})"
+        return
+      end
+
+      begin
+        self.paginate(@posts)
+      rescue Exception => e
+        puts "Failed to build a paginated post (#{e})"
         return
       end
 
