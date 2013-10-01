@@ -8,14 +8,18 @@ module Salt
         contents = parts.post_match.strip!
 
         metadata.each_pair do |key, value|
-          unless instance_variable_get("@#{key}")
-            self.class.send(:attr_accessor, key.to_sym)
-            instance_variable_set("@#{key}", value) 
-          end
+          self.add_metadata(key, value)
         end
       end
 
       contents
+    end
+
+    def add_metadata(key, value)
+      unless instance_variable_get("@#{key}")
+        self.class.send(:attr_accessor, key.to_sym)
+        instance_variable_set("@#{key}", value) 
+      end
     end
   end
 end
