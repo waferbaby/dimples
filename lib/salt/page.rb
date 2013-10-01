@@ -17,8 +17,9 @@ module Salt
       end
     end
 
-    def render
-      Site.instance.render_template(@layout, @contents, self)
+    def render(context = {})
+      context[:this] = self
+      Site.instance.render_template(@layout, @contents, context)
     end
 
     def output_file(extension = nil)
@@ -26,15 +27,15 @@ module Salt
     end
 
     def output_path(parent_path)
+      return parent_path if @path.nil?
       File.join(parent_path, File.dirname(@path).gsub(Site.instance.path(:pages), ''))
     end
 
-    def write(path, extension = nil)
-      contents = self.render
+    def write(path, context = {}, extension = nil)
+      contents = self.render(context)
       output_path = self.output_path(path)
 
       FileUtils.mkdir_p(output_path) unless Dir.exists?(output_path)
-
       full_path = File.join(output_path, self.output_file(extension))
 
       if @path && File.exists?(full_path)
