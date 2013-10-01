@@ -2,20 +2,18 @@ module Salt
   class Template
     include Frontable
 
-    attr_accessor :site, :slug, :metadata, :contents, :parent
+    attr_accessor :slug, :contents, :parent
 
-    def initialize(site, path)
-      @site = site
+    def initialize(path)
       @slug = File.basename(path, File.extname(path))
-      @contents, @metadata = read_with_yaml(path)
+      @contents = read_with_yaml(path)
     end
 
-    def render(contents, context = {})
-      
-      context['site'] ||= @site
+    def render(contents, context = Object.new)
+      site = Site.instance
 
-      output = Erubis::Eruby.new(@contents).evaluate(context) { contents }
-      output = @site.render_template(@metadata['layout'], output, context) if @metadata['layout']
+      output = Erubis::Eruby.new(@contents).evaluate({ site: site, this: context }) { contents }
+      output = site.render_template(@layout, output, context) if @layout
 
       output
     end
