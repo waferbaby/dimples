@@ -2,6 +2,10 @@ module Salt
   class Post < Page
     attr_accessor :slug, :date, :contents
 
+    def self.path
+      "posts"
+    end
+
     def initialize(path)
       super
 
@@ -14,7 +18,7 @@ module Salt
     end
 
     def output_path(parent_path)
-      File.join(parent_path, 'posts', @slug)
+      File.join(parent_path, self.class.path, @slug)
     end
   end
 end
