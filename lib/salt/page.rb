@@ -1,6 +1,7 @@
 module Salt
   class Page
     include Frontable
+    include Renderable
 
     attr_accessor :path, :contents, :filename, :extension
 
@@ -17,11 +18,6 @@ module Salt
       end
     end
 
-    def render(context = {})
-      context[:this] = self
-      Site.instance.render_template(@layout, @contents, context)
-    end
-
     def output_file(extension = nil)
       "#{self.filename}#{extension ? extension : self.extension}"
     end
@@ -32,15 +28,11 @@ module Salt
     end
 
     def write(path, context = {}, extension = nil)
-      contents = self.render(context)
+      contents = self.render(@contents, {this: self}.merge(context))
       output_path = self.output_path(path)
 
       FileUtils.mkdir_p(output_path) unless Dir.exists?(output_path)
       full_path = File.join(output_path, self.output_file(extension))
-
-      if @path && File.exists?(full_path)
-        return if File.mtime(@path) < File.mtime(full_path)
-      end
 
       File.open(full_path, 'w') do |file|
         file.write(contents)
