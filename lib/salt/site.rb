@@ -1,11 +1,18 @@
 module Salt
   class Site
+    attr_accessor :paths, :templates, :categories, :archives, :pages, :posts
+
     def self.instance
       @site ||= new
     end
 
     def initialize
-      @paths, @templates, @pages, @posts = {}, {}, [], []
+      @paths = {}
+      @templates = {}
+      @categories = {}
+      @archives = {}
+      @pages = []
+      @posts = []
 
       @klasses = {
         page: Salt::Page,
@@ -48,14 +55,21 @@ module Salt
       end
 
       @posts.reverse!
-    end
 
-    def render_template(key, contents, context = {})
-      unless @templates.include?(key)
-        return contents
+      @posts.each do |post|
+
+        year = post.date.year
+        month = post.date.strftime('%m')
+        
+        @archives[year] ||= {posts: [], months: {}}
+        @archives[year][:months][month] ||= []
+        @archives[year][:posts] << post
+        @archives[year][:months][month] << post
+
+        post.categories.each do |category|
+          (@categories[category] ||= []) << post
+        end
       end
-
-      @templates[key].render(contents, context)
     end
 
     def paginate(posts, sub_paths = [])
@@ -106,44 +120,25 @@ module Salt
 
       begin
         Dir.mkdir(@paths[:site]) unless Dir.exists?(@paths[:site])
-      rescue Exception => e
-        puts "Failed to prepare the site directory (#{e})"
-        return
-      end
 
-      begin
         @pages.each do |page|
           page.write(@paths[:site])
         end
-      rescue Exception => e
-        puts "Failed to render a page (#{e})"
-        return
-      end
 
-      begin
         @posts.each do |post|
           post.write(@paths[:site])
         end
-      rescue Exception => e
-        puts "Failed to render a post (#{e})"
-        return
-      end
 
-      begin
         self.paginate(@posts)
-      rescue Exception => e
-        puts "Failed to build a paginated post (#{e})"
-        return
-      end
 
-      begin
-        if Dir.exists?(@paths[:public])
-        end
+        FileUtils.cp_r(File.join(@paths[:public], '/.'), @paths[:site])
+
       rescue Exception => e
+        puts e
       end
     end
 
     private
-      attr_accessor :paths, :templates, :settings, :pages, :posts, :error, :klasses
+      attr_accessor :error, :klasses
   end
 end
