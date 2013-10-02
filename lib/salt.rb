@@ -6,6 +6,8 @@ require 'fileutils'
 require 'yaml'
 
 require 'salt/frontable'
+require 'salt/renderable'
+
 require 'salt/page'
 require 'salt/post'
 require 'salt/site'
