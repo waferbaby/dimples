@@ -131,8 +131,19 @@ module Salt
 
         self.paginate(@posts)
 
-        FileUtils.cp_r(File.join(@paths[:public], '/.'), @paths[:site])
+        @archives.each do |year, data|
+          data[:months].each do |month, posts|
+            self.paginate(posts, [@klasses[:post].path, year.to_s, month.to_s])
+          end
 
+          self.paginate(data[:posts], [@klasses[:post].path, year.to_s])
+        end
+
+        @categories.each_pair do |slug, posts|
+          self.paginate(posts, [@klasses[:post].path, slug])
+        end
+
+        FileUtils.cp_r(File.join(@paths[:public], '/.'), @paths[:site])
       rescue Exception => e
         puts e
       end
