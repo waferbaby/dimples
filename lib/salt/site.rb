@@ -1,30 +1,40 @@
 module Salt
   class Site
-    attr_accessor :paths, :templates, :categories, :archives, :pages, :posts
+    attr_accessor :paths, :settings, :templates, :categories, :archives, :pages, :posts
 
     def self.instance
       @site ||= new
     end
 
     def initialize
-      @paths = {}
-      @templates = {}
-      @categories = {}
-      @archives = {}
-      @pages = []
-      @posts = []
+      @paths, @templates, @categories, @archives = {}, {}, {}, {}
+      @pages, @posts = [], []
 
       @klasses = {
         page: Salt::Page,
         post: Salt::Post,
       }
+
+      @settings = {
+        pagination: 10,
+        archives: true,
+        categories: true,
+      }
     end
 
-    def setup(path = nil)
+    def setup(path = nil, config = {})
       @paths[:source] = path ? File.expand_path(path) : Dir.pwd
 
       %w{site pages posts templates public}.each do |path|
         @paths[path.to_sym] = File.join(@paths[:source], path)
+      end
+
+      config[:classes].each do |klass|
+        self.register(klass)
+      end if config[:classes].kind_of?(Array)
+
+      @settings.each_key do |key|
+        @settings[key] = config[key] if config[key]
       end
     end
 
@@ -72,12 +82,11 @@ module Salt
       end
     end
 
-    def paginate(posts, sub_paths = [])
-      per_page = 10
-      pages = (posts.length.to_f / per_page.to_i).ceil
+    def paginate(posts, title, sub_paths = [])
+      pages = (posts.length.to_f / @settings[:pagination].to_i).ceil
 
       for index in 0...pages
-        range = posts.slice(index * per_page, per_page)
+        range = posts.slice(index * @settings[:pagination], @settings[:pagination])
 
         page = Page.new
         paths = [@paths[:site]]
@@ -89,7 +98,10 @@ module Salt
           url_path = '/'
         end
 
-        paths.push("page#{index + 1}") if index > 0
+        if index > 0
+          paths.push("page#{index + 1}")
+          title << " (Page #{index + 1})"
+        end
 
         pagination = {
           page: index + 1,
@@ -106,7 +118,8 @@ module Salt
           pagination[:next_page] = pagination[:page] + 1
         end
 
-        page.add_metadata(:layout, @klasses[:post].path)
+        page.set_metadata(:layout, @klasses[:post].path)
+        page.set_metadata(:title, title)
 
         page.write(File.join(paths), {
           posts: range,
@@ -118,35 +131,37 @@ module Salt
     def generate
       self.scan_files
 
-      begin
-        Dir.mkdir(@paths[:site]) unless Dir.exists?(@paths[:site])
+      Dir.mkdir(@paths[:site]) unless Dir.exists?(@paths[:site])
 
-        @pages.each do |page|
-          page.write(@paths[:site])
-        end
+      @pages.each do |page|
+        page.write(@paths[:site])
+      end
 
-        @posts.each do |post|
-          post.write(@paths[:site])
-        end
+      @posts.each do |post|
+        post.write(@paths[:site])
+      end
 
-        self.paginate(@posts)
+      self.paginate(@posts, @klasses[:post].path.capitalize)
 
+      if @settings[:archives]
         @archives.each do |year, data|
           data[:months].each do |month, posts|
-            self.paginate(posts, [@klasses[:post].path, year.to_s, month.to_s])
+            self.paginate(posts, posts[0].date.strftime('%B %Y'), [@klasses[:post].path, year.to_s, month.to_s])
           end
 
-          self.paginate(data[:posts], [@klasses[:post].path, year.to_s])
+          self.paginate(data[:posts], year.to_s, [@klasses[:post].path, year.to_s])
         end
-
-        @categories.each_pair do |slug, posts|
-          self.paginate(posts, [@klasses[:post].path, slug])
-        end
-
-        FileUtils.cp_r(File.join(@paths[:public], '/.'), @paths[:site])
-      rescue Exception => e
-        puts e
       end
+
+      if @settings[:categories]
+        @categories.each_pair do |slug, posts|
+          self.paginate(posts, slug.capitalize, [@klasses[:post].path, slug])
+        end
+      end
+
+      FileUtils.cp_r(File.join(@paths[:public], '/.'), @paths[:site])
+    rescue Exception => e
+      puts e
     end
 
     private
