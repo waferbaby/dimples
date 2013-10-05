@@ -17,7 +17,7 @@ module Salt
       @filename = 'index'
     end
 
-    def output_path(parent_path)
+    def output_path(site, parent_path)
       File.join(parent_path, self.class.path, @slug)
     end
   end
