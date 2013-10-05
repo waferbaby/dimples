@@ -1,7 +1,6 @@
 module Salt
   module Renderable
-    def render(body, context = {})
-      site = Site.instance
+    def render(site, body, context = {})
       context[:site] ||= site
 
       begin
@@ -10,7 +9,7 @@ module Salt
         output = contents
       end
 
-      output = site.templates[@layout].render(output, context) if @layout && site.templates[@layout]
+      output = site.templates[@layout].render(site, output, context) if @layout && site.templates[@layout]
 
       output
     end
