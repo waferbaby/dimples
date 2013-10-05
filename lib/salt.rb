@@ -3,6 +3,7 @@ $:.unshift(__dir__)
 require 'rubygems'
 require 'erubis'
 require 'fileutils'
+require 'singleton'
 require 'yaml'
 
 require 'salt/frontable'
