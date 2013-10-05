@@ -1,10 +1,7 @@
 module Salt
   class Site
+    include Singleton
     attr_accessor :paths, :settings, :templates, :categories, :archives, :pages, :posts
-
-    def self.instance
-      @site ||= new
-    end
 
     def initialize
       @paths, @templates, @categories, @archives = {}, {}, {}, {}
@@ -121,7 +118,7 @@ module Salt
         page.set_metadata(:layout, @klasses[:post].path)
         page.set_metadata(:title, title)
 
-        page.write(File.join(paths), {
+        page.write(self, File.join(paths), {
           posts: range,
           pagination: pagination
         })
@@ -129,16 +126,32 @@ module Salt
     end
 
     def generate
-      self.scan_files
+      begin
+        self.scan_files
+      rescue Exception => e
+        raise "Failed to scan source files (#{e})"
+      end
 
-      Dir.mkdir(@paths[:site]) unless Dir.exists?(@paths[:site])
+      begin
+        Dir.mkdir(@paths[:site]) unless Dir.exists?(@paths[:site])
+      rescue Exception => e
+        raise "Failed to create the site directory (#{e})"
+      end
 
       @pages.each do |page|
-        page.write(@paths[:site])
+        begin
+          page.write(self, @paths[:site])
+        rescue Exception => e
+          raise "Failed to generate page #{page} (#{e})"
+        end
       end
 
       @posts.each do |post|
-        post.write(@paths[:site])
+        begin
+          post.write(self, @paths[:site])
+        rescue Exception => e
+          raise "Failed to generate post #{post} (#{e})"
+        end
       end
 
       self.paginate(@posts, @klasses[:post].path.capitalize)
@@ -146,22 +159,36 @@ module Salt
       if @settings[:archives]
         @archives.each do |year, data|
           data[:months].each do |month, posts|
-            self.paginate(posts, posts[0].date.strftime('%B %Y'), [@klasses[:post].path, year.to_s, month.to_s])
+            begin
+              self.paginate(posts, posts[0].date.strftime('%B %Y'), [@klasses[:post].path, year.to_s, month.to_s])
+            rescue Exception => e
+              raise "Failed to generate archive pages for #{year}, #{month} (#{e})"
+            end
           end
 
-          self.paginate(data[:posts], year.to_s, [@klasses[:post].path, year.to_s])
+          begin
+            self.paginate(data[:posts], year.to_s, [@klasses[:post].path, year.to_s])
+          rescue Exception => e
+            raise "Failed to generate archives pages for #{year} (#{e})"
+          end
         end
       end
 
       if @settings[:categories]
         @categories.each_pair do |slug, posts|
-          self.paginate(posts, slug.capitalize, [@klasses[:post].path, slug])
+          begin
+            self.paginate(posts, slug.capitalize, [@klasses[:post].path, slug])
+          rescue Exception => e
+            raise "Failed to generate category pages for '#{slug}' (#{e})"
+          end
         end
       end
 
-      FileUtils.cp_r(File.join(@paths[:public], '/.'), @paths[:site])
-    rescue Exception => e
-      puts e
+      begin
+        FileUtils.cp_r(File.join(@paths[:public], '/.'), @paths[:site])
+      rescue Exception => e
+        raise "Failed to copy site assets from #{@paths[:public]} (#{e})"
+      end
     end
 
     private
