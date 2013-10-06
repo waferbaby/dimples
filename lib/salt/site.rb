@@ -101,9 +101,11 @@ module Salt
           url_path = '/'
         end
 
+        page_title = title
+
         if index > 0
           paths.push("page#{index + 1}")
-          title << " (Page #{index + 1})"
+          page_title += " (Page #{index + 1})"
         end
 
         pagination = {
@@ -122,7 +124,7 @@ module Salt
         end
 
         page.set_metadata(:layout, @klasses[:post].path)
-        page.set_metadata(:title, title)
+        page.set_metadata(:title, page_title)
 
         page.write(self, File.join(paths), {
           posts: range,
