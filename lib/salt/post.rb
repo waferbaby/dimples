@@ -17,6 +17,10 @@ module Salt
       @filename = 'index'
     end
 
+    def type
+      :post
+    end
+
     def output_path(site, parent_path)
       File.join(parent_path, self.class.path, @slug)
     end
