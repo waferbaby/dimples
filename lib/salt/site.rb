@@ -4,7 +4,7 @@ module Salt
     attr_accessor :paths, :settings, :templates, :categories, :archives, :pages, :posts
 
     def initialize
-      @paths, @templates, @categories, @archives = {}, {}, {}, {}
+      @paths, @settings, @templates, @categories, @archives = {}, {}, {}, {}, {}
       @pages, @posts = [], []
 
       @klasses = {
@@ -12,10 +12,20 @@ module Salt
         post: Salt::Post,
       }
 
-      @settings = {
-        pagination: 10,
+      @settings = self.class.default_settings
+    end
+
+    def self.default_settings
+      {
+        posts_per_page: 10,
+        check_file_times: true,
+        pagination: true,
+        pages: true,
+        posts: true,
         archives: true,
         categories: true,
+        feed: true,
+        category_feeds: true,
       }
     end
 
@@ -25,10 +35,6 @@ module Salt
       %w{site pages posts templates public}.each do |path|
         @paths[path.to_sym] = File.join(@paths[:source], path)
       end
-
-      config[:classes].each do |klass|
-        self.register(klass)
-      end if config[:classes].kind_of?(Array)
 
       @settings.each_key do |key|
         @settings[key] = config[key] if config[key]
@@ -80,10 +86,10 @@ module Salt
     end
 
     def paginate(posts, title, sub_paths = [])
-      pages = (posts.length.to_f / @settings[:pagination].to_i).ceil
+      pages = (posts.length.to_f / @settings[:posts_per_page].to_i).ceil
 
       for index in 0...pages
-        range = posts.slice(index * @settings[:pagination], @settings[:pagination])
+        range = posts.slice(index * @settings[:posts_per_page], @settings[:posts_per_page])
 
         page = Page.new
         paths = [@paths[:site]]
@@ -138,23 +144,27 @@ module Salt
         raise "Failed to create the site directory (#{e})"
       end
 
-      @pages.each do |page|
-        begin
-          page.write(self, @paths[:site])
-        rescue Exception => e
-          raise "Failed to generate page #{page} (#{e})"
+      if @settings[:pages]
+        @pages.each do |page|
+          begin
+            page.write(self, @paths[:site])
+          rescue Exception => e
+            raise "Failed to generate page #{page} (#{e})"
+          end
         end
       end
 
-      @posts.each do |post|
-        begin
-          post.write(self, @paths[:site])
-        rescue Exception => e
-          raise "Failed to generate post #{post} (#{e})"
+      if @settings[:posts]
+        @posts.each do |post|
+          begin
+            post.write(self, @paths[:site])
+          rescue Exception => e
+            raise "Failed to generate post #{post} (#{e})"
+          end
         end
       end
 
-      self.paginate(@posts, @klasses[:post].path.capitalize)
+      self.paginate(@posts, @klasses[:post].path.capitalize) if @settings[:pagination]
 
       if @settings[:archives]
         @archives.each do |year, data|
@@ -178,10 +188,17 @@ module Salt
         @categories.each_pair do |slug, posts|
           begin
             self.paginate(posts, slug.capitalize, [@klasses[:post].path, slug])
+
+            if @settings[:category_feeds]
+            end
+
           rescue Exception => e
             raise "Failed to generate category pages for '#{slug}' (#{e})"
           end
         end
+      end
+
+      if @settings[:feed]
       end
 
       begin
@@ -190,8 +207,5 @@ module Salt
         raise "Failed to copy site assets from #{@paths[:public]} (#{e})"
       end
     end
-
-    private
-      attr_accessor :error, :klasses
   end
 end
