@@ -190,6 +190,18 @@ module Salt
             self.paginate(posts, slug.capitalize, [@klasses[:post].path, slug])
 
             if @settings[:category_feeds]
+              feed = @klasses[:page].new
+
+              feed.filename = 'feed'
+              feed.extension = 'xml'
+
+              feed.set_metadata(:layout, 'feed')
+
+              begin
+                feed.write(self, File.join(@paths[:site], @klasses[:post].path, slug), {posts: posts, category: slug})
+              rescue Exception => e
+                raise "Failed to build the #{slug} feed (#{e})"
+              end
             end
 
           rescue Exception => e
@@ -199,6 +211,18 @@ module Salt
       end
 
       if @settings[:feed]
+        feed = @klasses[:page].new
+
+        feed.filename = 'feed'
+        feed.extension = 'xml'
+
+        feed.set_metadata(:layout, 'feed')
+
+        begin
+          feed.write(self, @paths[:site], {posts: @posts[0..@settings[:posts_per_page]]})
+        rescue Exception => e
+          raise "Failed to build the site feed (#{e})"
+        end
       end
 
       begin
