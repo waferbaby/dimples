@@ -8,7 +8,7 @@ module Salt
 
     def initialize(path = nil)
       @path = path
-      @extension = '.html'
+      @extension = 'html'
 
       if path
         @contents = read_with_yaml(path)
@@ -19,12 +19,16 @@ module Salt
       end
     end
 
+    def type
+      :page
+    end
+
     def contents
       @contents
     end
 
-    def output_file(extension = nil)
-      "#{self.filename}#{extension ? extension : self.extension}"
+    def output_file
+      "#{self.filename}.#{self.extension}"
     end
 
     def output_path(site, parent_path)
@@ -32,10 +36,9 @@ module Salt
       File.join(parent_path, File.dirname(@path).gsub(site.path(:pages), ''))
     end
 
-    def write(site, path, context = {}, extension = nil)
-
+    def write(site, path, context = {})
       output_path = self.output_path(site, path)
-      full_path = File.join(output_path, self.output_file(extension))
+      full_path = File.join(output_path, self.output_file)
 
       if site.settings[:check_file_times] && @path && File.exists?(full_path)
         return unless File.mtime(@path) > File.mtime(full_path)
