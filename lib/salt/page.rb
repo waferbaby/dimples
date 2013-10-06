@@ -37,7 +37,7 @@ module Salt
       output_path = self.output_path(site, path)
       full_path = File.join(output_path, self.output_file(extension))
 
-      if @path && File.exists?(full_path)
+      if site.settings[:check_file_times] && @path && File.exists?(full_path)
         return unless File.mtime(@path) > File.mtime(full_path)
       end
 
