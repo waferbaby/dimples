@@ -40,10 +40,6 @@ module Salt
       output_path = self.output_path(site, path)
       full_path = File.join(output_path, self.output_file)
 
-      if site.settings[:check_file_times] && @path && File.exists?(full_path)
-        return unless File.mtime(@path) > File.mtime(full_path)
-      end
-
       contents = self.render(site, @contents, {this: self}.merge(context))
       FileUtils.mkdir_p(output_path) unless Dir.exists?(output_path)
 
