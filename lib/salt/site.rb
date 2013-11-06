@@ -37,7 +37,7 @@ module Salt
       end
 
       @settings.each_key do |key|
-        @settings[key] = config[key] if config[key]
+        @settings[key] = config[key] if config.key?(key)
       end
     end
 
