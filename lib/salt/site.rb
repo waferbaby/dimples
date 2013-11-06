@@ -18,7 +18,6 @@ module Salt
     def self.default_settings
       {
         posts_per_page: 10,
-        check_file_times: true,
         pagination: true,
         pages: true,
         posts: true,
