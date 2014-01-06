@@ -3,7 +3,7 @@ module Salt
     attr_accessor :slug, :date, :contents, :categories
 
     def self.path
-      "posts"
+      "archives"
     end
 
     def initialize(path)
@@ -16,6 +16,7 @@ module Salt
 
       @filename = 'index'
       @categories = []
+      @layout = 'post'
     end
 
     def type
