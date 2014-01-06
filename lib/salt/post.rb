@@ -1,6 +1,6 @@
 module Salt
   class Post < Page
-    attr_accessor :slug, :date, :contents
+    attr_accessor :slug, :date, :contents, :categories
 
     def self.path
       "posts"
@@ -15,6 +15,7 @@ module Salt
       @date = Time.mktime(parts[1], parts[2], parts[3])
 
       @filename = 'index'
+      @categories = []
     end
 
     def type
