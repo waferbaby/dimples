@@ -3,12 +3,13 @@ module Salt
     include Frontable
     include Renderable
 
-    attr_accessor :path, :filename, :extension
+    attr_accessor :path, :filename, :extension, :layout
     attr_writer :contents
 
     def initialize(path = nil)
       @path = path
       @extension = 'html'
+      @layout = nil
 
       if path
         @contents = read_with_yaml(path)
