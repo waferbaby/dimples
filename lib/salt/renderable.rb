@@ -4,7 +4,7 @@ module Salt
       context[:site] ||= site
 
       begin
-        output = Erubis::Eruby.new(@contents).evaluate(context) { body }
+        output = Erubis::Eruby.new(self.contents).evaluate(context) { body }
       rescue Exception => e
         output = body
       end
