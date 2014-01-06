@@ -17,6 +17,8 @@ module Salt
 
     def self.default_settings
       {
+        use_markdown: true,
+        markdown_options: {},
         posts_per_page: 10,
         pagination: true,
         pages: true,
