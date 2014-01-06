@@ -1,6 +1,6 @@
 module Salt
   class Post < Page
-    attr_accessor :slug, :date, :contents, :categories
+    attr_accessor :slug, :date, :categories, :markdown
 
     def self.path
       "archives"
@@ -21,6 +21,16 @@ module Salt
 
     def type
       :post
+    end
+
+    def contents
+      site = Salt::Site.instance
+
+      unless site.settings[:use_markdown]
+        @contents
+      else
+        @markdown ||= Kramdown::Document.new(@contents, site.settings[:markdown_options]).to_html
+      end
     end
 
     def output_path(site, parent_path)
