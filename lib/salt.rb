@@ -5,6 +5,7 @@ require 'erubis'
 require 'fileutils'
 require 'singleton'
 require 'yaml'
+require 'kramdown'
 
 require 'salt/frontable'
 require 'salt/renderable'
