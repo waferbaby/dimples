@@ -1,10 +1,6 @@
 module Salt
   class Post < Page
-    attr_accessor :slug, :date, :categories, :markdown
-
-    def self.path
-      "archives"
-    end
+    attr_accessor :slug, :date, :categories, :markdown, :year, :month, :day
 
     def initialize(path)
       super
@@ -17,6 +13,10 @@ module Salt
       @filename = 'index'
       @categories = []
       @layout = 'post'
+
+      @year = @date.strftime('%Y')
+      @month = @date.strftime('%m')
+      @day = @date.strftime('%d')
     end
 
     def type
@@ -34,7 +34,7 @@ module Salt
     end
 
     def output_path(site, parent_path)
-      File.join(parent_path, self.class.path, @slug)
+      File.join(parent_path, self.year, self.month, self.day, @slug)
     end
   end
 end
