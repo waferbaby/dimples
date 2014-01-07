@@ -1,6 +1,6 @@
 module Salt
   class Post < Page
-    attr_accessor :slug, :date, :categories, :markdown, :year, :month, :day
+    attr_accessor :slug, :date, :markdown, :year, :month, :day
 
     def initialize(path)
       super
@@ -11,7 +11,6 @@ module Salt
       @date = Time.mktime(parts[1], parts[2], parts[3])
 
       @filename = 'index'
-      @categories = []
       @layout = 'post'
 
       @year = @date.strftime('%Y')
