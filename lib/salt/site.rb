@@ -210,7 +210,7 @@ module Salt
       end
     end
 
-    def paginate(posts, title, paths = [])
+    def paginate(posts, title = false, paths = [])
       pages = (posts.length.to_f / @settings[:posts_per_page].to_i).ceil
       template = @templates[@settings[:archives][:layout]]
 
@@ -220,14 +220,19 @@ module Salt
         page = Page.new
         
         page_paths = paths.clone
-        page_title = title || template.title
+        page_title = title ? title : template.title
 
         url_path = "/#{File.split(page_paths[0])[-1]}/"
         url_path += "#{page_paths[1..-1].join('/')}/" if page_paths.length > 1
 
         if index > 0
           page_paths.push("page#{index + 1}")
-          page_title += " (Page #{index + 1})"
+
+          if page_title
+            page_title += " (Page #{index + 1})"
+          else
+            page_title = "Page #{index + 1}"
+          end
         end
 
         pagination = {
