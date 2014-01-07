@@ -9,7 +9,6 @@ module Salt
     def initialize(path = nil)
       @path = path
       @extension = 'html'
-      @layout = nil
 
       if path
         @contents = read_with_yaml(path)
