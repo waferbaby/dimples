@@ -3,7 +3,7 @@ module Salt
     include Frontable
     include Renderable
 
-    attr_accessor :slug, :contents, :parent
+    attr_accessor :slug, :title, :contents, :parent
 
     def initialize(path)
       @slug = File.basename(path, File.extname(path))
