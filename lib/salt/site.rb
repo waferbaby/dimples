@@ -129,7 +129,7 @@ module Salt
         end
       end
 
-      self.paginate(@posts, '', [@output_paths[:site]]) if @settings[:pagination]
+      self.paginate(@posts, false, [@output_paths[:site]]) if @settings[:pagination]
 
       if @settings[:archives][:years]
         @archives.each do |year, data|
@@ -165,7 +165,7 @@ module Salt
       if @settings[:categories]
         @categories.each_pair do |slug, posts|
           begin
-            self.paginate(posts, slug.capitalize, [@settings[:output_paths][:posts], slug])
+            self.paginate(posts, slug.capitalize, [@output_paths[:posts], slug])
 
             if @settings[:category_feeds]
               feed = @klasses[:page].new
@@ -212,20 +212,18 @@ module Salt
 
     def paginate(posts, title, paths = [])
       pages = (posts.length.to_f / @settings[:posts_per_page].to_i).ceil
+      template = @templates[@settings[:archives][:layout]]
 
       for index in 0...pages
         range = posts.slice(index * @settings[:posts_per_page], @settings[:posts_per_page])
 
         page = Page.new
+        
         page_paths = paths.clone
+        page_title = title || template.title
 
-        if page_paths.length > 1
-          url_path = "/#{page_paths.join('/')}/"
-        else
-          url_path = '/'
-        end
-
-        page_title = title
+        url_path = "/#{File.split(page_paths[0])[-1]}/"
+        url_path += "#{page_paths[1..-1].join('/')}/" if page_paths.length > 1
 
         if index > 0
           page_paths.push("page#{index + 1}")
