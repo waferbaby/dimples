@@ -222,12 +222,13 @@ module Salt
         page_paths = paths.clone
         page_title = title ? title : template.title
 
-        if page_paths.include?(@output_paths[:site])
+        if page_paths[0] == @output_paths[:site]
           url_path = "/"
         else
           url_path = "/#{File.split(page_paths[0])[-1]}/"
-          url_path += "#{page_paths[1..-1].join('/')}/"
         end
+
+        url_path += "#{page_paths[1..-1].join('/')}/" if page_paths.length > 1
 
         if index > 0
           page_paths.push("page#{index + 1}")
