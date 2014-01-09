@@ -3,11 +3,12 @@ module Salt
     include Frontable
     include Renderable
 
-    attr_accessor :path, :filename, :extension, :layout
+    attr_accessor :path, :url, :filename, :extension, :layout
     attr_writer :contents
 
     def initialize(path = nil)
       @path = path
+      @url = '/'
       @extension = 'html'
 
       if path
@@ -40,6 +41,8 @@ module Salt
       output_path = self.output_path(site, path)
       full_path = File.join(output_path, self.output_file)
 
+      @url = full_path.gsub(site.output_paths[:site], '').gsub(/index\.html$/, '')
+      
       contents = self.render(site, @contents, {this: self}.merge(context))
       FileUtils.mkdir_p(output_path) unless Dir.exists?(output_path)
 
