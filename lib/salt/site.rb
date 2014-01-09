@@ -1,7 +1,7 @@
 module Salt
   class Site
     include Singleton
-    attr_accessor :paths, :settings, :templates, :categories, :archives, :pages, :posts
+    attr_accessor :source_paths, :output_paths, :settings, :templates, :categories, :archives, :pages, :posts
 
     def initialize
       @source_paths, @output_paths, @settings, @templates, @categories, @archives = {}, {}, {}, {}, {}, {}
