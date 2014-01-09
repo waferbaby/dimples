@@ -1,11 +1,12 @@
 module Salt
   class Site
     include Singleton
-    attr_accessor :source_paths, :output_paths, :settings, :templates, :categories, :archives, :pages, :posts
+    attr_accessor :source_paths, :output_paths, :settings, :templates, :categories, :archives, :pages, :posts, :latest_post
 
     def initialize
       @source_paths, @output_paths, @settings, @templates, @categories, @archives = {}, {}, {}, {}, {}, {}
       @pages, @posts = [], []
+      @latest_post = false
 
       @klasses = {
         page: Salt::Page,
@@ -17,6 +18,7 @@ module Salt
 
     def self.default_settings
       {
+        root: Dir.pwd,
         use_markdown: true,
         markdown_options: {},
         posts_per_page: 10,
@@ -37,12 +39,12 @@ module Salt
       }
     end
 
-    def setup(path = nil, config = {})
+    def setup(config = {})
       @settings.each_key do |key|
         @settings[key] = config[key] if config.key?(key)
       end
 
-      @source_paths[:root] = path ? File.expand_path(path) : Dir.pwd
+      @source_paths[:root] = File.expand_path(@settings[:root])
 
       %w{pages posts templates public}.each do |path|
         @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
@@ -79,6 +81,7 @@ module Salt
       end
 
       @posts.reverse!
+      @latest_post = @posts.first
 
       @posts.each do |post|
 
