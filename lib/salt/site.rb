@@ -1,7 +1,7 @@
 module Salt
   class Site
     include Singleton
-    attr_accessor :source_paths, :output_paths, :settings, :templates, :categories, :archives, :pages, :posts, :latest_post
+    attr_accessor :source_paths, :output_paths, :settings, :templates, :categories, :archives, :pages, :posts, :latest_post, :markdown_renderer
 
     def initialize
       @source_paths, @output_paths, @settings, @templates, @categories, @archives = {}, {}, {}, {}, {}, {}
@@ -14,6 +14,13 @@ module Salt
       }
 
       @settings = self.class.default_settings
+
+      @markdown_renderer = if @settings[:use_markdown]
+        Redcarpet::Markdown.new(Redcarpet::Render::HTML, @settings[:markdown_options])
+      else
+        false
+      end
+
     end
 
     def self.default_settings
@@ -41,7 +48,7 @@ module Salt
           category: 'category',
           years: 'year',
           months: 'month',
-          day: 'day',
+          days: 'day',
         }
       }
     end
@@ -198,8 +205,7 @@ module Salt
 
               feed.filename = 'feed'
               feed.extension = 'xml'
-
-              feed.set_metadata(:layout, 'feed')
+              feed.layout = 'feed'
 
               begin
                 feed.write(self, File.join(@output_paths[:posts], slug), {posts: posts, category: slug})
@@ -219,8 +225,7 @@ module Salt
 
         feed.filename = 'feed'
         feed.extension = 'xml'
-
-        feed.set_metadata(:layout, 'feed')
+        feed.layout = 'feed'
 
         begin
           feed.write(self, @output_paths[:site], {posts: @posts[0..@settings[:posts_per_page]]})
@@ -281,8 +286,8 @@ module Salt
           pagination[:next_page] = pagination[:page] + 1
         end
 
-        page.set_metadata(:layout, layout)
-        page.set_metadata(:title, page_title)
+        page.layout = layout
+        page.title = page_title
 
         page.write(self, File.join(page_paths), {
           posts: range,
