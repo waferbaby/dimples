@@ -21,20 +21,27 @@ module Salt
         root: Dir.pwd,
         use_markdown: true,
         markdown_options: {},
+        use_pagination: true,
         posts_per_page: 10,
-        pagination: true,
-        categories: true,
-        feed: true,
-        category_feeds: true,
+        make_categories: true,
+        make_year_archives: true,
+        make_month_archives: true,
+        make_day_archives: true,
+        make_feed: true,
+        make_category_feeds: true,
+        year_format: '%Y',
+        month_format: '%Y-%m',
+        day_format: '%Y-%m-%d',
         output: {
           site: 'site',
           posts: 'archives',
         },
-        archives: {
-          years: '%Y',
-          months: '%Y-%m',
-          days: '%Y-%m-%d',
-          layout: 'archives'
+        layouts: {
+          listing: 'posts',
+          category: 'category',
+          years: 'year',
+          months: 'month',
+          day: 'day',
         }
       }
     end
@@ -128,23 +135,33 @@ module Salt
         end
       end
 
-      self.paginate(@posts, false, [@output_paths[:site]]) if @settings[:pagination]
+      self.paginate(@posts, false, [@output_paths[:site]], @settings[:layouts][:listing]) if @settings[:use_pagination]
 
-      if @settings[:archives][:years]
+      if @settings[:make_year_archives]
         @archives.each do |year, data|
 
-          if @settings[:archives][:months]
+          if @settings[:make_month_archives]
             data[:months].each do |month, month_data|
               begin
-                self.paginate(month_data[:posts], month_data[:posts][0].date.strftime(@settings[:archives][:months]), [@output_paths[:posts], year.to_s, month.to_s])
+                self.paginate(
+                  month_data[:posts], 
+                  month_data[:posts][0].date.strftime(@settings[:month_format]),
+                  [@output_paths[:posts], year.to_s, month.to_s],
+                  @settings[:layouts][:months]
+                )
               rescue Exception => e
                 raise "Failed to generate archive pages for #{year}, #{month} (#{e})"
               end
 
-              if @settings[:archives][:days]
+              if @settings[:make_day_archives]
                 month_data[:days].each do |day, posts|
                   begin
-                    self.paginate(posts, posts[0].date.strftime(@settings[:archives][:days]), [@output_paths[:posts], year.to_s, month.to_s, day.to_s])
+                    self.paginate(
+                      posts,
+                      posts[0].date.strftime(@settings[:day_format]),
+                      [@output_paths[:posts], year.to_s, month.to_s, day.to_s],
+                      @settings[:layouts][:days]
+                    )
                   rescue Exception => e
                     raise "Failed to generate archive pages for #{year}, #{month}, #{day} (#{e})"
                   end
@@ -154,19 +171,29 @@ module Salt
           end
 
           begin
-            self.paginate(data[:posts], data[:posts][0].date.strftime(@settings[:archives][:years]), [@output_paths[:posts], year.to_s])
+            self.paginate(
+              data[:posts],
+              data[:posts][0].date.strftime(@settings[:year_format]),
+              [@output_paths[:posts], year.to_s],
+              @settings[:layouts][:years]
+            )
           rescue Exception => e
             raise "Failed to generate archives pages for #{year} (#{e})"
           end
         end
       end
 
-      if @settings[:categories]
+      if @settings[:make_categories]
         @categories.each_pair do |slug, posts|
           begin
-            self.paginate(posts, slug.capitalize, [@output_paths[:posts], slug])
+            self.paginate(
+              posts,
+              slug.capitalize,
+              [@output_paths[:posts], slug],
+              @settings[:layouts][:category]
+            )
 
-            if @settings[:category_feeds]
+            if @settings[:make_category_feeds]
               feed = @klasses[:page].new
 
               feed.filename = 'feed'
@@ -187,7 +214,7 @@ module Salt
         end
       end
 
-      if @settings[:feed]
+      if @settings[:make_feed]
         feed = @klasses[:page].new
 
         feed.filename = 'feed'
@@ -209,9 +236,9 @@ module Salt
       end
     end
 
-    def paginate(posts, title, paths)
+    def paginate(posts, title, paths, layout)
       pages = (posts.length.to_f / @settings[:posts_per_page].to_i).ceil
-      template = @templates[@settings[:archives][:layout]]
+      raise "Failed to render pagination - '#{layout}' template not found" unless @templates[layout]
 
       for index in 0...pages
         range = posts.slice(index * @settings[:posts_per_page], @settings[:posts_per_page])
@@ -219,7 +246,7 @@ module Salt
         page = Page.new
         
         page_paths = paths.clone
-        page_title = title ? title : template.title
+        page_title = title ? title : @templates[layout].title
 
         if page_paths[0] == @output_paths[:site]
           url_path = "/"
@@ -254,7 +281,7 @@ module Salt
           pagination[:next_page] = pagination[:page] + 1
         end
 
-        page.set_metadata(:layout, @settings[:archives][:layout])
+        page.set_metadata(:layout, layout)
         page.set_metadata(:title, page_title)
 
         page.write(self, File.join(page_paths), {
