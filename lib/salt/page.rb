@@ -3,11 +3,12 @@ module Salt
     include Frontable
     include Renderable
 
-    attr_accessor :path, :url, :filename, :extension, :layout
+    attr_accessor :path, :title, :url, :filename, :extension, :layout
     attr_writer :contents
 
     def initialize(path = nil)
       @path = path
+      @title = false
       @url = '/'
       @extension = 'html'
 
@@ -34,7 +35,8 @@ module Salt
 
     def output_path(site, parent_path)
       return parent_path if @path.nil?
-      File.join(parent_path, File.dirname(@path).gsub(site.path(:pages), ''))
+
+      File.join(parent_path, File.dirname(@path).gsub(site.source_paths[:pages], ''))
     end
 
     def write(site, path, context = {})
