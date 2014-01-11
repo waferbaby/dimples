@@ -29,7 +29,7 @@ module Salt
       unless site.settings[:use_markdown]
         @contents
       else
-        @markdown ||= Kramdown::Document.new(@contents, site.settings[:markdown_options]).to_html
+        @markdown ||= site.markdown_renderer.render(@contents)
       end
     end
 
