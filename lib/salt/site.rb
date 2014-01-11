@@ -62,10 +62,6 @@ module Salt
       end
     end
 
-    def path(key)
-      @source_paths[key]
-    end
-
     def scan_files
       Dir.glob(File.join(@source_paths[:templates], '*.*')).each do |path|
         template = Salt::Template.new(path)
