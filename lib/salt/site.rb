@@ -46,9 +46,6 @@ module Salt
         layouts: {
           listing: 'posts',
           category: 'category',
-          years: 'year',
-          months: 'month',
-          days: 'day',
         }
       }
     end
@@ -154,7 +151,7 @@ module Salt
                   month_data[:posts], 
                   month_data[:posts][0].date.strftime(@settings[:month_format]),
                   [@output_paths[:posts], year.to_s, month.to_s],
-                  @settings[:layouts][:months]
+                  @settings[:layouts][:listing]
                 )
               rescue Exception => e
                 raise "Failed to generate archive pages for #{year}, #{month} (#{e})"
@@ -167,7 +164,7 @@ module Salt
                       posts,
                       posts[0].date.strftime(@settings[:day_format]),
                       [@output_paths[:posts], year.to_s, month.to_s, day.to_s],
-                      @settings[:layouts][:days]
+                      @settings[:layouts][:listing]
                     )
                   rescue Exception => e
                     raise "Failed to generate archive pages for #{year}, #{month}, #{day} (#{e})"
@@ -182,7 +179,7 @@ module Salt
               data[:posts],
               data[:posts][0].date.strftime(@settings[:year_format]),
               [@output_paths[:posts], year.to_s],
-              @settings[:layouts][:years]
+              @settings[:layouts][:listing]
             )
           rescue Exception => e
             raise "Failed to generate archives pages for #{year} (#{e})"
