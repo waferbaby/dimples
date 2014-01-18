@@ -1,6 +1,7 @@
 module Salt
   class Post < Page
-    attr_accessor :slug, :date, :categories, :year, :month, :day, :markdown
+    attr_accessor :slug, :date, :categories, :year, :month, :day
+    attr_writer :markdown
 
     def initialize(path)
       super
@@ -23,14 +24,8 @@ module Salt
       :post
     end
 
-    def contents
-      site = Salt::Site.instance
-
-      unless site.settings[:use_markdown]
-        @contents
-      else
-        @markdown ||= site.markdown_renderer.render(@contents)
-      end
+    def markdown
+      @markdown ||= Salt::Site.instance.markdown_renderer.render(@contents)
     end
 
     def output_path(site, parent_path)
