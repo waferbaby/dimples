@@ -1,1 +1,1 @@
-Do the dumbest thing that works.
+A very, very simple static site generator for Ruby.
