@@ -29,7 +29,7 @@ module Salt
     end
 
     def output_path(site, parent_path)
-      File.join(parent_path, self.year, self.month, self.day, @slug)
+      File.join(parent_path, year, month, day, @slug)
     end
   end
 end
