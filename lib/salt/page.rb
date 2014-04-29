@@ -24,7 +24,7 @@ module Salt
     end
 
     def output_file
-      "#{self.filename}.#{self.extension}"
+      "#{filename}.#{extension}"
     end
 
     def output_path(site, parent_path)
@@ -34,13 +34,13 @@ module Salt
     end
 
     def write(site, path, context = {})
-      output_path = self.output_path(site, path)
-      full_path = File.join(output_path, self.output_file)
+      directory_path = output_path(site, path)
+      full_path = File.join(directory_path, output_file)
 
       @url = full_path.gsub(site.output_paths[:site], '').gsub(/index\.html$/, '')
       
-      contents = self.render(site, @contents, {this: self}.merge(context))
-      FileUtils.mkdir_p(output_path) unless Dir.exists?(output_path)
+      contents = render(site, @contents, {this: self}.merge(context))
+      FileUtils.mkdir_p(directory_path) unless Dir.exist?(directory_path)
 
       File.open(full_path, 'w') do |file|
         file.write(contents)
