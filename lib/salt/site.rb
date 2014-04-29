@@ -40,7 +40,7 @@ module Salt
         use_pagination: true,
         posts_per_page: 10,
         make_categories: true,
-        make_year_archives: true,
+        make_archives: true,
         make_month_archives: true,
         make_day_archives: true,
         make_feed: true,
@@ -51,129 +51,185 @@ module Salt
         output: {
           site: 'site',
           posts: 'archives',
-        },
-        layouts: {
-          listing: 'posts',
-          category: 'category',
+          },
+          layouts: {
+            listing: 'posts',
+            category: 'category',
+          }
         }
-      }
-    end
-
-    def setup(config = {})
-      @settings.each_key do |key|
-        @settings[key] = config[key] if config.key?(key)
       end
 
-      @source_paths[:root] = File.expand_path(@settings[:root])
+      def setup(config = {})
+        @settings.each_key do |key|
+          @settings[key] = config[key] if config.key?(key)
+        end
 
-      %w{pages posts templates public}.each do |path|
-        @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
+        @source_paths[:root] = File.expand_path(@settings[:root])
+
+        %w{pages posts templates public}.each do |path|
+          @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
+        end
+
+        @output_paths[:site] = File.join(@source_paths[:root], @settings[:output][:site])
+        @output_paths[:posts] = File.join(@output_paths[:site], @settings[:output][:posts])
       end
 
-      @output_paths[:site] = File.join(@source_paths[:root], @settings[:output][:site])
-      @output_paths[:posts] = File.join(@output_paths[:site], @settings[:output][:posts])
-    end
-
-    def register(klass)
-      if klass.superclass == Salt::Page
-        @klasses[:page] = klass
-      elsif klass.superclass == Salt::Post
-        @klasses[:post] = klass
-      end
-    end
-
-    def scan_files
-      Dir.glob(File.join(@source_paths[:templates], '*.*')).each do |path|
-        template = Salt::Template.new(path)
-        @templates[template.slug] = template
-      end
-
-      Dir.glob(File.join(@source_paths[:pages], '**', '*.*')).each do |path|
-        @pages << @klasses[:page].new(path)
-      end
-
-      Dir.glob(File.join(@source_paths[:posts], '*.*')).each do |path|
-        @posts << @klasses[:post].new(path)
-      end
-
-      @posts.reverse!
-      @latest_post = @posts.first
-
-      @posts.each do |post|
-
-        year = post.year.to_s
-        month = post.month.to_s
-        day = post.day.to_s
-        
-        @archives[year] ||= {posts: [], months: {}}
-
-        @archives[year][:posts] << post
-        @archives[year][:months][month] ||= {posts: [], days: {}}
-        @archives[year][:months][month][:posts] << post
-        @archives[year][:months][month][:days][day] ||= []
-        @archives[year][:months][month][:days][day] << post
-
-        post.categories.each do |category|
-          (@categories[category] ||= []) << post
+      def register(klass)
+        if klass.superclass == Salt::Page
+          @klasses[:page] = klass
+        elsif klass.superclass == Salt::Post
+          @klasses[:post] = klass
         end
       end
-    end
 
-    def generate
-      begin
-        self.scan_files
-      rescue Exception => e
-        raise "Failed to scan source files (#{e})"
-      end
+      def scan_files
+        Dir.glob(File.join(@source_paths[:templates], '*.*')).each do |path|
+          template = Salt::Template.new(path)
+          @templates[template.slug] = template
+        end
 
-      begin
-        Dir.mkdir(@output_paths[:site]) unless Dir.exists?(@output_paths[:site])
-      rescue Exception => e
-        raise "Failed to create the site directory (#{e})"
-      end
+        Dir.glob(File.join(@source_paths[:pages], '**', '*.*')).each do |path|
+          @pages << @klasses[:page].new(path)
+        end
 
-      self.generate_pages      
-      self.generate_posts
+        Dir.glob(File.join(@source_paths[:posts], '*.*')).each do |path|
+          @posts << @klasses[:post].new(path)
+        end
 
-      if @settings[:use_pagination]
-        self.paginate(@posts, false, [@output_paths[:site]], @settings[:layouts][:listing])
-      end
+        @posts.reverse!
+        @latest_post = @posts.first
 
-      if @settings[:make_year_archives]
-        self.generate_archives
-      end      
+        @posts.each do |post|
 
-      if @settings[:make_categories]
-        @categories.each_pair do |slug, posts|
-          begin
-            self.paginate(
-              posts,
-              slug.capitalize,
-              [@output_paths[:posts], slug],
-              @settings[:layouts][:category]
-            )
+          year = post.year.to_s
+          month = post.month.to_s
+          day = post.day.to_s
 
-            if @settings[:make_category_feeds]
-              feed = @klasses[:page].new
+          @archives[year] ||= {posts: [], months: {}}
 
-              feed.filename = 'feed'
-              feed.extension = 'xml'
-              feed.layout = 'feed'
+          @archives[year][:posts] << post
+          @archives[year][:months][month] ||= {posts: [], days: {}}
+          @archives[year][:months][month][:posts] << post
+          @archives[year][:months][month][:days][day] ||= []
+          @archives[year][:months][month][:days][day] << post
 
-              begin
-                feed.write(self, File.join(@output_paths[:posts], slug), {posts: posts, category: slug})
-              rescue Exception => e
-                raise "Failed to build the #{slug} feed (#{e})"
-              end
-            end
-
-          rescue Exception => e
-            raise "Failed to generate category pages for '#{slug}' (#{e})"
+          post.categories.each do |category|
+            (@categories[category] ||= []) << post
           end
         end
       end
 
-      if @settings[:make_feed]
+      def generate
+        begin
+          self.scan_files
+        rescue Exception => e
+          raise "Failed to scan source files (#{e})"
+        end
+
+        begin
+          Dir.mkdir(@output_paths[:site]) unless Dir.exists?(@output_paths[:site])
+        rescue Exception => e
+          raise "Failed to create the site directory (#{e})"
+        end
+
+        @posts.each do |post|
+          begin
+            post.write(self, @output_paths[:posts])
+          rescue Exception => e
+            raise "Failed to generate post #{post} (#{e})"
+          end
+        end
+
+        @pages.each do |page|
+          begin
+            page.write(self, @output_paths[:site])
+          rescue Exception => e
+            raise "Failed to generate page #{page} (#{e})"
+          end
+        end
+
+        if @settings[:use_pagination]
+          self.paginate(@posts, false, [@output_paths[:site]], @settings[:layouts][:listing])
+        end
+
+        if @settings[:make_archives]
+          @archives.each do |year, archive|
+            self.generate_year_archives(year, archive)
+          end
+        end      
+
+        if @settings[:make_categories]
+          @categories.each_pair do |slug, posts|
+            self.generate_category(slug, posts)
+          end
+        end
+
+        if @settings[:make_feed]
+          self.generate_feed(@output_paths[:site], {posts: @posts[0..@settings[:posts_per_page]]})
+        end
+
+        begin
+          FileUtils.cp_r(File.join(@source_paths[:public], '/.'), @output_paths[:site])
+        rescue Exception => e
+          raise "Failed to copy site assets from #{@source_paths[:public]} (#{e})"
+        end
+      end
+
+      def generate_year_archives(year, params)
+        if @settings[:make_month_archives]
+          params[:months].each do |month, month_archive|
+            self.generate_month_archives(year, month, month_archive)
+          end
+        end
+
+        title = params[:posts][0].date.strftime(@settings[:year_format])
+
+        begin
+          self.paginate(params[:posts], title, [@output_paths[:posts], year.to_s], @settings[:layouts][:listing])
+        rescue Exception => e
+          raise "Failed to generate archives pages for #{year} (#{e})"
+        end
+      end
+
+      def generate_month_archives(year, month, params)
+        if @settings[:make_day_archives]
+          params[:days].each do |day, posts|
+            self.generate_day_archives(year, month, day, posts)
+          end
+        end
+
+        title = params[:posts][0].date.strftime(@settings[:month_format])
+
+        begin
+          self.paginate(params[:posts], title, [@output_paths[:posts], year.to_s, month.to_s], @settings[:layouts][:listing])
+        rescue Exception => e
+          raise "Failed to generate archive pages for #{year}, #{month} (#{e})"
+        end
+      end
+
+      def generate_day_archives(year, month, day, posts)
+        title = posts[0].date.strftime(@settings[:day_format])
+
+        begin
+          self.paginate(posts, title, [@output_paths[:posts], year.to_s, month.to_s, day.to_s], @settings[:layouts][:listing])
+        rescue Exception => e
+          raise "Failed to generate archive pages for #{year}, #{month}, #{day} (#{e})"
+        end
+      end
+
+      def generate_category(slug, posts)
+        begin
+          self.paginate(posts, slug.capitalize, [@output_paths[:posts], slug], @settings[:layouts][:category])
+        rescue Exception => e
+          raise "Failed to generate category pages for '#{slug}' (#{e})"
+        end
+
+        if @settings[:make_category_feeds]
+          self.generate_feed(File.join(@output_paths[:posts], slug), {posts: posts, category: slug})
+        end
+      end
+
+      def generate_feed(path, params)
         feed = @klasses[:page].new
 
         feed.filename = 'feed'
@@ -181,137 +237,66 @@ module Salt
         feed.layout = 'feed'
 
         begin
-          feed.write(self, @output_paths[:site], {posts: @posts[0..@settings[:posts_per_page]]})
+          feed.write(self, path, params)
         rescue Exception => e
-          raise "Failed to build the site feed (#{e})"
+          raise "Failed to build the feed at '#{path}' (#{e})"
         end
       end
 
-      begin
-        FileUtils.cp_r(File.join(@source_paths[:public], '/.'), @output_paths[:site])
-      rescue Exception => e
-        raise "Failed to copy site assets from #{@source_paths[:public]} (#{e})"
-      end
-    end
+      def paginate(posts, title, paths, layout)
+        fail "'#{layout}' template not found" unless @templates[layout]
 
-    def generate_posts
-      @posts.each do |post|
-        begin
-          post.write(self, @output_paths[:posts])
-        rescue Exception => e
-          raise "Failed to generate post #{post} (#{e})"
-        end
-      end
-    end
+        pages = (posts.length.to_f / @settings[:posts_per_page].to_i).ceil
 
-    def generate_pages
-      @pages.each do |page|
-        begin
-          page.write(self, @output_paths[:site])
-        rescue Exception => e
-          raise "Failed to generate page #{page} (#{e})"
-        end
-      end
-    end
+        for index in 0...pages
+          range = posts.slice(index * @settings[:posts_per_page], @settings[:posts_per_page])
 
-    def generate_archives
-      @archives.each do |year, archive|
-        if @settings[:make_month_archives]
-          archive[:months].each do |month, month_archive|
-            self.generate_month_archives(year, month, month_archive)
-          end
-        end
+          page = Page.new
 
-        title = archive[:posts][0].date.strftime(@settings[:year_format])
+          page_paths = paths.clone
+          page_title = title ? title : @templates[layout].title
 
-        begin
-          self.paginate(archive[:posts], title, [@output_paths[:posts], year.to_s], @settings[:layouts][:listing])
-        rescue Exception => e
-          raise "Failed to generate archives pages for #{year} (#{e})"
-        end
-      end
-    end
-
-    def generate_month_archives(year, month, params)
-      if @settings[:make_day_archives]
-        params[:days].each do |day, posts|
-          self.generate_day_archives(year, month, day, posts)
-        end
-      end
-
-      title = params[:posts][0].date.strftime(@settings[:month_format])
-
-      begin
-        self.paginate(params[:posts], title, [@output_paths[:posts], year.to_s, month.to_s], @settings[:layouts][:listing])
-      rescue Exception => e
-        raise "Failed to generate archive pages for #{year}, #{month} (#{e})"
-      end
-    end
-
-    def generate_day_archives(year, month, day, posts)
-      title = posts[0].date.strftime(@settings[:day_format])
-
-      begin
-        self.paginate(posts, title, [@output_paths[:posts], year.to_s, month.to_s, day.to_s], @settings[:layouts][:listing])
-      rescue Exception => e
-        raise "Failed to generate archive pages for #{year}, #{month}, #{day} (#{e})"
-      end
-    end
-
-    def paginate(posts, title, paths, layout)
-      fail "'#{layout}' template not found" unless @templates[layout]
-
-      pages = (posts.length.to_f / @settings[:posts_per_page].to_i).ceil
-
-      for index in 0...pages
-        range = posts.slice(index * @settings[:posts_per_page], @settings[:posts_per_page])
-
-        page = Page.new
-        
-        page_paths = paths.clone
-        page_title = title ? title : @templates[layout].title
-
-        if page_paths[0] == @output_paths[:site]
-          url_path = '/'
-        else
-          url_path = "/#{File.split(page_paths[0])[-1]}/"
-        end
-
-        url_path += "#{page_paths[1..-1].join('/')}/" if page_paths.length > 1
-
-        if index > 0
-          page_paths.push("page#{index + 1}")
-
-          if page_title
-            page_title += " (Page #{index + 1})"
+          if page_paths[0] == @output_paths[:site]
+            url_path = '/'
           else
-            page_title = "Page #{index + 1}"
+            url_path = "/#{File.split(page_paths[0])[-1]}/"
           end
+
+          url_path += "#{page_paths[1..-1].join('/')}/" if page_paths.length > 1
+
+          if index > 0
+            page_paths.push("page#{index + 1}")
+
+            if page_title
+              page_title += " (Page #{index + 1})"
+            else
+              page_title = "Page #{index + 1}"
+            end
+          end
+
+          pagination = {
+            page: index + 1,
+            pages: pages,
+            total: posts.length,
+            path: url_path
+          }
+
+          if (pagination[:page] - 1) > 0
+            pagination[:previous_page] = pagination[:page] - 1
+          end
+
+          if (pagination[:page] + 1) <= pagination[:pages]
+            pagination[:next_page] = pagination[:page] + 1
+          end
+
+          page.layout = layout
+          page.title = page_title
+
+          page.write(self, File.join(page_paths), {
+            posts: range,
+            pagination: pagination
+            })
         end
-
-        pagination = {
-          page: index + 1,
-          pages: pages,
-          total: posts.length,
-          path: url_path
-        }
-
-        if (pagination[:page] - 1) > 0
-          pagination[:previous_page] = pagination[:page] - 1
-        end
-
-        if (pagination[:page] + 1) <= pagination[:pages]
-          pagination[:next_page] = pagination[:page] + 1
-        end
-
-        page.layout = layout
-        page.title = page_title
-
-        page.write(self, File.join(page_paths), {
-          posts: range,
-          pagination: pagination
-        })
       end
     end
   end
-end
