@@ -121,29 +121,29 @@ module Salt
     def generate
       begin
         scan_files
-      rescue Exception => e
-        raise "Failed to scan source files (#{e})"
+      rescue
+        raise "Failed to scan source files"
       end
 
       begin
         Dir.mkdir(@output_paths[:site]) unless Dir.exist?(@output_paths[:site])
-      rescue Exception => e
-        raise "Failed to create the site directory (#{e})"
+      rescue
+        raise "Failed to create the site directory"
       end
 
       @posts.each do |post|
         begin
           post.write(self, @output_paths[:posts])
-        rescue Exception => e
-          raise "Failed to generate post #{post} (#{e})"
+        rescue
+          raise "Failed to generate post #{post}"
         end
       end
 
       @pages.each do |page|
         begin
           page.write(self, @output_paths[:site])
-        rescue Exception => e
-          raise "Failed to generate page #{page} (#{e})"
+        rescue
+          raise "Failed to generate page #{page}"
         end
       end
 
@@ -169,8 +169,8 @@ module Salt
 
       begin
         FileUtils.cp_r(File.join(@source_paths[:public], '/.'), @output_paths[:site])
-      rescue Exception => e
-        raise "Failed to copy site assets from #{@source_paths[:public]} (#{e})"
+      rescue
+        raise "Failed to copy site assets from #{@source_paths[:public]}"
       end
     end
 
@@ -182,12 +182,9 @@ module Salt
       end
 
       title = params[:posts][0].date.strftime(@settings[:year_format])
-
-      begin
-        paginate(params[:posts], title, [@output_paths[:posts], year.to_s], @settings[:layouts][:listing])
-      rescue Exception => e
-        raise "Failed to generate archives pages for #{year} (#{e})"
-      end
+      paginate(params[:posts], title, [@output_paths[:posts], year.to_s], @settings[:layouts][:listing])
+    rescue
+      raise "Failed to generate archives pages for #{year}"
     end
 
     def generate_month_archives(year, month, params)
@@ -198,34 +195,26 @@ module Salt
       end
 
       title = params[:posts][0].date.strftime(@settings[:month_format])
-
-      begin
-        paginate(params[:posts], title, [@output_paths[:posts], year.to_s, month.to_s], @settings[:layouts][:listing])
-      rescue Exception => e
-        raise "Failed to generate archive pages for #{year}, #{month} (#{e})"
-      end
+      paginate(params[:posts], title, [@output_paths[:posts], year.to_s, month.to_s], @settings[:layouts][:listing])
+    rescue
+      raise "Failed to generate archive pages for #{year}, #{month}"
     end
 
     def generate_day_archives(year, month, day, posts)
       title = posts[0].date.strftime(@settings[:day_format])
-
-      begin
-        paginate(posts, title, [@output_paths[:posts], year.to_s, month.to_s, day.to_s], @settings[:layouts][:listing])
-      rescue Exception => e
-        raise "Failed to generate archive pages for #{year}, #{month}, #{day} (#{e})"
-      end
+      paginate(posts, title, [@output_paths[:posts], year.to_s, month.to_s, day.to_s], @settings[:layouts][:listing])
+    rescue
+      raise "Failed to generate archive pages for #{year}, #{month}, #{day}"
     end
 
     def generate_category(slug, posts)
-      begin
-        paginate(posts, slug.capitalize, [@output_paths[:posts], slug], @settings[:layouts][:category])
-      rescue Exception => e
-        raise "Failed to generate category pages for '#{slug}' (#{e})"
-      end
-
       if @settings[:make_category_feeds]
         generate_feed(File.join(@output_paths[:posts], slug), {posts: posts, category: slug})
       end
+
+      paginate(posts, slug.capitalize, [@output_paths[:posts], slug], @settings[:layouts][:category])
+    rescue
+      raise "Failed to generate category pages for '#{slug}'"
     end
 
     def generate_feed(path, params)
@@ -235,11 +224,9 @@ module Salt
       feed.extension = 'xml'
       feed.layout = 'feed'
 
-      begin
-        feed.write(self, path, params)
-      rescue Exception => e
-        raise "Failed to build the feed at '#{path}' (#{e})"
-      end
+      feed.write(self, path, params)
+    rescue
+      raise "Failed to build the feed at '#{path}'"
     end
 
     def paginate(posts, title, paths, layout)
@@ -291,10 +278,7 @@ module Salt
         page.layout = layout
         page.title = page_title
 
-        page.write(self, File.join(page_paths), {
-          posts: range,
-          pagination: pagination
-          })
+        page.write(self, File.join(page_paths), {posts: range, pagination: pagination})
       end
     end
   end
