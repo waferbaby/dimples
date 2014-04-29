@@ -1,7 +1,16 @@
 module Salt
   class Site
     include Singleton
-    attr_accessor :source_paths, :output_paths, :settings, :templates, :categories, :archives, :pages, :posts, :latest_post, :markdown_renderer
+    attr_accessor :source_paths
+    attr_accessor :output_paths
+    attr_accessor :settings
+    attr_accessor :templates
+    attr_accessor :categories
+    attr_accessor :archives
+    attr_accessor :pages
+    attr_accessor :posts
+    attr_accessor :latest_post
+    attr_accessor :markdown_renderer
 
     def initialize
       @source_paths, @output_paths, @settings, @templates, @categories, @archives = {}, {}, {}, {}, {}, {}
@@ -10,7 +19,7 @@ module Salt
 
       @klasses = {
         page: Salt::Page,
-        post: Salt::Post,
+        post: Salt::Post
       }
 
       @settings = self.class.default_settings
@@ -123,69 +132,16 @@ module Salt
         raise "Failed to create the site directory (#{e})"
       end
 
-      @pages.each do |page|
-        begin
-          page.write(self, @output_paths[:site])
-        rescue Exception => e
-          raise "Failed to generate page #{page} (#{e})"
-        end
-      end
+      self.generate_pages      
+      self.generate_posts
 
-      @posts.each do |post|
-        begin
-          post.write(self, @output_paths[:posts])
-        rescue Exception => e
-          raise "Failed to generate post #{post} (#{e})"
-        end
+      if @settings[:use_pagination]
+        self.paginate(@posts, false, [@output_paths[:site]], @settings[:layouts][:listing])
       end
-
-      self.paginate(@posts, false, [@output_paths[:site]], @settings[:layouts][:listing]) if @settings[:use_pagination]
 
       if @settings[:make_year_archives]
-        @archives.each do |year, data|
-
-          if @settings[:make_month_archives]
-            data[:months].each do |month, month_data|
-              begin
-                self.paginate(
-                  month_data[:posts], 
-                  month_data[:posts][0].date.strftime(@settings[:month_format]),
-                  [@output_paths[:posts], year.to_s, month.to_s],
-                  @settings[:layouts][:listing]
-                )
-              rescue Exception => e
-                raise "Failed to generate archive pages for #{year}, #{month} (#{e})"
-              end
-
-              if @settings[:make_day_archives]
-                month_data[:days].each do |day, posts|
-                  begin
-                    self.paginate(
-                      posts,
-                      posts[0].date.strftime(@settings[:day_format]),
-                      [@output_paths[:posts], year.to_s, month.to_s, day.to_s],
-                      @settings[:layouts][:listing]
-                    )
-                  rescue Exception => e
-                    raise "Failed to generate archive pages for #{year}, #{month}, #{day} (#{e})"
-                  end
-                end
-              end
-            end
-          end
-
-          begin
-            self.paginate(
-              data[:posts],
-              data[:posts][0].date.strftime(@settings[:year_format]),
-              [@output_paths[:posts], year.to_s],
-              @settings[:layouts][:listing]
-            )
-          rescue Exception => e
-            raise "Failed to generate archives pages for #{year} (#{e})"
-          end
-        end
-      end
+        self.generate_archives
+      end      
 
       if @settings[:make_categories]
         @categories.each_pair do |slug, posts|
@@ -238,9 +194,74 @@ module Salt
       end
     end
 
+    def generate_posts
+      @posts.each do |post|
+        begin
+          post.write(self, @output_paths[:posts])
+        rescue Exception => e
+          raise "Failed to generate post #{post} (#{e})"
+        end
+      end
+    end
+
+    def generate_pages
+      @pages.each do |page|
+        begin
+          page.write(self, @output_paths[:site])
+        rescue Exception => e
+          raise "Failed to generate page #{page} (#{e})"
+        end
+      end
+    end
+
+    def generate_archives
+      @archives.each do |year, archive|
+        if @settings[:make_month_archives]
+          archive[:months].each do |month, month_archive|
+            self.generate_month_archives(year, month, month_archive)
+          end
+        end
+
+        title = archive[:posts][0].date.strftime(@settings[:year_format])
+
+        begin
+          self.paginate(archive[:posts], title, [@output_paths[:posts], year.to_s], @settings[:layouts][:listing])
+        rescue Exception => e
+          raise "Failed to generate archives pages for #{year} (#{e})"
+        end
+      end
+    end
+
+    def generate_month_archives(year, month, params)
+      if @settings[:make_day_archives]
+        params[:days].each do |day, posts|
+          self.generate_day_archives(year, month, day, posts)
+        end
+      end
+
+      title = params[:posts][0].date.strftime(@settings[:month_format])
+
+      begin
+        self.paginate(params[:posts], title, [@output_paths[:posts], year.to_s, month.to_s], @settings[:layouts][:listing])
+      rescue Exception => e
+        raise "Failed to generate archive pages for #{year}, #{month} (#{e})"
+      end
+    end
+
+    def generate_day_archives(year, month, day, posts)
+      title = posts[0].date.strftime(@settings[:day_format])
+
+      begin
+        self.paginate(posts, title, [@output_paths[:posts], year.to_s, month.to_s, day.to_s], @settings[:layouts][:listing])
+      rescue Exception => e
+        raise "Failed to generate archive pages for #{year}, #{month}, #{day} (#{e})"
+      end
+    end
+
     def paginate(posts, title, paths, layout)
+      fail "'#{layout}' template not found" unless @templates[layout]
+
       pages = (posts.length.to_f / @settings[:posts_per_page].to_i).ceil
-      raise "Failed to render pagination - '#{layout}' template not found" unless @templates[layout]
 
       for index in 0...pages
         range = posts.slice(index * @settings[:posts_per_page], @settings[:posts_per_page])
@@ -251,7 +272,7 @@ module Salt
         page_title = title ? title : @templates[layout].title
 
         if page_paths[0] == @output_paths[:site]
-          url_path = "/"
+          url_path = '/'
         else
           url_path = "/#{File.split(page_paths[0])[-1]}/"
         end
