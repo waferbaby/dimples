@@ -6,7 +6,7 @@ module Salt
       begin
         output = Erubis::Eruby.new(self.contents).evaluate(context) { body }
       rescue Exception => e
-        output = body
+        raise "Failed to render '#{body}'"
       end
 
       output = site.templates[@layout].render(site, output, context) if @layout && site.templates[@layout]
