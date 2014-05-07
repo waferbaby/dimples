@@ -13,8 +13,16 @@ module Salt
     attr_accessor :markdown_renderer
 
     def initialize
-      @source_paths, @output_paths, @settings, @templates, @categories, @archives = {}, {}, {}, {}, {}, {}
-      @pages, @posts = [], []
+      @source_paths = {}
+      @output_paths = {}
+      @settings = {}
+      @templates = {}
+      @categories = {}
+      @archives = {}
+
+      @pages = []
+      @posts = []
+
       @latest_post = false
 
       @klasses = {
@@ -34,28 +42,36 @@ module Salt
     def self.default_settings
       {
         root: Dir.pwd,
+
         use_markdown: true,
         markdown_options: {},
         use_pagination: true,
         posts_per_page: 10,
+        feed_extension: 'atom',
+
         make_categories: true,
         make_archives: true,
         make_month_archives: true,
         make_day_archives: true,
         make_feed: true,
         make_category_feeds: true,
-        year_format: '%Y',
-        month_format: '%Y-%m',
-        day_format: '%Y-%m-%d',
+
+        date_formats: {
+          year: '%Y',
+          month: '%Y-%m',
+          day: '%Y-%m-%d',
+        },
+
         output: {
           site: 'site',
           posts: 'archives'
-          },
-          layouts: {
-            listing: 'posts',
-            category: 'category'
-          }
+        },
+
+        layouts: {
+          listing: 'posts',
+          category: 'category'
         }
+      }
     end
 
     def setup(config = {})
@@ -181,7 +197,7 @@ module Salt
         end
       end
 
-      title = params[:posts][0].date.strftime(@settings[:year_format])
+      title = params[:posts][0].date.strftime(@settings[:date_formats][:year])
       paginate(params[:posts], title, [@output_paths[:posts], year.to_s], @settings[:layouts][:listing])
     rescue
       raise "Failed to generate archives pages for #{year}"
@@ -194,14 +210,14 @@ module Salt
         end
       end
 
-      title = params[:posts][0].date.strftime(@settings[:month_format])
+      title = params[:posts][0].date.strftime(@settings[:date_formats][:month])
       paginate(params[:posts], title, [@output_paths[:posts], year.to_s, month.to_s], @settings[:layouts][:listing])
     rescue
       raise "Failed to generate archive pages for #{year}, #{month}"
     end
 
     def generate_day_archives(year, month, day, posts)
-      title = posts[0].date.strftime(@settings[:day_format])
+      title = posts[0].date.strftime(@settings[:date_formats][:day])
       paginate(posts, title, [@output_paths[:posts], year.to_s, month.to_s, day.to_s], @settings[:layouts][:listing])
     rescue
       raise "Failed to generate archive pages for #{year}, #{month}, #{day}"
@@ -221,7 +237,7 @@ module Salt
       feed = @klasses[:page].new
 
       feed.filename = 'feed'
-      feed.extension = 'xml'
+      feed.extension = @settings[:feed_extension]
       feed.layout = 'feed'
 
       feed.write(self, path, params)
