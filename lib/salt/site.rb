@@ -164,7 +164,7 @@ module Salt
       end
 
       if @settings[:make_feed]
-        generate_feed(@output_paths[:site], {posts: @posts[0..@settings[:posts_per_page]]})
+        generate_feed(@output_paths[:site], {posts: @posts[0..@settings[:posts_per_page] - 1]})
       end
 
       begin
@@ -209,7 +209,7 @@ module Salt
 
     def generate_category(slug, posts)
       if @settings[:make_category_feeds]
-        generate_feed(File.join(@output_paths[:posts], slug), {posts: posts, category: slug})
+        generate_feed(File.join(@output_paths[:posts], slug), {posts: posts[0..@settings[:posts_per_page] - 1], category: slug})
       end
 
       paginate(posts, slug.capitalize, [@output_paths[:posts], slug], @settings[:layouts][:category])
