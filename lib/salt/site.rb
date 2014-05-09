@@ -150,7 +150,7 @@ module Salt
       @posts.each do |post|
         begin
           before_post_generation(post)
-          post.write(self, @output_paths[:posts])
+          post.write(self, @output_paths[:posts], {})
           after_post_generation(post)
         rescue
           raise "Failed to generate post #{post}"
@@ -160,7 +160,7 @@ module Salt
       @pages.each do |page|
         begin
           before_page_generation(page)
-          page.write(self, @output_paths[:site])
+          page.write(self, @output_paths[:site], {})
           after_page_generation(page)
         rescue
           raise "Failed to generate page #{page}"
