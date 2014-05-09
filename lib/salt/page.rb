@@ -33,13 +33,18 @@ module Salt
       File.join(parent_path, File.dirname(@path).gsub(site.source_paths[:pages], ''))
     end
 
-    def write(site, path, context = {})
+    def write(site, path, context = false)
       directory_path = output_path(site, path)
       full_path = File.join(directory_path, output_file)
 
       @url = full_path.gsub(site.output_paths[:site], '').gsub(/index\.html$/, '')
       
-      contents = render(site, @contents, {this: self}.merge(context))
+      contents = if context
+        render(site, @contents, {this: self}.merge(context))
+      else
+        @contents
+      end
+
       FileUtils.mkdir_p(directory_path) unless Dir.exist?(directory_path)
 
       File.open(full_path, 'w') do |file|
