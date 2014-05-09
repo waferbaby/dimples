@@ -149,7 +149,9 @@ module Salt
 
       @posts.each do |post|
         begin
+          before_post_generation(post)
           post.write(self, @output_paths[:posts])
+          after_post_generation(post)
         rescue
           raise "Failed to generate post #{post}"
         end
@@ -157,7 +159,9 @@ module Salt
 
       @pages.each do |page|
         begin
+          before_page_generation(page)
           page.write(self, @output_paths[:site])
+          after_page_generation(page)
         rescue
           raise "Failed to generate page #{page}"
         end
@@ -296,6 +300,18 @@ module Salt
 
         page.write(self, File.join(page_paths), {posts: range, pagination: pagination})
       end
+    end
+
+    def before_post_generation(post)
+    end
+    
+    def after_post_generation(post)
+    end
+
+    def before_page_generation(page)
+    end
+    
+    def after_page_generation(page)
     end
   end
 end
