@@ -20,6 +20,8 @@ module Salt
       @categories = {}
       @archives = {}
 
+      @hooks = {}
+
       @pages = []
       @posts = []
 
@@ -97,6 +99,14 @@ module Salt
       end
     end
 
+    def set_hook(name, method)
+      @hooks[name] = method
+    end
+
+    def call_hook(name, params)
+      send(@hooks[name], params) if @hooks[name] && respond_to?(@hooks[name])
+    end
+
     def scan_files
       Dir.glob(File.join(@source_paths[:templates], '*.*')).each do |path|
         template = Salt::Template.new(path)
@@ -149,19 +159,19 @@ module Salt
 
       @posts.each do |post|
         begin
-          before_post_generation(post)
+          call_hook(:before_post, post)
           post.write(self, @output_paths[:posts], {})
-          after_post_generation(post)
-        rescue
-          raise "Failed to generate post #{post}"
+          call_hook(:after_post, post)
+        rescue Exception => e
+          raise "Failed to generate post #{post} (#{e}"
         end
       end
 
       @pages.each do |page|
         begin
-          before_page_generation(page)
+          call_hook(:before_page, page)
           page.write(self, @output_paths[:site], {})
-          after_page_generation(page)
+          call_hook(:after_page, page)
         rescue
           raise "Failed to generate page #{page}"
         end
@@ -300,18 +310,6 @@ module Salt
 
         page.write(self, File.join(page_paths), {posts: range, pagination: pagination})
       end
-    end
-
-    def before_post_generation(post)
-    end
-    
-    def after_post_generation(post)
-    end
-
-    def before_page_generation(page)
-    end
-    
-    def after_page_generation(page)
     end
   end
 end
