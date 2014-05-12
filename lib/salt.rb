@@ -10,6 +10,7 @@ require 'redcarpet'
 require 'salt/frontable'
 require 'salt/renderable'
 
+require 'salt/configuration'
 require 'salt/page'
 require 'salt/post'
 require 'salt/site'
