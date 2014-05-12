@@ -5,7 +5,8 @@ module Salt
 
     attr_accessor :path, :title, :contents, :filename, :extension, :layout
 
-    def initialize(path = nil)
+    def initialize(site, path = nil)
+      @site = site
       @path = path
       @title = false
       @extension = 'html'
@@ -27,20 +28,20 @@ module Salt
       "#{filename}.#{extension}"
     end
 
-    def output_path(site, parent_path)
+    def output_path(parent_path)
       return parent_path if @path.nil?
 
-      File.join(parent_path, File.dirname(@path).gsub(site.source_paths[:pages], ''))
+      File.join(parent_path, File.dirname(@path).gsub(@site.source_paths[:pages], ''))
     end
 
-    def write(site, path, context = false)
-      directory_path = output_path(site, path)
+    def write(path, context = false)
+      directory_path = output_path(path)
       full_path = File.join(directory_path, output_file)
 
-      @url = full_path.gsub(site.output_paths[:site], '').gsub(/index\.html$/, '')
+      @url = full_path.gsub(@site.output_paths[:site], '').gsub(/index\.html$/, '')
       
       contents = if context
-        render(site, @contents, {this: self}.merge(context))
+        render(@site, @contents, {this: self}.merge(context))
       else
         @contents
       end
