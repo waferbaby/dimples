@@ -4,7 +4,13 @@ module Salt
       @settings = Salt::Configuration.default_settings
 
       @settings.each_key do |key|
-        @settings[key] = config[key] if config.key?(key)
+        if config.key?(key)
+          if @settings[key].is_a?(Hash)
+            @settings[key].merge!(config[key])
+          else
+            @settings[key] = config[key]
+          end
+        end
       end
     end
 
