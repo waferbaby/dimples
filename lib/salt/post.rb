@@ -3,7 +3,7 @@ module Salt
     attr_accessor :slug, :date, :categories, :year, :month, :day
     attr_writer :markdown
 
-    def initialize(path)
+    def initialize(site, path)
       super
 
       parts = File.basename(path, File.extname(path)).match(/(\d{4})-(\d{2})-(\d{2})-(.+)/)
@@ -25,10 +25,10 @@ module Salt
     end
 
     def markdown
-      @markdown ||= Salt::Site.instance.markdown_renderer.render(@contents)
+      @markdown ||= @site.markdown_engine.render(@contents)
     end
 
-    def output_path(site, parent_path)
+    def output_path(parent_path)
       File.join(parent_path, year, month, day, @slug)
     end
   end
