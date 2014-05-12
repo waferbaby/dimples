@@ -5,7 +5,8 @@ module Salt
 
     attr_accessor :slug, :title, :contents, :parent
 
-    def initialize(path)
+    def initialize(site, path)
+    	@site = site
       @slug = File.basename(path, File.extname(path))
       @contents = read_with_yaml(path)
     end
