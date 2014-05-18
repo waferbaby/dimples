@@ -130,7 +130,7 @@ module Salt
       end
 
       if @config[:pagination][:enabled]
-        paginate(@posts, false, [@output_paths[:site]], @config[:layouts][:listing])
+        paginate(@posts, false, @config[:pagination][:per_page], [@output_paths[:site]], @config[:layouts][:listing])
       end
 
       if @config[:generation][:year_archives]
@@ -164,7 +164,7 @@ module Salt
       end
 
       title = params[:posts][0].date.strftime(@config[:date_formats][:year])
-      paginate(params[:posts], title, [@output_paths[:posts], year.to_s], @config[:layouts][:listing])
+      paginate(params[:posts], title, @config[:pagination][:per_page], [@output_paths[:posts], year.to_s], @config[:layouts][:listing])
     rescue
       raise "Failed to generate archives pages for #{year}"
     end
@@ -177,14 +177,14 @@ module Salt
       end
 
       title = params[:posts][0].date.strftime(@config[:date_formats][:month])
-      paginate(params[:posts], title, [@output_paths[:posts], year.to_s, month.to_s], @config[:layouts][:listing])
+      paginate(params[:posts], title, @config[:pagination][:per_page], [@output_paths[:posts], year.to_s, month.to_s], @config[:layouts][:listing])
     rescue
       raise "Failed to generate archive pages for #{year}, #{month}"
     end
 
     def generate_day_archives(year, month, day, posts)
       title = posts[0].date.strftime(@config[:date_formats][:day])
-      paginate(posts, title, [@output_paths[:posts], year.to_s, month.to_s, day.to_s], @config[:layouts][:listing])
+      paginate(posts, title, @config[:pagination][:per_page], [@output_paths[:posts], year.to_s, month.to_s, day.to_s], @config[:layouts][:listing])
     rescue
       raise "Failed to generate archive pages for #{year}, #{month}, #{day}"
     end
@@ -194,7 +194,7 @@ module Salt
         generate_feed(File.join(@output_paths[:posts], slug), {posts: posts[0..@config[:pagination][:per_page] - 1], category: slug})
       end
 
-      paginate(posts, slug.capitalize, [@output_paths[:posts], slug], @config[:layouts][:category])
+      paginate(posts, slug.capitalize, @config[:pagination][:per_page], [@output_paths[:posts], slug], @config[:layouts][:category])
     rescue
       raise "Failed to generate category pages for '#{slug}'"
     end
@@ -211,13 +211,13 @@ module Salt
       raise "Failed to build the feed at '#{path}'"
     end
 
-    def paginate(posts, title, paths, layout)
+    def paginate(posts, title, per_page, paths, layout, params = {})
       fail "'#{layout}' template not found" unless @templates[layout]
 
-      pages = (posts.length.to_f / @config[:pagination][:per_page].to_i).ceil
+      pages = (posts.length.to_f / per_page.to_i).ceil
 
       for index in 0...pages
-        range = posts.slice(index * @config[:pagination][:per_page], @config[:pagination][:per_page])
+        range = posts.slice(index * per_page, per_page)
 
         page = @klasses[:page].new(self)
 
@@ -260,7 +260,7 @@ module Salt
         page.layout = layout
         page.title = page_title
 
-        page.write(File.join(page_paths), {posts: range, pagination: pagination})
+        page.write(File.join(page_paths), {posts: range, pagination: pagination}.merge(params))
       end
     end
   end
