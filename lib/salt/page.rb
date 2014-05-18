@@ -38,7 +38,7 @@ module Salt
       directory_path = output_path(path)
       full_path = File.join(directory_path, output_file)
 
-      @url = full_path.gsub(@site.output_paths[:site], '').gsub(/index\.html$/, '')
+      @page_url = full_path.gsub(@site.output_paths[:site], '').gsub(/index\.html$/, '')
       
       contents = if context
         render(@site, @contents, {this: self}.merge(context))
