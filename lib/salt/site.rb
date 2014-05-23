@@ -27,17 +27,17 @@ module Salt
 
       @config = Salt::Configuration.new(config)
 
-      @source_paths[:root] = File.expand_path(@config[:root])
+      @source_paths[:root] = File.expand_path(@config['root'])
 
       %w{pages posts templates public}.each do |path|
         @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
       end
 
-      @output_paths[:site] = File.join(@source_paths[:root], @config[:output][:site])
-      @output_paths[:posts] = File.join(@output_paths[:site], @config[:output][:posts])
+      @output_paths[:site] = File.join(@source_paths[:root], @config['output']['site'])
+      @output_paths[:posts] = File.join(@output_paths[:site], @config['output']['posts'])
 
-      @markdown_engine = if @config[:markdown][:enabled]
-        Redcarpet::Markdown.new(Redcarpet::Render::HTML, @config[:markdown][:options])
+      @markdown_engine = if @config['markdown']['enabled']
+        Redcarpet::Markdown.new(Redcarpet::Render::HTML, @config['markdown']['options'])
       else
         false
       end
@@ -129,24 +129,24 @@ module Salt
         end
       end
 
-      if @config[:pagination][:enabled]
-        paginate(@posts, false, @config[:pagination][:per_page], [@output_paths[:site]], @config[:layouts][:listing])
+      if @config['pagination']['enabled']
+        paginate(@posts, false, @config['pagination']['per_page'], [@output_paths[:site]], @config['layouts']['listing'])
       end
 
-      if @config[:generation][:year_archives]
+      if @config['generation']['year_archives']
         @archives.each do |year, archive|
           generate_year_archives(year, archive)
         end
       end
 
-      if @config[:generation][:categories]
+      if @config['generation']['categories']
         @categories.each_pair do |slug, posts|
           generate_category(slug, posts)
         end
       end
 
-      if @config[:generation][:feed]
-        generate_feed(@output_paths[:site], {posts: @posts[0..@config[:pagination][:per_page] - 1]})
+      if @config['generation']['feed']
+        generate_feed(@output_paths[:site], {posts: @posts[0..@config['pagination']['per_page'] - 1]})
       end
 
       begin
@@ -157,44 +157,44 @@ module Salt
     end
 
     def generate_year_archives(year, params)
-      if @config[:generation][:month_archives]
+      if @config['generation']['month_archives']
         params[:months].each do |month, month_archive|
           generate_month_archives(year, month, month_archive)
         end
       end
 
-      title = params[:posts][0].date.strftime(@config[:date_formats][:year])
-      paginate(params[:posts], title, @config[:pagination][:per_page], [@output_paths[:posts], year.to_s], @config[:layouts][:listing])
+      title = params[:posts][0].date.strftime(@config['date_formats']['year'])
+      paginate(params[:posts], title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s], @config['layouts']['listing'])
     rescue
       raise "Failed to generate archives pages for #{year}"
     end
 
     def generate_month_archives(year, month, params)
-      if @config[:generation][:day_archives]
+      if @config['generation']['day_archives']
         params[:days].each do |day, posts|
           generate_day_archives(year, month, day, posts)
         end
       end
 
-      title = params[:posts][0].date.strftime(@config[:date_formats][:month])
-      paginate(params[:posts], title, @config[:pagination][:per_page], [@output_paths[:posts], year.to_s, month.to_s], @config[:layouts][:listing])
+      title = params[:posts][0].date.strftime(@config['date_formats']['month'])
+      paginate(params[:posts], title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s], @config['layouts']['listing'])
     rescue
       raise "Failed to generate archive pages for #{year}, #{month}"
     end
 
     def generate_day_archives(year, month, day, posts)
-      title = posts[0].date.strftime(@config[:date_formats][:day])
-      paginate(posts, title, @config[:pagination][:per_page], [@output_paths[:posts], year.to_s, month.to_s, day.to_s], @config[:layouts][:listing])
+      title = posts[0].date.strftime(@config['date_formats'][:day])
+      paginate(posts, title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s, day.to_s], @config['layouts']['listing'])
     rescue
       raise "Failed to generate archive pages for #{year}, #{month}, #{day}"
     end
 
     def generate_category(slug, posts)
-      if @config[:generation][:category_feeds]
-        generate_feed(File.join(@output_paths[:posts], slug), {posts: posts[0..@config[:pagination][:per_page] - 1], category: slug})
+      if @config['generation']['category_feeds']
+        generate_feed(File.join(@output_paths[:posts], slug), {posts: posts[0..@config['pagination']['per_page'] - 1], category: slug})
       end
 
-      paginate(posts, slug.capitalize, @config[:pagination][:per_page], [@output_paths[:posts], slug], @config[:layouts][:category])
+      paginate(posts, slug.capitalize, @config['pagination']['per_page'], [@output_paths[:posts], slug], @config['layouts']['category'])
     rescue
       raise "Failed to generate category pages for '#{slug}'"
     end
@@ -262,6 +262,10 @@ module Salt
 
         page.write(File.join(page_paths), {posts: range, pagination: pagination}.merge(params))
       end
+    end
+
+    def render_template(slug, body, context)
+      @templates[slug] ? @templates[slug].render(self, body, context) : ''
     end
   end
 end
