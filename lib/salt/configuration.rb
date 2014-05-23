@@ -20,41 +20,41 @@ module Salt
 
     def self.default_settings
       {
-        root: Dir.pwd,
+        'root' => Dir.pwd,
 
-        markdown: {
-          enabled: true,
-          options: {}
+        'markdown' => {
+          'enabled' => true,
+          'options' => {}
         },
 
-        pagination: {
-          enabled: true,
-          per_page: 10,
+        'pagination' => {
+          'enabled' => true,
+          'per_page' => 10,
         },
 
-        generation: {
-          categories: true,
-          year_archives: true,
-          month_archives: true,
-          day_archives: true,
-          feed: true,
-          category_feeds: true,
+        'generation' => {
+          'categories' => true,
+          'year_archives' => true,
+          'month_archives' => true,
+          'day_archives' => true,
+          'feed' => true,
+          'category_feeds' => true,
         },
 
-        date_formats: {
-          year: '%Y',
-          month: '%Y-%m',
-          day: '%Y-%m-%d',
+        'date_formats' => {
+          'year' => '%Y',
+          'month' => '%Y-%m',
+          'day' => '%Y-%m-%d',
         },
 
-        output: {
-          site: 'site',
-          posts: 'archives'
+        'output' => {
+          'site' => 'site',
+          'posts' => 'archives'
         },
 
-        layouts: {
-          listing: 'posts',
-          category: 'category'
+        'layouts' => {
+          'listing' => 'posts',
+          'category' => 'category'
         }
       }
     end
