@@ -24,7 +24,7 @@ module Salt
 
         'markdown' => {
           'enabled' => true,
-          'options' => {}
+          'options' => {},
         },
 
         'pagination' => {
@@ -49,12 +49,15 @@ module Salt
 
         'output' => {
           'site' => 'site',
-          'posts' => 'archives'
+          'posts' => 'archives',
         },
 
         'layouts' => {
-          'listing' => 'posts',
-          'category' => 'category'
+          'posts' => 'posts',
+          'category' => 'category',
+          'year' => 'year',
+          'month' => 'month',
+          'day' => 'day',
         }
       }
     end
