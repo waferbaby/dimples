@@ -130,7 +130,7 @@ module Salt
       end
 
       if @config['pagination']['enabled']
-        paginate(@posts, false, @config['pagination']['per_page'], [@output_paths[:site]], @config['layouts']['listing'])
+        paginate(@posts, false, @config['pagination']['per_page'], [@output_paths[:site]], @config['layouts']['posts'])
       end
 
       if @config['generation']['year_archives']
@@ -164,7 +164,7 @@ module Salt
       end
 
       title = params[:posts][0].date.strftime(@config['date_formats']['year'])
-      paginate(params[:posts], title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s], @config['layouts']['listing'])
+      paginate(params[:posts], title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s], @config['layouts']['year'])
     rescue
       raise "Failed to generate archives pages for #{year}"
     end
@@ -177,14 +177,14 @@ module Salt
       end
 
       title = params[:posts][0].date.strftime(@config['date_formats']['month'])
-      paginate(params[:posts], title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s], @config['layouts']['listing'])
+      paginate(params[:posts], title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s], @config['layouts']['month'])
     rescue
       raise "Failed to generate archive pages for #{year}, #{month}"
     end
 
     def generate_day_archives(year, month, day, posts)
       title = posts[0].date.strftime(@config['date_formats'][:day])
-      paginate(posts, title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s, day.to_s], @config['layouts']['listing'])
+      paginate(posts, title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s, day.to_s], @config['layouts']['day'])
     rescue
       raise "Failed to generate archive pages for #{year}, #{month}, #{day}"
     end
