@@ -22,6 +22,19 @@ module Salt
       {
         'root' => Dir.pwd,
 
+        'paths' => {
+          'site' => 'site',
+          'posts' => 'archives',
+        },
+
+        'layouts' => {
+          'posts' => 'posts',
+          'category' => 'category',
+          'year' => 'year',
+          'month' => 'month',
+          'day' => 'day',
+        },
+
         'markdown' => {
           'enabled' => true,
           'options' => {},
@@ -45,19 +58,6 @@ module Salt
           'year' => '%Y',
           'month' => '%Y-%m',
           'day' => '%Y-%m-%d',
-        },
-
-        'paths' => {
-          'site' => 'site',
-          'posts' => 'archives',
-        },
-
-        'layouts' => {
-          'posts' => 'posts',
-          'category' => 'category',
-          'year' => 'year',
-          'month' => 'month',
-          'day' => 'day',
         }
       }
     end
