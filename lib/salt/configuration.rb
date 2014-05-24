@@ -47,7 +47,7 @@ module Salt
           'day' => '%Y-%m-%d',
         },
 
-        'output' => {
+        'paths' => {
           'site' => 'site',
           'posts' => 'archives',
         },
