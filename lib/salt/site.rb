@@ -33,8 +33,8 @@ module Salt
         @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
       end
 
-      @output_paths[:site] = File.join(@source_paths[:root], @config['output']['site'])
-      @output_paths[:posts] = File.join(@output_paths[:site], @config['output']['posts'])
+      @output_paths[:site] = File.join(@source_paths[:root], @config['paths']['site'])
+      @output_paths[:posts] = File.join(@output_paths[:site], @config['paths']['posts'])
 
       @markdown_engine = if @config['markdown']['enabled']
         Redcarpet::Markdown.new(Redcarpet::Render::HTML, @config['markdown']['options'])
