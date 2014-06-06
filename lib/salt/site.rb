@@ -129,23 +129,23 @@ module Salt
         end
       end
 
-      if @config['pagination']['enabled']
+      if @config['pagination']['enabled'] && @posts.length > 0
         paginate(@posts, false, @config['pagination']['per_page'], [@output_paths[:site]], @config['layouts']['posts'])
       end
 
-      if @config['generation']['year_archives']
+      if @config['generation']['year_archives'] && @archives.length > 0
         @archives.each do |year, archive|
           generate_year_archives(year, archive)
         end
       end
 
-      if @config['generation']['categories']
+      if @config['generation']['categories'] && @categories.length > 0
         @categories.each_pair do |slug, posts|
           generate_category(slug, posts)
         end
       end
 
-      if @config['generation']['feed']
+      if @config['generation']['feed'] && @posts.length > 0
         generate_feed(@output_paths[:site], {posts: @posts[0..@config['pagination']['per_page'] - 1]})
       end
 
