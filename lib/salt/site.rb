@@ -101,8 +101,8 @@ module Salt
 
       begin
         Dir.mkdir(@output_paths[:site]) unless Dir.exist?(@output_paths[:site])
-      rescue
-        raise "Failed to create the site directory (#{$!})"
+      rescue => e
+        raise "Failed to create the site directory (#{e})"
       end
 
       @posts.each do |post|
@@ -110,8 +110,8 @@ module Salt
           call_hook(:before_post, post)
           post.write(@output_paths[:posts], {})
           call_hook(:after_post, post)
-        rescue
-          raise "Failed to generate post #{post} (#{$!})"
+        rescue => e
+          raise "Failed to render post #{File.basename(post.path)} (#{e})"
         end
       end
 
@@ -120,20 +120,24 @@ module Salt
           call_hook(:before_page, page)
           page.write(@output_paths[:site], {})
           call_hook(:after_page, page)
-        rescue
-          raise "Failed to generate page #{page} (#{$!})"
+        rescue => e
+          raise "Failed to render page from #{page.path.gsub(@source_paths[:root], '')} (#{e})"
         end
       end
 
       if @config['pagination']['enabled'] && @posts.length > 0
-        paginate(@posts, false, @config['pagination']['per_page'], [@output_paths[:site]], @config['layouts']['posts'])
+        begin
+          paginate(@posts, false, @config['pagination']['per_page'], [@output_paths[:site]], @config['layouts']['posts'])
+        rescue => e
+          raise "Failed to paginate main posts (#{e})"
+        end
       end
 
       if @config['generation']['year_archives'] && @archives.length > 0
         begin
           generate_archives
-        rescue
-          raise "Failed to generate archives (#{$!})"
+        rescue => e
+          raise "Failed to generate archives (#{e})"
         end
       end
 
@@ -142,15 +146,15 @@ module Salt
           if @config['generation']['category_feeds']
             begin
               generate_feed(File.join(@output_paths[:posts], slug), {posts: posts[0..@config['pagination']['per_page'] - 1], category: slug})
-            rescue
-              raise "Failed to generate category feed for '#{slug}' (#{$!})"
+            rescue => e
+              raise "Failed to generate category feed for '#{slug}' (#{e})"
             end
           end
 
           begin
             paginate(posts, slug.capitalize, @config['pagination']['per_page'], [@output_paths[:posts], slug], @config['layouts']['category'])
-          rescue
-            raise "Failed to generate category pages for '#{slug}' (#{$!})"
+          rescue => e
+            raise "Failed to generate category pages for '#{slug}' (#{e})"
           end
         end
       end
@@ -158,15 +162,15 @@ module Salt
       if @config['generation']['feed'] && @posts.length > 0
         begin
           generate_feed(@output_paths[:site], {posts: @posts[0..@config['pagination']['per_page'] - 1]})
-        rescue
-          raise "Failed to generate main feed (#{$!})"
+        rescue => e
+          raise "Failed to generate main feed (#{e})"
         end
       end
 
       begin
         FileUtils.cp_r(File.join(@source_paths[:public], '/.'), @output_paths[:site])
-      rescue
-        raise "Failed to copy site assets (#{$!})"
+      rescue => e
+        raise "Failed to copy site assets (#{e})"
       end
     end
 
