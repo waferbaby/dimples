@@ -97,16 +97,12 @@ module Salt
     end
 
     def generate
-      begin
-        scan_files
-      rescue Exception => e
-        raise "Failed to scan source files (#{e})"
-      end
+      scan_files
 
       begin
         Dir.mkdir(@output_paths[:site]) unless Dir.exist?(@output_paths[:site])
       rescue
-        raise "Failed to create the site directory"
+        raise "Failed to create the site directory (#{$!})"
       end
 
       @posts.each do |post|
@@ -115,7 +111,7 @@ module Salt
           post.write(@output_paths[:posts], {})
           call_hook(:after_post, post)
         rescue
-          raise "Failed to generate post #{post}"
+          raise "Failed to generate post #{post} (#{$!})"
         end
       end
 
@@ -125,7 +121,7 @@ module Salt
           page.write(@output_paths[:site], {})
           call_hook(:after_page, page)
         rescue
-          raise "Failed to generate page #{page}"
+          raise "Failed to generate page #{page} (#{$!})"
         end
       end
 
@@ -134,69 +130,68 @@ module Salt
       end
 
       if @config['generation']['year_archives'] && @archives.length > 0
-        @archives.each do |year, archive|
-          generate_year_archives(year, archive)
+        begin
+          generate_archives
+        rescue
+          raise "Failed to generate archives (#{$!})"
         end
       end
 
       if @config['generation']['categories'] && @categories.length > 0
-        @categories.each_pair do |slug, posts|
-          generate_category(slug, posts)
+        @categories.each_pair do |slug, posts|  
+          if @config['generation']['category_feeds']
+            begin
+              generate_feed(File.join(@output_paths[:posts], slug), {posts: posts[0..@config['pagination']['per_page'] - 1], category: slug})
+            rescue
+              raise "Failed to generate category feed for '#{slug}' (#{$!})"
+            end
+          end
+
+          begin
+            paginate(posts, slug.capitalize, @config['pagination']['per_page'], [@output_paths[:posts], slug], @config['layouts']['category'])
+          rescue
+            raise "Failed to generate category pages for '#{slug}' (#{$!})"
+          end
         end
       end
 
       if @config['generation']['feed'] && @posts.length > 0
-        generate_feed(@output_paths[:site], {posts: @posts[0..@config['pagination']['per_page'] - 1]})
+        begin
+          generate_feed(@output_paths[:site], {posts: @posts[0..@config['pagination']['per_page'] - 1]})
+        rescue
+          raise "Failed to generate main feed (#{$!})"
+        end
       end
 
       begin
         FileUtils.cp_r(File.join(@source_paths[:public], '/.'), @output_paths[:site])
       rescue
-        raise "Failed to copy site assets from #{@source_paths[:public]}"
+        raise "Failed to copy site assets (#{$!})"
       end
     end
 
-    def generate_year_archives(year, params)
-      if @config['generation']['month_archives']
-        params[:months].each do |month, month_archive|
-          generate_month_archives(year, month, month_archive)
+    def generate_archives
+      @archives.each do |year, year_archive|
+
+        if @config['generation']['month_archives']
+          year_archive[:months].each do |month, month_archive|
+
+            if @config['generation']['day_archives']
+              month_archive[:days].each do |day, posts|
+
+                day_title = posts[0].date.strftime(@config['date_formats'][:day])
+                paginate(posts, day_title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s, day.to_s], @config['layouts']['day'])
+              end
+            end
+
+            month_title = month_archive[:posts][0].date.strftime(@config['date_formats']['month'])
+            paginate(month_archive[:posts], month_title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s], @config['layouts']['month'])
+          end
         end
+
+        year_title = year_archive[:posts][0].date.strftime(@config['date_formats']['year'])
+        paginate(year_archive[:posts], year_title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s], @config['layouts']['year'])
       end
-
-      title = params[:posts][0].date.strftime(@config['date_formats']['year'])
-      paginate(params[:posts], title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s], @config['layouts']['year'])
-    rescue
-      raise "Failed to generate archives pages for #{year}"
-    end
-
-    def generate_month_archives(year, month, params)
-      if @config['generation']['day_archives']
-        params[:days].each do |day, posts|
-          generate_day_archives(year, month, day, posts)
-        end
-      end
-
-      title = params[:posts][0].date.strftime(@config['date_formats']['month'])
-      paginate(params[:posts], title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s], @config['layouts']['month'])
-    rescue
-      raise "Failed to generate archive pages for #{year}, #{month}"
-    end
-
-    def generate_day_archives(year, month, day, posts)
-      title = posts[0].date.strftime(@config['date_formats'][:day])
-      paginate(posts, title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s, day.to_s], @config['layouts']['day'])
-    rescue
-      raise "Failed to generate archive pages for #{year}, #{month}, #{day}"
-    end
-
-    def generate_category(slug, posts)
-      if @config['generation']['category_feeds']
-        generate_feed(File.join(@output_paths[:posts], slug), {posts: posts[0..@config['pagination']['per_page'] - 1], category: slug})
-      end
-
-      paginate(posts, slug.capitalize, @config['pagination']['per_page'], [@output_paths[:posts], slug], @config['layouts']['category'])
-    rescue
-      raise "Failed to generate category pages for '#{slug}'"
     end
 
     def generate_feed(path, params)
@@ -207,8 +202,6 @@ module Salt
       feed.layout = 'feed'
 
       feed.write(path, params)
-    rescue
-      raise "Failed to build the feed at '#{path}'"
     end
 
     def paginate(posts, title, per_page, paths, layout, params = {})
