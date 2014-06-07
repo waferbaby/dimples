@@ -3,7 +3,12 @@ module Salt
     def render(site, body, context = {})
       context[:site] ||= site
 
-      output = Erubis::Eruby.new(contents).evaluate(context) { body }
+      begin
+        output = Erubis::Eruby.new(contents).evaluate(context) { body }
+      rescue SyntaxError => e
+        raise "Syntax error in #{path.gsub(site.source_paths[:root], '')}"
+      end
+
       output = site.templates[@layout].render(site, output, context) if @layout && site.templates[@layout]
 
       output
