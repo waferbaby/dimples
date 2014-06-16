@@ -1,6 +1,6 @@
 module Salt
   module Renderable
-    def render(site, body, context = {})
+    def render(site, body, context = {}, layout = true)
       context[:site] ||= site
 
       begin
@@ -9,7 +9,7 @@ module Salt
         raise "Syntax error in #{path.gsub(site.source_paths[:root], '')}"
       end
 
-      output = site.templates[@layout].render(site, output, context) if @layout && site.templates[@layout]
+      output = site.templates[@layout].render(site, output, context) if @layout && site.templates[@layout] && layout
 
       output
     end
