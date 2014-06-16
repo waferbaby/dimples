@@ -60,7 +60,7 @@ module Salt
     end
 
     def scan_files
-      Dir.glob(File.join(@source_paths[:templates], '*.*')).each do |path|
+      Dir.glob(File.join(@source_paths[:templates], '**', '*.*')).each do |path|
         template = Salt::Template.new(self, path)
         @templates[template.slug] = template
       end
@@ -261,8 +261,16 @@ module Salt
       end
     end
 
-    def render_template(slug, body, context)
-      @templates[slug] ? @templates[slug].render(self, body, context) : ''
+    def render(template_slug, content, layout = true)
+      return '' unless @templates[template_slug]
+
+      if content.is_a? String
+        @templates[template_slug].render(self, content, {}, layout)
+      elsif content.is_a? Hash
+        @templates[template_slug].render(self, '', content, layout)
+      else
+        ''
+      end
     end
   end
 end
