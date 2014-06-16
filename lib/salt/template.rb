@@ -7,7 +7,8 @@ module Salt
 
     def initialize(site, path)
     	@site = site
-      @slug = File.basename(path, File.extname(path))
+
+      @slug = path.match(/#{@site.source_paths[:templates]}#{File::SEPARATOR}?(.+)\.erb/)[1]
       @path = path
       @contents = read_with_yaml(path)
     end
