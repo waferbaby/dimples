@@ -85,7 +85,7 @@ module Salt
         @archives[year] ||= {posts: [], months: {}}
 
         @archives[year][:posts] << post
-        @archives[year][:months][month] ||= {posts: [], days: {}}
+        @archives[year][:months][month] ||= {posts: [], days: {}, name: post.date.strftime('%B')}
         @archives[year][:months][month][:posts] << post
         @archives[year][:months][month][:days][day] ||= []
         @archives[year][:months][month][:days][day] << post
