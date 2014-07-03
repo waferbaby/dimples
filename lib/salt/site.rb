@@ -182,8 +182,7 @@ module Salt
 
             if @config['generation']['day_archives']
               month_archive[:days].each do |day, posts|
-
-                day_title = posts[0].date.strftime(@config['date_formats'][:day])
+                day_title = posts[0].date.strftime(@config['date_formats']['day'])
                 paginate(posts, day_title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s, day.to_s], @config['layouts']['day'])
               end
             end
@@ -209,7 +208,7 @@ module Salt
     end
 
     def paginate(posts, title, per_page, paths, layout, params = {})
-      fail "'#{layout}' template not found" unless @templates[layout]
+      fail "'#{layout}' template not found" unless @templates.has_key?(layout)
 
       pages = (posts.length.to_f / per_page.to_i).ceil
 
