@@ -175,25 +175,31 @@ module Salt
     end
 
     def generate_archives
+      year_template = @config['layouts'].has_key?('year') ? @config['layouts']['year'] : @config['layouts']['posts']
+      
       @archives.each do |year, year_archive|
 
         if @config['generation']['month_archives']
+          month_template = @config['layouts'].has_key?('month') ? @config['layouts']['month'] : @config['layouts']['posts']
+
           year_archive[:months].each do |month, month_archive|
 
             if @config['generation']['day_archives']
+              day_template = @config['layouts'].has_key?('day') ? @config['layouts']['day'] : @config['layouts']['posts']
+
               month_archive[:days].each do |day, posts|
                 day_title = posts[0].date.strftime(@config['date_formats']['day'])
-                paginate(posts, day_title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s, day.to_s], @config['layouts']['day'])
+                paginate(posts, day_title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s, day.to_s], day_template)
               end
             end
 
             month_title = month_archive[:posts][0].date.strftime(@config['date_formats']['month'])
-            paginate(month_archive[:posts], month_title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s], @config['layouts']['month'])
+            paginate(month_archive[:posts], month_title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s], month_template)
           end
         end
 
         year_title = year_archive[:posts][0].date.strftime(@config['date_formats']['year'])
-        paginate(year_archive[:posts], year_title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s], @config['layouts']['year'])
+        paginate(year_archive[:posts], year_title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s], year_template)
       end
     end
 
