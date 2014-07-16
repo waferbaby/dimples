@@ -45,6 +45,7 @@ module Salt
         },
 
         'generation' => {
+          'paginated_posts' => false,
           'categories' => true,
           'year_archives' => true,
           'month_archives' => true,
