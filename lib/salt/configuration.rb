@@ -32,9 +32,6 @@ module Salt
         'layouts' => {
           'posts' => 'posts',
           'category' => 'category',
-          'year' => 'year',
-          'month' => 'month',
-          'day' => 'day',
         },
 
         'markdown' => {
