@@ -125,7 +125,7 @@ module Salt
         end
       end
 
-      if @config['pagination']['enabled'] && @posts.length > 0
+      if @config['generation']['paginated_posts'] && @posts.length > 0
         begin
           paginate(@posts, false, @config['pagination']['per_page'], [@output_paths[:site]], @config['layouts']['posts'])
         rescue => e
