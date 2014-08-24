@@ -27,10 +27,12 @@ module Salt
         'paths' => {
           'site' => 'site',
           'posts' => 'archives',
+          'post' => '%Y/%m/%d',
         },
 
         'layouts' => {
           'posts' => 'posts',
+          'post' => 'post',
           'category' => 'category',
         },
 
