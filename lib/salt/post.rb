@@ -12,7 +12,7 @@ module Salt
       @date = Time.mktime(parts[1], parts[2], parts[3])
 
       @filename = 'index'
-      @layout = 'post'
+      @layout = @site.config['layouts']['post']
       @categories ||= []
 
       @year = @date.strftime('%Y')
@@ -29,7 +29,17 @@ module Salt
     end
 
     def output_path(parent_path)
-      File.join(parent_path, year, month, day, @slug)
+
+      parts = [parent_path]
+
+      if @site.config['paths']['post']
+        path = @date.strftime(@site.config['paths']['post'])
+        parts.concat(path.split('/')) if path
+      end
+
+      parts << @slug
+
+      File.join(parts)
     end
   end
 end
