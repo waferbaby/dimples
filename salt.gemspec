@@ -16,4 +16,5 @@ Gem::Specification.new do |s|
  
   s.files        = Dir.glob("{bin,lib}/**/*")
   s.require_path = 'lib'
+  s.executables << 'salt'
 end
