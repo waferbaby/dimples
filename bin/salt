@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
-$:.unshift(__dir__)
+root_path = Dir.pwd
+$:.unshift(root_path)
 
 require 'yaml'
 require 'salt'
@@ -18,8 +19,7 @@ if command.nil?
 end
 
 command = command.to_sym
-
-config_path = File.join(__dir__, 'config.yml')
+config_path = File.join(root_path, 'config.yml')
 
 if File.exists?(config_path)
   begin
@@ -29,11 +29,12 @@ if File.exists?(config_path)
     exit
   end
 else
+  puts "No config file found - using defaults."
   config = {}
 end
 
 klass = Salt::Site
-lib_path = File.join(__dir__, 'lib')
+lib_path = File.join(root_path, 'lib')
 
 if Dir.exists?(lib_path)
   Dir.glob(File.join(lib_path, '*.rb')) do |file|
@@ -47,31 +48,34 @@ end
 site = klass.new(config)
 output_path = File.join(site.config['root'], site.config['paths']['site'])
 
-begin
-  site.generate
-  puts "Site built (#{output_path})"
-rescue Exception => e
-  puts "Error: Failed to generate site (#{e})"
-end
+case command
+  when :build
+    begin
+      puts "Building site..."
+      site.generate
+      puts "Site built at #{output_path}."
+    rescue Exception => e
+      puts "Error: Failed to generate site (#{e})"
+    end
+  
+  when :serve
+    require 'webrick'
 
-if command == :serve
-  require 'webrick'
+    begin
+      puts "Serving up #{output_path} at http://localhost:8080/."
 
-  begin
-    puts "Serving up the site."
+      server = WEBrick::HTTPServer.new(
+        Port: 8080,
+        DocumentRoot: File.join(output_path)
+      )
+    rescue
+      puts "Error: Failed to start local web server."
+      exit
+    end
 
-    server = WEBrick::HTTPServer.new(
-      Port: 8080,
-      DocumentRoot: File.join(output_path)
-    )
-  rescue
-    puts "Error: Failed to start local web server."
-    exit
-  end
+    trap 'INT' do
+      server.shutdown
+    end
 
-  trap 'INT' do
-    server.shutdown
-  end
-
-  server.start
+    server.start
 end
