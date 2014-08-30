@@ -11,15 +11,6 @@ module Salt
     attr_accessor :latest_post
     attr_accessor :markdown_engine
 
-    class << self
-      attr_reader :subclasses
-      
-      def inherited(klass)
-        @subclasses ||= []
-        @subclasses << klass
-      end
-    end
-
     def initialize(config = {})
       @source_paths = {}
       @output_paths = {}
