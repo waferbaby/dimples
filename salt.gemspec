@@ -10,7 +10,8 @@ Gem::Specification.new do |s|
   s.email       = ["d+salt@waferbaby.com"]
   s.homepage    = "http://github.com/waferbaby/salt"
   s.summary     = "A very silly static site generator"
-  s.description = "A very silly static site generator"
+  s.description = "This is a very simple static site generator, born out of the loins of usesthis.com."
+  s.license     = "LICENSE"
  
   s.required_rubygems_version = ">= 1.3.6"
  
