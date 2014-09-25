@@ -100,9 +100,10 @@ module Salt
       scan_files
 
       begin
-        Dir.mkdir(@output_paths[:site]) unless Dir.exist?(@output_paths[:site])
+        FileUtils.remove_dir(@output_paths[:site]) if Dir.exist?(@output_paths[:site])
+        Dir.mkdir(@output_paths[:site])
       rescue => e
-        raise "Failed to create the site directory (#{e})"
+        raise "Failed to prepare the site directory (#{e})"
       end
 
       @posts.each do |post|
