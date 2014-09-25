@@ -168,7 +168,7 @@ module Salt
       end
 
       begin
-        FileUtils.cp_r(File.join(@source_paths[:public], '/.'), @output_paths[:site])
+        FileUtils.cp_r(File.join(@source_paths[:public], '.'), @output_paths[:site]) if Dir.exists?(@source_paths[:public])
       rescue => e
         raise "Failed to copy site assets (#{e})"
       end
