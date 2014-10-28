@@ -128,7 +128,7 @@ module Salt
 
       if @config['generation']['paginated_posts'] && @posts.length > 0
         begin
-          paginate(@posts, false, @config['pagination']['per_page'], [@output_paths[:site]], @config['layouts']['posts'])
+          paginate(@posts, false, @config['pagination']['per_page'], [@output_paths[:posts]], @config['layouts']['posts'])
         rescue => e
           raise "Failed to paginate main posts (#{e})"
         end
@@ -176,17 +176,36 @@ module Salt
     end
 
     def generate_archives
-      year_template = @config['layouts'].has_key?('year') ? @config['layouts']['year'] : @config['layouts']['posts']
-      
+      if @config['layouts'].has_key?('year')
+        year_template = @config['layouts']['year']
+      elsif @config['layouts'].has_key?('archives')
+        year_template = @config['layouts']['archives']
+      else
+        year_template = @config['layouts']['posts']
+      end
+
       @archives.each do |year, year_archive|
 
         if @config['generation']['month_archives']
-          month_template = @config['layouts'].has_key?('month') ? @config['layouts']['month'] : @config['layouts']['posts']
+          if @config['layouts'].has_key?('month')
+            month_template = @config['layouts']['month']
+          elsif @config['layouts'].has_key?('archives')
+            month_template = @config['layouts']['archives']
+          else
+            month_template = @config['layouts']['posts']
+          end
 
           year_archive[:months].each do |month, month_archive|
 
             if @config['generation']['day_archives']
-              day_template = @config['layouts'].has_key?('day') ? @config['layouts']['day'] : @config['layouts']['posts']
+
+              if @config['layouts'].has_key?('day')
+                day_template = @config['layouts']['day']
+              elsif @config['layouts'].has_key?('archives')
+                day_template = @config['layouts']['archives']
+              else
+                day_template = @config['layouts']['posts']
+              end
 
               month_archive[:days].each do |day, posts|
                 day_title = posts[0].date.strftime(@config['date_formats']['day'])
