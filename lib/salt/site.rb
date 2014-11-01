@@ -256,12 +256,6 @@ module Salt
 
         if index > 0
           page_paths.push("page#{index + 1}")
-
-          if page_title
-            page_title += " (Page #{index + 1})"
-          else
-            page_title = "Page #{index + 1}"
-          end
         end
 
         pagination = {
