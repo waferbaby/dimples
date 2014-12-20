@@ -2,10 +2,11 @@ $LOAD_PATH.unshift(__dir__)
 
 begin
   require 'rubygems'
-  require 'erubis'
+  require 'bundler/setup'
   require 'fileutils'
   require 'singleton'
   require 'yaml'
+  require 'erubis'
   require 'redcarpet'
 rescue LoadError => e
   puts "D'oh! Looks like you're missing the '#{e.path}' gem!"
