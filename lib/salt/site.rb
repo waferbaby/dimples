@@ -10,6 +10,8 @@ module Salt
     attr_accessor :posts
     attr_accessor :latest_post
     attr_accessor :markdown_engine
+    attr_accessor :page_class
+    attr_accessor :post_class
 
     def initialize(config = {})
       @source_paths = {}
@@ -23,7 +25,9 @@ module Salt
       @posts = []
 
       @latest_post = false
-      @klasses = { page: Salt::Page, post: Salt::Post }
+
+      @page_class = Salt::Page
+      @post_class = Salt::Post
 
       @config = Salt::Configuration.new(config)
 
@@ -43,14 +47,6 @@ module Salt
       end
     end
 
-    def register(klass)
-      if klass.superclass == Salt::Page
-        @klasses[:page] = klass
-      elsif klass.superclass == Salt::Post
-        @klasses[:post] = klass
-      end
-    end
-
     def set_hook(name, method)
       @hooks[name] = method
     end
@@ -66,11 +62,11 @@ module Salt
       end
 
       Dir.glob(File.join(@source_paths[:pages], '**', '*.*')).each do |path|
-        @pages << @klasses[:page].new(self, path)
+        @pages << @page_class.new(self, path)
       end
 
       Dir.glob(File.join(@source_paths[:posts], '*.*')).each do |path|
-        @posts << @klasses[:post].new(self, path)
+        @posts << @post_class.new(self, path)
       end
 
       @posts.reverse!
@@ -224,7 +220,7 @@ module Salt
     end
 
     def generate_feed(path, params)
-      feed = @klasses[:page].new(self)
+      feed = @page_class.new(self)
 
       feed.filename = 'feed'
       feed.extension = 'atom'
@@ -241,7 +237,7 @@ module Salt
       for index in 0...pages
         range = posts.slice(index * per_page, per_page)
 
-        page = @klasses[:page].new(self)
+        page = @page_class.new(self)
 
         page_paths = paths.clone
         page_title = title ? title : @templates[layout].title
