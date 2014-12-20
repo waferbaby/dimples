@@ -1,0 +1,16 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    erubis (2.7.0)
+    fileutils (0.7)
+      rmagick (>= 2.13.1)
+    redcarpet (3.2.2)
+    rmagick (2.13.4)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  erubis
+  fileutils
+  redcarpet
