@@ -19,7 +19,6 @@ module Salt
       @templates = {}
       @categories = {}
       @archives = {}
-      @hooks = {}
 
       @pages = []
       @posts = []
@@ -45,14 +44,6 @@ module Salt
       else
         false
       end
-    end
-
-    def set_hook(name, method)
-      @hooks[name] = method
-    end
-
-    def call_hook(name, params)
-      send(@hooks[name], params) if @hooks[name] && respond_to?(@hooks[name])
     end
 
     def scan_files
@@ -104,9 +95,7 @@ module Salt
 
       @posts.each do |post|
         begin
-          call_hook(:before_post, post)
           post.write(@output_paths[:posts], {})
-          call_hook(:after_post, post)
         rescue => e
           raise "Failed to render post #{File.basename(post.path)} (#{e})"
         end
@@ -114,9 +103,7 @@ module Salt
 
       @pages.each do |page|
         begin
-          call_hook(:before_page, page)
           page.write(@output_paths[:site], {})
-          call_hook(:after_page, page)
         rescue => e
           raise "Failed to render page from #{page.path.gsub(@source_paths[:root], '')} (#{e})"
         end
