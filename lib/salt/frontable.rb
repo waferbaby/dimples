@@ -16,18 +16,14 @@ module Salt
 
       if metadata
         metadata.each_pair do |key, value|
-          set_metadata(key, value)
+          unless instance_variable_get("@#{key}")
+            self.class.send(:attr_accessor, key.to_sym)
+            instance_variable_set("@#{key}", value)
+          end
         end
       end
 
       contents
-    end
-
-    def set_metadata(key, value)
-      unless instance_variable_get("@#{key}")
-        self.class.send(:attr_accessor, key.to_sym)
-        instance_variable_set("@#{key}", value)
-      end
     end
   end
 end
