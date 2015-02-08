@@ -4,7 +4,6 @@ begin
   require 'rubygems'
   require 'bundler/setup'
   require 'fileutils'
-  require 'singleton'
   require 'yaml'
   require 'erubis'
   require 'redcarpet'
