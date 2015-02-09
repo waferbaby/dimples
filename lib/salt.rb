@@ -9,7 +9,7 @@ require 'erubis'
 require 'redcarpet'
 
 require 'salt/frontable'
-require 'salt/renderable'
+require 'salt/publishable'
 require 'salt/configuration'
 require 'salt/page'
 require 'salt/post'
