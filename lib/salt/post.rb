@@ -1,18 +1,38 @@
 module Salt
-  class Post < Page
-    attr_accessor :slug, :date, :categories, :year, :month, :day
+  class Post
+    include Frontable
+    include Publishable
+    
+    attr_accessor :path
+    attr_accessor :title
+    attr_accessor :contents
+    attr_accessor :filename
+    attr_accessor :extension
+    attr_accessor :layout
+    attr_accessor :slug
+    attr_accessor :date
+    attr_accessor :categories
+    attr_accessor :year
+    attr_accessor :month
+    attr_accessor :day
+
     attr_writer :markdown
 
     def initialize(site, path)
-      super
+      @site = site
+
+      @path = path
+      @contents = read_with_yaml(path)
+
+      @filename = 'index'
+      @extension = @site.config['file_extensions']['posts']
 
       parts = File.basename(path, File.extname(path)).match(/(\d{4})-(\d{2})-(\d{2})-(.+)/)
 
       @slug = parts[4]
       @date = Time.mktime(parts[1], parts[2], parts[3])
 
-      @filename = 'index'
-      @layout = @site.config['layouts']['post']
+      @layout ||= @site.config['layouts']['post']
       @categories ||= []
 
       @year = @date.strftime('%Y')
@@ -29,7 +49,6 @@ module Salt
     end
 
     def output_path(parent_path)
-
       parts = [parent_path]
 
       if @site.config['paths']['post']
