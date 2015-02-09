@@ -267,9 +267,9 @@ module Salt
       return '' unless @templates[template_slug]
 
       if content.is_a? String
-        @templates[template_slug].render(self, content, {}, layout)
+        @templates[template_slug].render(content, {}, layout)
       elsif content.is_a? Hash
-        @templates[template_slug].render(self, '', content, layout)
+        @templates[template_slug].render('', content, layout)
       else
         ''
       end
