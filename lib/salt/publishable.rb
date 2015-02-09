@@ -20,7 +20,7 @@ module Salt
         raise "Syntax error in #{path.gsub(site.source_paths[:root], '')}"
       end
 
-      if @layout && @site.templates[@layout] && use_layout
+      if use_layout && @layout && @site.templates[@layout]
         output = @site.templates[@layout].render(output, context) 
       end
 
