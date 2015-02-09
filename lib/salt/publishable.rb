@@ -11,11 +11,11 @@ module Salt
       end
     end
 
-    def render(contents, context = {}, use_layout = true)
+    def render(body, context = {}, use_layout = true)
       context[:site] ||= @site
 
       begin
-        output = Erubis::Eruby.new(contents).evaluate(context) { contents }
+        output = Erubis::Eruby.new(@contents).evaluate(context) { body }
       rescue SyntaxError => e
         raise "Syntax error in #{path.gsub(site.source_paths[:root], '')}"
       end
