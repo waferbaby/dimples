@@ -56,6 +56,11 @@ module Salt
           'category_feeds' => true,
         },
 
+        'file_extensions' => {
+          'pages' => 'html',
+          'posts' => 'html',
+        },
+
         'date_formats' => {
           'year' => '%Y',
           'month' => '%Y-%m',
