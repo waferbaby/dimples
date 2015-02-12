@@ -7,7 +7,6 @@ module Salt
     attr_accessor :title
     attr_accessor :path
     attr_accessor :contents
-    attr_accessor :parent
 
     def initialize(site, path)
     	@site = site
