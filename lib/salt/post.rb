@@ -48,7 +48,7 @@ module Salt
       @markdown ||= @site.markdown_engine.render(@contents)
     end
 
-    def output_path(parent_path)
+    def output_file_path(parent_path)
       parts = [parent_path]
 
       if @site.config['paths']['post']
@@ -57,6 +57,7 @@ module Salt
       end
 
       parts << @slug
+      parts << "#{@filename}.#{@extension}"
 
       File.join(parts)
     end

@@ -29,9 +29,13 @@ module Salt
       :page
     end
 
-    def output_path(parent_path)
-      return parent_path if @path.nil?
-      File.join(parent_path, File.dirname(@path).gsub(@site.source_paths[:pages], ''))
+    def output_file_path(parent_path)
+      parts = [parent_path]
+
+      parts << File.dirname(@path).gsub(@site.source_paths[:pages], '') unless @path.nil?
+      parts << "#{@filename}.#{@extension}"
+
+      File.join(parts)
     end
   end
 end
