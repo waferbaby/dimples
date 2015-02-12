@@ -1,7 +1,7 @@
 module Salt
   module Publishable
     def write(path, context = false)
-      contents = context ? render(@contents, {this: self}.merge(context)) : @contents
+      output = context ? render(contents(), {this: self}.merge(context)) : contents()
 
       publish_path = output_file_path(path)
       parent_path = File.dirname(publish_path)
@@ -9,7 +9,7 @@ module Salt
       FileUtils.mkdir_p(parent_path) unless Dir.exist?(parent_path)
 
       File.open(publish_path, 'w') do |file|
-        file.write(contents)
+        file.write(output)
       end
     end
 
@@ -17,7 +17,7 @@ module Salt
       context[:site] ||= @site
 
       begin
-        output = Erubis::Eruby.new(@contents).evaluate(context) { body }
+        output = Erubis::Eruby.new(contents()).evaluate(context) { body }
       rescue SyntaxError => e
         raise "Syntax error in #{path.gsub(site.source_paths[:root], '')}"
       end
