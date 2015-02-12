@@ -5,10 +5,11 @@ module Salt
 
     attr_accessor :path
     attr_accessor :title
-    attr_accessor :contents
     attr_accessor :filename
     attr_accessor :extension
     attr_accessor :layout
+
+    attr_writer :contents
 
     def initialize(site, path = nil)
       @site = site
@@ -27,6 +28,10 @@ module Salt
 
     def type
       :page
+    end
+
+    def contents
+      @contents
     end
 
     def output_file_path(parent_path)

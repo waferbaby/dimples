@@ -5,7 +5,6 @@ module Salt
     
     attr_accessor :path
     attr_accessor :title
-    attr_accessor :contents
     attr_accessor :filename
     attr_accessor :extension
     attr_accessor :layout
@@ -16,6 +15,7 @@ module Salt
     attr_accessor :month
     attr_accessor :day
 
+    attr_writer :contents
     attr_writer :markdown
 
     def initialize(site, path)
@@ -44,8 +44,12 @@ module Salt
       :post
     end
 
+    def contents
+      @contents
+    end
+
     def markdown
-      @markdown ||= @site.markdown_engine.render(@contents)
+      @markdown ||= @site.markdown_engine.render(contents())
     end
 
     def output_file_path(parent_path)
