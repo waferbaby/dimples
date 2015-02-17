@@ -21,11 +21,13 @@ module Salt
     end
 
     def self.default_settings
+      current_path = Dir.pwd
+
       {
-        'root' => Dir.pwd,
+        'source_path' => current_path,
+        'destination_path' => File.join(current_path, 'site'),
 
         'paths' => {
-          'site' => 'site',
           'posts' => 'archives',
           'post' => '%Y/%m/%d',
         },
