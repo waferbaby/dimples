@@ -30,13 +30,13 @@ module Salt
 
       @config = Salt::Configuration.new(config)
 
-      @source_paths[:root] = File.expand_path(@config['root'])
+      @source_paths[:root] = File.expand_path(@config['source_path'])
+      @output_paths[:site] = File.expand_path(@config['destination_path'])
 
       %w{pages posts templates public}.each do |path|
         @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
       end
 
-      @output_paths[:site] = File.join(@source_paths[:root], @config['paths']['site'])
       @output_paths[:posts] = File.join(@output_paths[:site], @config['paths']['posts'])
 
       @markdown_engine = if @config['markdown']['enabled']
