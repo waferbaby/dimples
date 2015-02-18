@@ -1,14 +1,14 @@
 $:.unshift File.expand_path('./lib')
  
-require 'salt/version'
+require 'dimples/version'
  
 Gem::Specification.new do |s|
-  s.name        = "salt"
+  s.name        = "dimples"
   s.version     = Dimples::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Daniel Bogan"]
-  s.email       = ["d+salt@waferbaby.com"]
-  s.homepage    = "http://github.com/waferbaby/salt"
+  s.email       = ["d+dimples@waferbaby.com"]
+  s.homepage    = "http://github.com/waferbaby/dimples"
   s.summary     = "A very silly static site generator"
   s.description = "This is a very simple static site generator, born out of the loins of usesthis.com."
   s.license     = "LICENSE"
