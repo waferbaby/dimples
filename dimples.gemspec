@@ -13,8 +13,9 @@ Gem::Specification.new do |s|
   s.description = "This is a very simple static site generator, born out of the loins of usesthis.com."
   s.license     = "LICENSE"
  
-  s.required_rubygems_version = ">= 1.3.6"
- 
   s.files        = Dir.glob("lib/**/*")
   s.require_path = 'lib'
+
+  s.add_dependency 'erubis', '~> 2.7'
+  s.add_dependency 'redcarpet', '~> 3.2'
 end
