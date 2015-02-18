@@ -1,3 +1,3 @@
-module Salt
+module Dimples
   VERSION = "0.1"
 end

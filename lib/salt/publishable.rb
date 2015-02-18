@@ -1,4 +1,4 @@
-module Salt
+module Dimples
   module Publishable
     def write(path, context = false)
       output = context ? render(contents(), {this: self}.merge(context)) : contents()

@@ -1,4 +1,4 @@
-module Salt
+module Dimples
   module Frontable
     def read_with_yaml(path)
       if path =~ /.yml$/

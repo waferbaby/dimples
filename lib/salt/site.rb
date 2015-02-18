@@ -1,4 +1,4 @@
-module Salt
+module Dimples
   class Site
     attr_accessor :source_paths
     attr_accessor :output_paths
@@ -25,10 +25,10 @@ module Salt
 
       @latest_post = false
 
-      @page_class = Salt::Page
-      @post_class = Salt::Post
+      @page_class = Dimples::Page
+      @post_class = Dimples::Post
 
-      @config = Salt::Configuration.new(config)
+      @config = Dimples::Configuration.new(config)
 
       @source_paths[:root] = File.expand_path(@config['source_path'])
       @output_paths[:site] = File.expand_path(@config['destination_path'])
@@ -48,7 +48,7 @@ module Salt
 
     def scan_files
       Dir.glob(File.join(@source_paths[:templates], '**', '*.*')).each do |path|
-        template = Salt::Template.new(self, path)
+        template = Dimples::Template.new(self, path)
         @templates[template.slug] = template
       end
 

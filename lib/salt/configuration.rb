@@ -1,7 +1,7 @@
-module Salt
+module Dimples
   class Configuration
     def initialize(config = {})
-      @settings = Salt::Configuration.default_settings
+      @settings = Dimples::Configuration.default_settings
 
       if config
         @settings.each_key do |key|

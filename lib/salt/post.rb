@@ -1,4 +1,4 @@
-module Salt
+module Dimples
   class Post
     include Frontable
     include Publishable
