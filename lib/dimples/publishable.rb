@@ -1,7 +1,7 @@
 module Dimples
   module Publishable
     def write(path, context = false)
-      output = context ? render(contents(), {this: self}.merge(context)) : contents()
+      output = context ? render(contents(), context) : contents()
 
       publish_path = output_file_path(path)
       parent_path = File.dirname(publish_path)
@@ -14,6 +14,7 @@ module Dimples
     end
 
     def render(body, context = {}, use_layout = true)
+      context[:this] = self
       context[:site] ||= @site
 
       begin
