@@ -4,7 +4,7 @@ require 'salt/version'
  
 Gem::Specification.new do |s|
   s.name        = "salt"
-  s.version     = Salt::VERSION
+  s.version     = Dimples::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Daniel Bogan"]
   s.email       = ["d+salt@waferbaby.com"]
