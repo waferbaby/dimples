@@ -1,4 +1,4 @@
-# Salt
+# Dimples
 
 A very, very, *very* simple static site generator for Ruby.
 
