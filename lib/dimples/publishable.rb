@@ -13,7 +13,7 @@ module Dimples
       end
     end
 
-    def render(body, context = {}, use_layout = true)
+    def render(body = nil, context = {}, use_layout = true)
       context[:this] = self
       context[:site] ||= @site
 
