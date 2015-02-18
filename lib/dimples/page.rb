@@ -24,7 +24,6 @@ module Dimples
       end
 
       @extension = @site.config['file_extensions']['pages']
-      @layout ||= @site.config['layouts']['page']
     end
 
     def type
