@@ -1,8 +1,5 @@
 $LOAD_PATH.unshift(__dir__)
 
-require 'rubygems'
-
-require 'bundler/setup'
 require 'fileutils'
 require 'yaml'
 require 'erubis'
