@@ -1,35 +1,34 @@
-require 'salt'
+require 'dimples'
 
 describe 'A page' do
 
-  let!(:site) do
-    site = Salt::Site.new()
-    site.templates['test'] = Salt::Template.new(site, File.join(File.dirname(__dir__), 'spec', 'template.erb'))
-
-    site
-  end
-
-  subject { Salt::Page.new(site) }
+  subject { @site.pages[0] }
     
   it 'should create a file when published' do
-    subject.filename = 'salt_test_' + Time.new.strftime('%s')
-    subject.write('/tmp/')
-
-    file_path = subject.output_file_path('/tmp/')
-
-    result = File.exist?(file_path)
-    File.delete(file_path)
+    subject.write(@site.output_paths[:site], {})
+    result = File.exist?(subject.output_file_path(@site.output_paths[:site]))
 
     expect(result).to be_truthy
   end
 
   it 'should render using a template' do
-    subject.contents = "Wow, butts!"
-    subject.layout = 'test'
+    output = subject.render()
+    expected = <<EXPECTED
+<!DOCTYPE html>
+<html lang="en-US" xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>About</title>
+</head>
+<body>
+<h2>About this site</h2>
+<p>Hello! I'm an about page.</p>
+</body>
+</html>
+EXPECTED
 
-    output = subject.render(subject.contents())
+    expected.rstrip!
 
-    expect(output).to match("<strong>Wow, butts!</strong>")
+    expect(output).to match(expected)
   end
 
 end
