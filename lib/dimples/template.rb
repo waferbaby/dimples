@@ -15,5 +15,9 @@ module Dimples
 
       @contents = read_with_yaml(path)
     end
+
+    def type
+      :template
+    end
   end
 end
