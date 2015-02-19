@@ -44,8 +44,6 @@ module Dimples
       else
         false
       end
-
-      scan_files
     end
 
     def scan_files
@@ -86,6 +84,8 @@ module Dimples
     end
 
     def generate
+      scan_files
+      
       begin
         FileUtils.remove_dir(@output_paths[:site]) if Dir.exist?(@output_paths[:site])
         Dir.mkdir(@output_paths[:site])
