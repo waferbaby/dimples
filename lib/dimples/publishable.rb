@@ -14,13 +14,13 @@ module Dimples
     end
 
     def render(body = nil, context = {}, use_layout = true)
-      context[:this] = self
+      context[:this] = self unless context[:this]
       context[:site] ||= @site
 
       begin
         output = Erubis::Eruby.new(contents()).evaluate(context) { body }
       rescue SyntaxError => e
-        raise "Syntax error in #{path.gsub(site.source_paths[:root], '')}"
+        raise "Syntax error in #{path.gsub(@site.source_paths[:root], '')}"
       end
 
       if use_layout && @layout && @site.templates[@layout]
