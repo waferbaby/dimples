@@ -18,10 +18,13 @@ module Dimples
       context[:this] = self unless context[:this]
 
       begin
-        renderer = Tilt.new(@path) { |template| contents() }
+        proc = Proc.new { |template| contents() }
+        renderer = @path ? Tilt.new(@path, &proc) : Tilt::StringTemplate.new(&proc)
         output = renderer.render(nil, context) { body }.strip
+
+        @rendered_contents = output
       rescue RuntimeError, TypeError, NoMethodError => e
-        raise "Failed to render #{type} #{path.gsub(@site.source_paths[:root], '')} - #{e}"
+        raise "Failed to render #{path ? path.gsub(@site.source_paths[:root], '') : type} - #{e}"
       end
 
       if use_layout && @layout && @site.templates[@layout]
