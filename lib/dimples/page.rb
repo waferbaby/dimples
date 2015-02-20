@@ -9,6 +9,7 @@ module Dimples
     attr_accessor :filename
     attr_accessor :extension
     attr_accessor :layout
+    attr_accessor :rendered_contents
 
     attr_writer :contents
 

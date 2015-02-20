@@ -15,6 +15,7 @@ module Dimples
     attr_accessor :year
     attr_accessor :month
     attr_accessor :day
+    attr_accessor :rendered_contents
 
     attr_writer :contents
 
