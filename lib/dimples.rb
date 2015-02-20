@@ -2,8 +2,7 @@ $LOAD_PATH.unshift(__dir__)
 
 require 'fileutils'
 require 'yaml'
-require 'erubis'
-require 'redcarpet'
+require 'tilt'
 
 require 'dimples/frontable'
 require 'dimples/publishable'
