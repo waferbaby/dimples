@@ -17,7 +17,6 @@ module Dimples
     attr_accessor :day
 
     attr_writer :contents
-    attr_writer :markdown
 
     def initialize(site, path)
       @site = site
@@ -47,10 +46,6 @@ module Dimples
 
     def contents
       @contents
-    end
-
-    def markdown
-      @markdown ||= @site.markdown_engine.render(contents())
     end
 
     def output_file_path(parent_path)
