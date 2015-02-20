@@ -1,7 +1,7 @@
 module Dimples
   module Publishable
-    def write(path, context = false)
-      output = context ? render(contents(), context) : contents()
+    def write(path, context = {})
+      output = render(context)
 
       publish_path = output_file_path(path)
       parent_path = File.dirname(publish_path)
@@ -13,18 +13,19 @@ module Dimples
       end
     end
 
-    def render(body = nil, context = {}, use_layout = true)
+    def render(context = {}, body = nil, use_layout = true)
+      context[:site] = @site unless context[:site]
       context[:this] = self unless context[:this]
-      context[:site] ||= @site
 
       begin
-        output = Erubis::Eruby.new(contents()).evaluate(context) { body }
-      rescue SyntaxError => e
-        raise "Syntax error in #{path.gsub(@site.source_paths[:root], '')}"
+        renderer = Tilt.new(@path) { |template| contents() }
+        output = renderer.render(nil, context) { body }.strip
+      rescue RuntimeError, TypeError, NoMethodError => e
+        raise "Failed to render #{type} #{path.gsub(@site.source_paths[:root], '')} - #{e}"
       end
 
       if use_layout && @layout && @site.templates[@layout]
-        output = @site.templates[@layout].render(output, context) 
+        output = @site.templates[@layout].render(context, output)
       end
 
       output
