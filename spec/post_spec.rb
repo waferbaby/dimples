@@ -23,7 +23,7 @@ describe 'A post' do
 <h2>My first post</h2>
 <h3>Hello</h3>
 
-<p>Welcome to my <strong>first post</strong>.</p>
+<p>Welcome to my first post. This is <em>awesome</em>.</p>
 </body>
 </html>
 EXPECTED
