@@ -1,7 +1,7 @@
 module Dimples
   module Frontable
     def read_with_yaml(path)
-      if path =~ /.yml$/
+      if File.extname(path) == '.yml'
         contents = ''
         metadata = YAML.load_file(path)
       else
@@ -10,7 +10,7 @@ module Dimples
 
         if matches
           metadata = YAML.load(matches[1])
-          contents = matches.post_match.strip!
+          contents = matches.post_match.strip
         end
       end
 
