@@ -9,7 +9,6 @@ module Dimples
     attr_accessor :pages
     attr_accessor :posts
     attr_accessor :latest_post
-    attr_accessor :markdown_engine
     attr_accessor :page_class
     attr_accessor :post_class
 
@@ -38,12 +37,6 @@ module Dimples
       end
 
       @output_paths[:posts] = File.join(@output_paths[:site], @config['paths']['posts'])
-
-      @markdown_engine = if @config['markdown']['enabled']
-        Redcarpet::Markdown.new(Redcarpet::Render::HTML, @config['markdown']['options'])
-      else
-        false
-      end
     end
 
     def scan_files
@@ -95,7 +88,7 @@ module Dimples
 
       @posts.each do |post|
         begin
-          post.write(@output_paths[:posts], {})
+          post.write(@output_paths[:posts])
         rescue => e
           raise "Failed to render post #{File.basename(post.path)} (#{e})"
         end
@@ -103,7 +96,7 @@ module Dimples
 
       @pages.each do |page|
         begin
-          page.write(@output_paths[:site], {})
+          page.write(@output_paths[:site])
         rescue => e
           raise "Failed to render page from #{page.path.gsub(@source_paths[:root], '')} (#{e})"
         end
@@ -206,14 +199,14 @@ module Dimples
       end
     end
 
-    def generate_feed(path, params)
+    def generate_feed(path, options)
       feed = @page_class.new(self)
 
       feed.filename = 'feed'
       feed.extension = 'atom'
       feed.layout = 'feed'
 
-      feed.write(path, params)
+      feed.write(path, options)
     end
 
     def paginate(posts, title, per_page, paths, layout, params = {})
@@ -260,18 +253,6 @@ module Dimples
         page.title = page_title
 
         page.write(File.join(page_paths), {posts: range, pagination: pagination}.merge(params))
-      end
-    end
-
-    def render(template_slug, content, layout = true)
-      return '' unless @templates[template_slug]
-
-      if content.is_a? String
-        @templates[template_slug].render(content, {}, layout)
-      elsif content.is_a? Hash
-        @templates[template_slug].render('', content, layout)
-      else
-        ''
       end
     end
   end
