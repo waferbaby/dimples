@@ -5,7 +5,7 @@ describe 'A page' do
   subject { @site.pages[0] }
     
   it 'should create a file when published' do
-    subject.write(@site.output_paths[:site], {})
+    subject.write(@site.output_paths[:site])
     result = File.exist?(subject.output_file_path(@site.output_paths[:site]))
 
     expect(result).to be_truthy
