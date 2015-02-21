@@ -86,62 +86,23 @@ module Dimples
         raise "Failed to prepare the site directory (#{e})"
       end
 
-      @posts.each do |post|
-        begin
-          post.write(@output_paths[:posts])
-        rescue => e
-          raise "Failed to render post #{File.basename(post.path)} (#{e})"
-        end
-      end
-
-      @pages.each do |page|
-        begin
-          page.write(@output_paths[:site])
-        rescue => e
-          raise "Failed to render page from #{page.path.gsub(@source_paths[:root], '')} (#{e})"
-        end
-      end
+      generate_posts
+      generate_pages
 
       if @config['generation']['paginated_posts'] && @posts.length > 0
-        begin
-          paginate(@posts, false, @config['pagination']['per_page'], [@output_paths[:posts]], @config['layouts']['posts'])
-        rescue => e
-          raise "Failed to paginate main posts (#{e})"
-        end
+        paginate(@posts, false, @config['pagination']['per_page'], [@output_paths[:posts]], @config['layouts']['posts'])
       end
 
       if @config['generation']['year_archives'] && @archives.length > 0
-        begin
-          generate_archives
-        rescue => e
-          raise "Failed to generate archives (#{e})"
-        end
+        generate_archives
       end
 
       if @config['generation']['categories'] && @categories.length > 0
-        @categories.each_pair do |slug, posts|  
-          if @config['generation']['category_feeds']
-            begin
-              generate_feed(File.join(@output_paths[:posts], slug), {posts: posts[0..@config['pagination']['per_page'] - 1], category: slug})
-            rescue => e
-              raise "Failed to generate category feed for '#{slug}' (#{e})"
-            end
-          end
-
-          begin
-            paginate(posts, slug.capitalize, @config['pagination']['per_page'], [@output_paths[:posts], slug], @config['layouts']['category'])
-          rescue => e
-            raise "Failed to generate category pages for '#{slug}' (#{e})"
-          end
-        end
+        generate_categories
       end
 
       if @config['generation']['feed'] && @posts.length > 0
-        begin
-          generate_feed(@output_paths[:site], {posts: @posts[0..@config['pagination']['per_page'] - 1]})
-        rescue => e
-          raise "Failed to generate main feed (#{e})"
-        end
+        generate_feed(@output_paths[:site], {posts: @posts[0..@config['pagination']['per_page'] - 1]})
       end
 
       begin
@@ -151,37 +112,47 @@ module Dimples
       end
     end
 
-    def generate_archives
-      if @config['layouts'].has_key?('year')
-        year_template = @config['layouts']['year']
-      elsif @config['layouts'].has_key?('archives')
-        year_template = @config['layouts']['archives']
-      else
-        year_template = @config['layouts']['posts']
+    def generate_posts
+      @posts.each do |post|
+        begin
+          post.write(@output_paths[:posts])
+        rescue => e
+          raise "Failed to render post #{post.path} (#{e})"
+        end
       end
+    end
+
+    def generate_pages
+      @pages.each do |page|
+        begin
+          page.write(@output_paths[:site])
+        rescue => e
+          raise "Failed to render page #{page.path.gsub(@source_paths[:root], '')} (#{e})"
+        end
+      end
+    end
+
+    def generate_categories
+      @categories.each_pair do |slug, posts|
+        if @config['generation']['category_feeds']
+          generate_feed(File.join(@output_paths[:posts], slug), {posts: posts[0..@config['pagination']['per_page'] - 1], category: slug})
+        end
+
+        paginate(posts, slug.capitalize, @config['pagination']['per_page'], [@output_paths[:posts], slug], @config['layouts']['category'])
+      end
+    end
+
+    def generate_archives
+      year_template = @config['layouts']['year'] || @config['layouts']['archives'] || @config['layouts']['posts']
 
       @archives.each do |year, year_archive|
-
         if @config['generation']['month_archives']
-          if @config['layouts'].has_key?('month')
-            month_template = @config['layouts']['month']
-          elsif @config['layouts'].has_key?('archives')
-            month_template = @config['layouts']['archives']
-          else
-            month_template = @config['layouts']['posts']
-          end
+          month_template = @config['layouts']['month'] || @config['layouts']['archives'] || @config['layouts']['posts']
 
           year_archive[:months].each do |month, month_archive|
 
             if @config['generation']['day_archives']
-
-              if @config['layouts'].has_key?('day')
-                day_template = @config['layouts']['day']
-              elsif @config['layouts'].has_key?('archives')
-                day_template = @config['layouts']['archives']
-              else
-                day_template = @config['layouts']['posts']
-              end
+              day_template = @config['layouts']['day'] || @config['layouts']['archives'] || @config['layouts']['posts']
 
               month_archive[:days].each do |day, posts|
                 day_title = posts[0].date.strftime(@config['date_formats']['day'])
@@ -206,7 +177,11 @@ module Dimples
       feed.extension = 'atom'
       feed.layout = 'feed'
 
-      feed.write(path, options)
+      begin
+        feed.write(path, options)
+      rescue => e
+        raise "Failed to generate feed #{path} (#{e})"
+      end
     end
 
     def paginate(posts, title, per_page, paths, layout, params = {})
@@ -252,7 +227,13 @@ module Dimples
         page.layout = layout
         page.title = page_title
 
-        page.write(File.join(page_paths), {posts: range, pagination: pagination}.merge(params))
+        path = File.join(page_paths)
+
+        begin
+          page.write(path, {posts: range, pagination: pagination}.merge(params))
+        rescue => e
+          raise "Failed to generate paginated page #{path} (#{e})"
+        end
       end
     end
   end
