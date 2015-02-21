@@ -1,6 +1,7 @@
 # Dimples
-
 A very, very, *very* simple static site generator gem.
+
+[![Build Status](https://travis-ci.org/waferbaby/dimples.svg?branch=master)](https://travis-ci.org/waferbaby/dimples)
 
 ## Requirements
 
