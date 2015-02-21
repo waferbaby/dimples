@@ -16,6 +16,5 @@ Gem::Specification.new do |s|
   s.files        = Dir.glob("lib/**/*")
   s.require_path = 'lib'
 
-  s.add_dependency 'erubis', '~> 2.7'
-  s.add_dependency 'redcarpet', '~> 3.2'
+  s.add_dependency 'tilt', '~> 2.0'
 end
