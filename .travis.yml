@@ -1,4 +1,7 @@
 language: ruby
 rvm:
   - 2.1.0
-script: bundle exec rspec
+script:
+  - gem install erubis
+  - gem install redcarpet
+  - bundle exec rspec
