@@ -1,4 +1,9 @@
 source "https://rubygems.org"
 
 gem 'tilt'
-gem 'rspec'
+
+group :test do
+  gem 'rspec'
+  gem 'erubis'
+  gem 'redcarpet'
+end
