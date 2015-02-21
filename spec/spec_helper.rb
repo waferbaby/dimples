@@ -1,6 +1,4 @@
 require 'fileutils'
-require 'erubis'
-require 'redcarpet'
 
 RSpec.configure do |config|
   config.before(:all) do
