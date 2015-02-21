@@ -2,6 +2,8 @@ GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.2.5)
+    erubis (2.7.0)
+    redcarpet (3.2.2)
     rspec (3.2.0)
       rspec-core (~> 3.2.0)
       rspec-expectations (~> 3.2.0)
@@ -21,5 +23,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  erubis
+  redcarpet
   rspec
   tilt
