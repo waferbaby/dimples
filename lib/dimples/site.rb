@@ -39,58 +39,59 @@ module Dimples
       @output_paths[:posts] = File.join(@output_paths[:site], @config['paths']['posts'])
     end
 
-    def scan_files
-      Dir.glob(File.join(@source_paths[:templates], '**', '*.*')).each do |path|
-        template = Dimples::Template.new(self, path)
-        @templates[template.slug] = template
-      end
+    def generate
+      prepare_site
+      
+      scan_templates
+      scan_pages
+      scan_posts
 
-      Dir.glob(File.join(@source_paths[:pages], '**', '*.*')).each do |path|
-        @pages << @page_class.new(self, path)
-      end
+      generate_posts
+      generate_pages
 
-      Dir.glob(File.join(@source_paths[:posts], '*.*')).each do |path|
-        @posts << @post_class.new(self, path)
-      end
+      generate_archives if @config['generation']['year_archives']
+      generate_categories if @config['generation']['categories']
 
-      @posts.reverse!
-      @latest_post = @posts.first
+      generate_posts_feed if @config['generation']['feed']
+      generate_category_feeds if @config['generation']['category_feeds']
+
+      copy_assets
     end
 
-    def generate
-      scan_files
-      
+    def prepare_site
       begin
         FileUtils.remove_dir(@output_paths[:site]) if Dir.exist?(@output_paths[:site])
         Dir.mkdir(@output_paths[:site])
       rescue => e
         raise "Failed to prepare the site directory (#{e})"
       end
+    end
 
-      generate_posts
-      generate_pages
+    def scan_templates
+      Dir.glob(File.join(@source_paths[:templates], '**', '*.*')).each do |path|
+        template = Dimples::Template.new(self, path)
+        @templates[template.slug] = template
+      end
+    end
 
-      if @config['generation']['paginated_posts'] && @posts.length > 0
-        paginate(@posts, false, @config['pagination']['per_page'], [@output_paths[:posts]], @config['layouts']['posts'])
+    def scan_pages
+      Dir.glob(File.join(@source_paths[:pages], '**', '*.*')).each do |path|
+        @pages << @page_class.new(self, path)
+      end
+    end
+
+    def scan_posts
+      Dir.glob(File.join(@source_paths[:posts], '*.*')).reverse.each do |path|
+        post = @post_class.new(self, path)
+
+        post.categories.each do |category|
+          (@categories[category] ||= []) << post
+        end
+
+        @posts << post
       end
 
-      if @config['generation']['year_archives']
-        generate_archives
-      end
-
-      if @config['generation']['categories'] && @categories.length > 0
-        generate_categories
-      end
-
-      if @config['generation']['feed'] && @posts.length > 0
-        generate_feed(@output_paths[:site], {posts: @posts[0..@config['pagination']['per_page'] - 1]})
-      end
-
-      begin
-        FileUtils.cp_r(File.join(@source_paths[:public], '.'), @output_paths[:site]) if Dir.exists?(@source_paths[:public])
-      rescue => e
-        raise "Failed to copy site assets (#{e})"
-      end
+      @latest_post = @posts.first
     end
 
     def generate_posts
@@ -100,6 +101,10 @@ module Dimples
         rescue => e
           raise "Failed to render post #{post.path} (#{e})"
         end
+      end
+
+      if @config['generation']['paginated_posts']
+        paginate(@posts, false, @config['pagination']['per_page'], [@output_paths[:posts]], @config['layouts']['posts'])
       end
     end
 
@@ -115,10 +120,6 @@ module Dimples
 
     def generate_categories
       @categories.each_pair do |slug, posts|
-        if @config['generation']['category_feeds']
-          generate_feed(File.join(@output_paths[:posts], slug), {posts: posts[0..@config['pagination']['per_page'] - 1], category: slug})
-        end
-
         paginate(posts, slug.capitalize, @config['pagination']['per_page'], [@output_paths[:posts], slug], @config['layouts']['category'])
       end
     end
@@ -168,6 +169,24 @@ module Dimples
       end
     end
 
+    def generate_posts_feed
+      generate_feed(@output_paths[:site], {posts: @posts[0..@config['pagination']['per_page'] - 1]})
+    end
+
+    def generate_category_feeds
+      @categories.each_pair do |slug, posts|
+        generate_feed(File.join(@output_paths[:posts], slug), {posts: posts[0..@config['pagination']['per_page'] - 1], category: slug})
+      end
+    end
+
+    def copy_assets
+      begin
+        FileUtils.cp_r(File.join(@source_paths[:public], '.'), @output_paths[:site]) if Dir.exists?(@source_paths[:public])
+      rescue => e
+        raise "Failed to copy site assets (#{e})"
+      end
+    end
+
     def paginate(posts, title, per_page, paths, layout, params = {})
       fail "'#{layout}' template not found" unless @templates.has_key?(layout)
 
@@ -188,10 +207,7 @@ module Dimples
         end
 
         url_path += "#{page_paths[1..-1].join('/')}/" if page_paths.length > 1
-
-        if index > 0
-          page_paths.push("page#{index + 1}")
-        end
+        page_paths << "page#{index + 1}" if index > 0
 
         pagination = {
           page: index + 1,
@@ -200,13 +216,8 @@ module Dimples
           path: url_path
         }
 
-        if (pagination[:page] - 1) > 0
-          pagination[:previous_page] = pagination[:page] - 1
-        end
-
-        if (pagination[:page] + 1) <= pagination[:pages]
-          pagination[:next_page] = pagination[:page] + 1
-        end
+        pagination[:previous_page] = pagination[:page] - 1 if (pagination[:page] - 1) > 0
+        pagination[:next_page] = pagination[:page] + 1 if (pagination[:page] + 1) <= pagination[:pages]
 
         page.layout = layout
         page.title = page_title
