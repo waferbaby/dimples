@@ -55,25 +55,6 @@ module Dimples
 
       @posts.reverse!
       @latest_post = @posts.first
-
-      @posts.each do |post|
-
-        year = post.year.to_s
-        month = post.month.to_s
-        day = post.day.to_s
-
-        @archives[year] ||= {posts: [], months: {}}
-
-        @archives[year][:posts] << post
-        @archives[year][:months][month] ||= {posts: [], days: {}, name: post.date.strftime('%B')}
-        @archives[year][:months][month][:posts] << post
-        @archives[year][:months][month][:days][day] ||= []
-        @archives[year][:months][month][:days][day] << post
-
-        post.categories.each do |category|
-          (@categories[category] ||= []) << post
-        end
-      end
     end
 
     def generate
@@ -93,7 +74,7 @@ module Dimples
         paginate(@posts, false, @config['pagination']['per_page'], [@output_paths[:posts]], @config['layouts']['posts'])
       end
 
-      if @config['generation']['year_archives'] && @archives.length > 0
+      if @config['generation']['year_archives']
         generate_archives
       end
 
@@ -143,30 +124,33 @@ module Dimples
     end
 
     def generate_archives
-      year_template = @config['layouts']['year'] || @config['layouts']['archives'] || @config['layouts']['posts']
+      archives = {year: {}, month: {}, day: {}}
 
-      @archives.each do |year, year_archive|
-        if @config['generation']['month_archives']
-          month_template = @config['layouts']['month'] || @config['layouts']['archives'] || @config['layouts']['posts']
+      @posts.each do |post|
+        %w[year month day].each do |date_type|
 
-          year_archive[:months].each do |month, month_archive|
+          if @config['generation']["#{date_type}_archives"]
 
-            if @config['generation']['day_archives']
-              day_template = @config['layouts']['day'] || @config['layouts']['archives'] || @config['layouts']['posts']
-
-              month_archive[:days].each do |day, posts|
-                day_title = posts[0].date.strftime(@config['date_formats']['day'])
-                paginate(posts, day_title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s, day.to_s], day_template)
-              end
-            end
-
-            month_title = month_archive[:posts][0].date.strftime(@config['date_formats']['month'])
-            paginate(month_archive[:posts], month_title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s, month.to_s], month_template)
+            date_key = post.date.strftime(@config['date_formats'][date_type])
+            (archives[date_type.to_sym][date_key] ||= []) << post
           end
         end
+      end
 
-        year_title = year_archive[:posts][0].date.strftime(@config['date_formats']['year'])
-        paginate(year_archive[:posts], year_title, @config['pagination']['per_page'], [@output_paths[:posts], year.to_s], year_template)
+      %w[year month day].each do |date_type|
+
+        if @config['generation']["#{date_type}_archives"]
+
+          template = @config['layouts'][date_type] || @config['layouts']['archives'] || @config['layouts']['posts']
+          archives[date_type.to_sym].each_pair do |date_title, posts|
+
+            paths = [@output_paths[:posts], posts[0].year]
+            paths << posts[0].month if date_type =~ /month|day/
+            paths << posts[0].day if date_type == 'day'
+
+            paginate(posts, date_title, @config['pagination']['per_page'], paths, template)
+          end
+        end
       end
     end
 
