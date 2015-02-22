@@ -12,7 +12,9 @@ RSpec.configure do |config|
       'destination_path' => File.join(current_path, 'test_site')
     })
 
-    @site.scan_files
+    @site.scan_templates
+    @site.scan_pages
+    @site.scan_posts
   end
 
   config.after(:all) do
