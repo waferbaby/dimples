@@ -10,7 +10,6 @@ describe 'A page', publishing: true do
   end
 
   it 'should render using a template' do
-    output = subject.render()
     expected = <<EXPECTED
 <!DOCTYPE html>
 <html lang="en-US" xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
@@ -24,9 +23,7 @@ describe 'A page', publishing: true do
 </html>
 EXPECTED
 
-    expected.rstrip!
-
-    expect(output).to eql(expected)
+    expect(subject.render()).to eql(expected.rstrip)
   end
 
 end
