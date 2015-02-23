@@ -6,9 +6,7 @@ describe 'A post', publishing: true do
     
   it 'should create a file when published' do
     subject.write(@site.output_paths[:posts])
-    result = File.exist?(subject.output_file_path(@site.output_paths[:posts]))
-
-    expect(result).to be_truthy
+    expect(File).to exist(subject.output_file_path(@site.output_paths[:posts]))
   end
 
   it 'should render using a template' do
@@ -30,7 +28,7 @@ EXPECTED
 
     expected.rstrip!
     
-    expect(output).to match(expected)
+    expect(output).to eql(expected)
   end
 
 end
