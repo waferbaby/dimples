@@ -11,7 +11,9 @@ RSpec.configure do |config|
       'source_path' => File.join(current_path, 'spec', 'fixtures'),
       'destination_path' => File.join(current_path, 'test_site')
     })
+  end
 
+  config.before(:example, publishing: true) do
     @site.scan_templates
     @site.scan_pages
     @site.scan_posts
