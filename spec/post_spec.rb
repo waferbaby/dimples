@@ -1,6 +1,6 @@
 require 'dimples'
 
-describe 'A post' do
+describe 'A post', publishing: true do
 
   subject { @site.posts[0] }
     
