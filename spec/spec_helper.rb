@@ -14,9 +14,7 @@ RSpec.configure do |config|
   end
 
   config.before(:example, publishing: true) do
-    @site.scan_templates
-    @site.scan_pages
-    @site.scan_posts
+    @site.scan_files
   end
 
   config.after(:all) do
