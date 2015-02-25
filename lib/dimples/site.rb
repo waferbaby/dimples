@@ -213,6 +213,7 @@ module Dimples
         pagination = {
           page: index,
           pages: page_count,
+          post_count: posts.length,
           path: pagination_url(index, page_paths)
         }
 
