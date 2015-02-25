@@ -9,7 +9,7 @@ describe 'A template', publishing: true do
 <!DOCTYPE html>
 <html lang="en-US" xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title></title>
+<title>My site</title>
 </head>
 <body>
 Hello
