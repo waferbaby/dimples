@@ -41,17 +41,13 @@ module Dimples
 
     def generate
       prepare_site
-      
-      scan_templates
-      scan_pages
-      scan_posts
+      scan_files
 
       generate_posts
       generate_pages
       generate_archives
 
       generate_categories if @config['generation']['categories']
-
       generate_posts_feed if @config['generation']['feed']
       generate_category_feeds if @config['generation']['category_feeds']
 
@@ -65,6 +61,12 @@ module Dimples
       rescue => e
         raise "Failed to prepare the site directory (#{e})"
       end
+    end
+
+    def scan_files
+      scan_templates
+      scan_pages
+      scan_posts
     end
 
     def scan_templates
