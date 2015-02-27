@@ -32,6 +32,6 @@ describe 'A site' do
       files << File.basename(file)
     end
 
-    expect(files).to eq(["a.jpg", "b.jpg", "c.jpg"])
+    expect(files.sort).to eq(["a.jpg", "b.jpg", "c.jpg"])
   end
 end
