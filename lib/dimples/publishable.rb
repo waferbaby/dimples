@@ -17,14 +17,28 @@ module Dimples
       context[:site] = @site unless context[:site]
       context[:this] = self unless context[:this]
 
-      begin
-        proc = Proc.new { |template| contents() }
-        renderer = @path ? Tilt.new(@path, &proc) : Tilt::StringTemplate.new(&proc)
-        output = renderer.render(nil, context) { body }.strip
+      proc = Proc.new { |template| contents() }
 
+      renderer = if @path
+        extension = File.extname(@path)[1..-1]
+        options = @site.config['rendering'][extension] || {}
+
+        Tilt.new(@path, options, &proc)
+      else
+        Tilt::StringTemplate.new(&proc)
+      end
+
+      begin
+        output = renderer.render(nil, context) { body }.strip
         @rendered_contents = output
-      rescue RuntimeError, TypeError, NoMethodError => e
-        raise "Failed to render #{path ? path.gsub(@site.source_paths[:root], '') : type} - #{e}"
+      rescue RuntimeError, TypeError, NoMethodError, SyntaxError => e
+        problem_file = if @path
+          @path.gsub(@site.source_paths[:root], '')
+        else
+          "dynamic #{type}"
+        end
+
+        raise "Failed to render #{problem_file} - #{e}"
       end
 
       if use_layout && @layout && @site.templates[@layout]
