@@ -38,11 +38,6 @@ module Dimples
           'category' => 'category',
         },
 
-        'markdown' => {
-          'enabled' => true,
-          'options' => {},
-        },
-
         'pagination' => {
           'enabled' => true,
           'per_page' => 10,
