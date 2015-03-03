@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Daniel Bogan"]
   s.email       = ["d+dimples@waferbaby.com"]
   s.homepage    = "http://github.com/waferbaby/dimples"
-  s.summary     = "A very silly static site generator"
-  s.description = "This is a very simple static site generator, born out of the loins of usesthis.com."
+  s.summary     = "A basic static site generator"
+  s.description = "A very, very, very simple gem for building static websites."
   s.license     = "LICENSE"
  
   s.files        = Dir.glob("lib/**/*")
