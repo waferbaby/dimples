@@ -38,6 +38,9 @@ module Dimples
           'category' => 'category',
         },
 
+        'rendering' => {
+        },
+
         'pagination' => {
           'enabled' => true,
           'per_page' => 10,
