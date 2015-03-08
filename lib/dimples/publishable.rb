@@ -35,7 +35,7 @@ module Dimples
         problem_file = if @path
           @path.gsub(@site.source_paths[:root], '')
         else
-          "dynamic #{type}"
+          "dynamic #{self.class}"
         end
 
         raise "Failed to render #{problem_file} - #{e}"
