@@ -41,10 +41,6 @@ module Dimples
       @day = @date.strftime('%d')
     end
 
-    def type
-      :post
-    end
-
     def contents
       @contents
     end

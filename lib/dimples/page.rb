@@ -27,10 +27,6 @@ module Dimples
       @extension = @site.config['file_extensions']['pages']
     end
 
-    def type
-      :page
-    end
-
     def contents
       @contents
     end
