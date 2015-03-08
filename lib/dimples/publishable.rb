@@ -14,8 +14,16 @@ module Dimples
     end
 
     def render(context = {}, body = nil, use_layout = true)
+      class_name = self.class.name.split('::').last.downcase.to_sym
+
       context[:site] = @site unless context[:site]
-      context[:this] = self unless context[:this]
+      context[class_name] = self unless context[class_name]
+
+      scope = Object.new
+
+      context.each_pair do |key, value|
+        scope.instance_variable_set("@#{key}".to_sym, value)
+      end
 
       proc = Proc.new { |template| contents() }
 
@@ -27,9 +35,9 @@ module Dimples
       else
         Tilt::StringTemplate.new(&proc)
       end
-
+    
       begin
-        output = renderer.render(nil, context) { body }.strip
+        output = renderer.render(scope) { body }.strip
         @rendered_contents = output
       rescue RuntimeError, TypeError, NoMethodError, SyntaxError => e
         problem_file = if @path
