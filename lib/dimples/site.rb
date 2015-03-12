@@ -108,7 +108,7 @@ module Dimples
     def generate_posts
       @posts.each do |post|
         begin
-          post.write(@output_paths[:posts])
+          post.write(@output_paths[:posts], {})
         rescue => e
           raise "Failed to render post #{post.path} (#{e})"
         end
@@ -122,7 +122,7 @@ module Dimples
     def generate_pages
       @pages.each do |page|
         begin
-          page.write(@output_paths[:site])
+          page.write(@output_paths[:site], {})
         rescue => e
           raise "Failed to render page #{page.path.gsub(@source_paths[:root], '')} (#{e})"
         end
