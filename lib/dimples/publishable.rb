@@ -1,6 +1,6 @@
 module Dimples
   module Publishable
-    def write(path, context = false)
+    def write(path, context = {})
       output = context ? render(context) : contents()
 
       publish_path = output_file_path(path)
