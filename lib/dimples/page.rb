@@ -15,16 +15,15 @@ module Dimples
 
     def initialize(site, path = nil)
       @site = site
-      
+      @extension = @site.config['file_extensions']['pages']
+
       if path
         @path = path
-        @contents = read_with_yaml(path)
         @filename = File.basename(path, File.extname(path))
+        @contents = read_with_yaml(path)
       else
         @filename = 'index'
       end
-
-      @extension = @site.config['file_extensions']['pages']
     end
 
     def contents

@@ -21,9 +21,7 @@ module Dimples
 
     def initialize(site, path)
       @site = site
-
       @path = path
-      @contents = read_with_yaml(path)
 
       @filename = 'index'
       @extension = @site.config['file_extensions']['posts']
@@ -33,12 +31,14 @@ module Dimples
       @slug = parts[4]
       @date = Time.mktime(parts[1], parts[2], parts[3])
 
-      @layout ||= @site.config['layouts']['post']
-      @categories ||= []
+      @layout = @site.config['layouts']['post']
+      @categories = []
 
       @year = @date.strftime('%Y')
       @month = @date.strftime('%m')
       @day = @date.strftime('%d')
+
+      @contents = read_with_yaml(path)
     end
 
     def contents
