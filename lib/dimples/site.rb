@@ -83,7 +83,6 @@ module Dimples
     end
 
     def scan_posts
-
       Dir.glob(File.join(@source_paths[:posts], '*.*')).reverse.each do |path|
         post = @post_class.new(self, path)
 
@@ -100,6 +99,11 @@ module Dimples
         end
 
         @posts << post
+      end
+
+      @posts.each_index do |index|
+         posts[index].next_post = @posts.fetch(index - 1, nil) if index - 1 > 0
+        @posts[index].previous_post = @posts.fetch(index + 1, nil) if index + 1 < @posts.count
       end
 
       @latest_post = @posts.first
@@ -190,7 +194,7 @@ module Dimples
 
       path += File.split(paths[0])[-1] + "/" if paths[0] != @output_paths[:site]
       path += paths[1..-1].join('/') + "/" if paths.length > 1
-      
+
       path
     end
 
