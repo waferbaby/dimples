@@ -2,7 +2,7 @@ module Dimples
   class Post
     include Frontable
     include Publishable
-    
+
     attr_accessor :path
     attr_accessor :title
     attr_accessor :template
@@ -16,6 +16,8 @@ module Dimples
     attr_accessor :month
     attr_accessor :day
     attr_accessor :rendered_contents
+    attr_accessor :previous_post
+    attr_accessor :next_post
 
     attr_writer :contents
 
