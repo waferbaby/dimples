@@ -102,7 +102,7 @@ module Dimples
       end
 
       @posts.each_index do |index|
-         posts[index].next_post = @posts.fetch(index - 1, nil) if index - 1 > 0
+        @posts[index].next_post = @posts.fetch(index - 1, nil) if index - 1 >= 0
         @posts[index].previous_post = @posts.fetch(index + 1, nil) if index + 1 < @posts.count
       end
 
