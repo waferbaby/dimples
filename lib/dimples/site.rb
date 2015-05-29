@@ -205,31 +205,32 @@ module Dimples
       page_count = (posts.length.to_f / per_page.to_i).ceil
 
       for index in 1..page_count
-        range = posts.slice((index - 1) * per_page, per_page)
-
         page = @page_class.new(self)
 
         page.layout = layout
         page.title = title || @templates[layout].title
 
-        page_paths = paths.clone
-
         pagination = {
           page: index,
           pages: page_count,
           post_count: posts.length,
-          path: pagination_url(index, page_paths)
+          path: pagination_url(index, paths)
         }
-
-        page_paths << "page#{index}" if index != 1
 
         pagination[:previous_page] = pagination[:page] - 1 if (pagination[:page] - 1) > 0
         pagination[:next_page] = pagination[:page] + 1 if (pagination[:page] + 1) <= pagination[:pages]
 
-        path = File.join(page_paths)
+        if pagination[:previous_page]
+          pagination[:previous_page_url] = pagination[:path]
+          pagination[:previous_page_url] += "page" + pagination[:previous_page].to_s if pagination[:previous_page] != 1
+        end
+
+        pagination[:next_page_url] = pagination[:path] + "page" + pagination[:next_page].to_s if pagination[:next_page]
+
+        output_path = File.join(paths, index != 1 ? "page#{index}" : '')
 
         begin
-          page.write(path, {posts: range, pagination: pagination})
+          page.write(output_path, {posts: posts.slice((index - 1) * per_page, per_page), pagination: pagination})
         rescue => e
           raise "Failed to generate paginated page #{path} (#{e})"
         end
