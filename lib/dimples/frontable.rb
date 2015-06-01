@@ -16,7 +16,7 @@ module Dimples
 
       if metadata
         metadata.each_pair do |key, value|
-          self.class.send(:attr_accessor, key.to_sym) unless instance_variable_get("@#{key}")
+          self.class.send(:attr_accessor, key.to_sym) unless self.respond_to?(key.to_sym)
           instance_variable_set("@#{key}", value)
         end
       end
