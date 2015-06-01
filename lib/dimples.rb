@@ -4,6 +4,7 @@ require 'fileutils'
 require 'yaml'
 require 'tilt'
 
+require 'dimples/errors'
 require 'dimples/frontable'
 require 'dimples/publishable'
 require 'dimples/configuration'
