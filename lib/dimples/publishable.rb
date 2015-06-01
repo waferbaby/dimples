@@ -6,10 +6,14 @@ module Dimples
       publish_path = output_file_path(path)
       parent_path = File.dirname(publish_path)
 
-      FileUtils.mkdir_p(parent_path) unless Dir.exist?(parent_path)
+      begin
+        FileUtils.mkdir_p(parent_path) unless Dir.exist?(parent_path)
 
-      File.open(publish_path, 'w') do |file|
-        file.write(output)
+        File.open(publish_path, 'w+') do |file|
+          file.write(output)
+        end
+      rescue SystemCallError => e
+        raise Errors::PublishingError.new(publish_path, e.message)
       end
     end
 
@@ -35,18 +39,18 @@ module Dimples
       else
         Tilt::StringTemplate.new(&proc)
       end
-    
+
       begin
         output = renderer.render(scope) { body }.strip
         @rendered_contents = output
-      rescue RuntimeError, TypeError, NoMethodError, SyntaxError => e
+      rescue RuntimeError, TypeError, NoMethodError, SyntaxError, NameError => e
         problem_file = if @path
           @path.gsub(@site.source_paths[:root], '')
         else
           "dynamic #{self.class}"
         end
 
-        raise "Failed to render #{problem_file} - #{e}"
+        raise Errors::RenderingError.new(problem_file, e.message)
       end
 
       if use_layout && @layout && @site.templates[@layout]
