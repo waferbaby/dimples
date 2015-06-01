@@ -42,16 +42,15 @@ module Dimples
     def generate
       prepare_site
       scan_files
-
-      generate_posts
-      generate_pages
-      generate_archives
-
-      generate_categories if @config['generation']['categories']
-      generate_posts_feed if @config['generation']['feed']
-      generate_category_feeds if @config['generation']['category_feeds']
-
+      generate_files
       copy_assets
+
+    rescue Errors::RenderingError => e
+      puts "Error: Failed to render #{e.file}: #{e.message}"
+    rescue Errors::PublishingError => e
+      puts "Error: Failed to publish #{e.file}: #{e.message}"
+    rescue => e
+      puts "Error: #{e}"
     end
 
     def prepare_site
@@ -109,13 +108,19 @@ module Dimples
       @latest_post = @posts.first
     end
 
+    def generate_files
+      generate_posts
+      generate_pages
+      generate_archives
+
+      generate_categories if @config['generation']['categories']
+      generate_posts_feed if @config['generation']['feed']
+      generate_category_feeds if @config['generation']['category_feeds']
+    end
+
     def generate_posts
       @posts.each do |post|
-        begin
-          post.write(@output_paths[:posts])
-        rescue => e
-          raise "Failed to render post #{post.path} (#{e})"
-        end
+        post.write(@output_paths[:posts])
       end
 
       if @config['generation']['paginated_posts']
@@ -125,11 +130,7 @@ module Dimples
 
     def generate_pages
       @pages.each do |page|
-        begin
-          page.write(@output_paths[:site])
-        rescue => e
-          raise "Failed to render page #{page.path.gsub(@source_paths[:root], '')} (#{e})"
-        end
+        page.write(@output_paths[:site])
       end
     end
 
@@ -164,11 +165,7 @@ module Dimples
       feed.extension = 'atom'
       feed.layout = 'feed'
 
-      begin
-        feed.write(path, options)
-      rescue => e
-        raise "Failed to generate feed #{path} (#{e})"
-      end
+      feed.write(path, options)
     end
 
     def generate_posts_feed
@@ -229,11 +226,7 @@ module Dimples
 
         output_path = File.join(paths, index != 1 ? "page#{index}" : '')
 
-        begin
-          page.write(output_path, {posts: posts.slice((index - 1) * per_page, per_page), pagination: pagination})
-        rescue => e
-          raise "Failed to generate paginated page #{path} (#{e})"
-        end
+        page.write(output_path, {posts: posts.slice((index - 1) * per_page, per_page), pagination: pagination})
       end
     end
   end
