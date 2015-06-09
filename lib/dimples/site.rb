@@ -95,11 +95,6 @@ module Dimples
       Dir.glob(File.join(@source_paths[:posts], '*.*')).reverse.each do |path|
         post = @post_class.new(self, path)
 
-        post.categories.each do |slug|
-          @categories[slug] ||= Dimples::Category.new(slug)
-          @categories[slug].posts << post
-        end
-
         %w[year month day].each do |date_type|
           if @config['generation']["#{date_type}_archives"]
 
