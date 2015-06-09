@@ -32,7 +32,7 @@ module Dimples
       @source_paths[:root] = File.expand_path(@config['source_path'])
       @output_paths[:site] = File.expand_path(@config['destination_path'])
 
-      %w{pages posts templates public}.each do |path|
+      %w{categories pages posts public templates}.each do |path|
         @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
       end
 
@@ -64,6 +64,7 @@ module Dimples
 
     def scan_files
       scan_templates
+      scan_categories
       scan_pages
       scan_posts
     end
@@ -72,6 +73,15 @@ module Dimples
       Dir.glob(File.join(@source_paths[:templates], '**', '*.*')).each do |path|
         template = Dimples::Template.new(self, path)
         @templates[template.slug] = template
+      end
+    end
+
+    def scan_categories
+      Dir.glob(File.join(@source_paths[:categories], '*.*')).each do |path|
+        slug = File.basename(path, File.extname(path))
+        category = Dimples::Category.new(slug, path)
+
+        @categories[category.slug] = category
       end
     end
 
@@ -85,8 +95,9 @@ module Dimples
       Dir.glob(File.join(@source_paths[:posts], '*.*')).reverse.each do |path|
         post = @post_class.new(self, path)
 
-        post.categories.each do |category|
-          (@categories[category] ||= []) << post
+        post.categories.each do |slug|
+          @categories[slug] ||= Dimples::Category.new(slug)
+          @categories[slug].posts << post
         end
 
         %w[year month day].each do |date_type|
@@ -135,8 +146,8 @@ module Dimples
     end
 
     def generate_categories
-      @categories.each_pair do |slug, posts|
-        paginate(posts: posts, title: slug.capitalize, paths: [@output_paths[:posts], slug], layout: @config['layouts']['category'])
+      @categories.each_value do |category|
+        paginate(posts: category.posts, title: category.name, paths: [@output_paths[:posts], category.slug], layout: @config['layouts']['category'])
       end
     end
 
@@ -173,8 +184,8 @@ module Dimples
     end
 
     def generate_category_feeds
-      @categories.each_pair do |slug, posts|
-        generate_feed(File.join(@output_paths[:posts], slug), {posts: posts[0..@config['pagination']['per_page'] - 1], category: slug})
+      @categories.each_value do |category|
+        generate_feed(File.join(@output_paths[:posts], category.slug), {posts: category.posts[0..@config['pagination']['per_page'] - 1], category: category.slug})
       end
     end
 
