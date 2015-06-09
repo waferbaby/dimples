@@ -11,7 +11,6 @@ module Dimples
     attr_accessor :layout
     attr_accessor :slug
     attr_accessor :date
-    attr_accessor :categories
     attr_accessor :year
     attr_accessor :month
     attr_accessor :day
@@ -34,7 +33,7 @@ module Dimples
       @date = Time.mktime(parts[1], parts[2], parts[3])
 
       @layout = @site.config['layouts']['post']
-      @categories = []
+      @categories = {}
 
       @year = @date.strftime('%Y')
       @month = @date.strftime('%m')
@@ -45,6 +44,19 @@ module Dimples
 
     def contents
       @contents
+    end
+
+    def categories=(slugs)
+      @categories = {}
+
+      slugs.each do |slug|
+        @site.categories[slug].posts << self
+        @categories[slug] = @site.categories[slug]
+      end
+    end
+
+    def categories
+      @categories
     end
 
     def output_file_path(parent_path)
