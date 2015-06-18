@@ -65,7 +65,10 @@ module Dimples
           'year' => '%Y',
           'month' => '%Y-%m',
           'day' => '%Y-%m-%d',
-        }
+        },
+
+        'categories' => [
+        ]
       }
     end
   end
