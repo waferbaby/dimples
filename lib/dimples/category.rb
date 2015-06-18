@@ -3,16 +3,12 @@ module Dimples
     include Frontable
 
     attr_accessor :slug
-    attr_accessor :path
     attr_accessor :name
     attr_accessor :posts
 
-    def initialize(slug, path)
+    def initialize(slug, name = nil)
       @slug = slug
-      @path = path
-      @name = @slug.capitalize
-
-      read_with_yaml(path)
+      @name = name || @slug.capitalize
 
       @posts = []
     end
