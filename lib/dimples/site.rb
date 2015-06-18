@@ -32,7 +32,7 @@ module Dimples
       @source_paths[:root] = File.expand_path(@config['source_path'])
       @output_paths[:site] = File.expand_path(@config['destination_path'])
 
-      %w{categories pages posts public templates}.each do |path|
+      %w{pages posts public templates}.each do |path|
         @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
       end
 
@@ -41,6 +41,7 @@ module Dimples
 
     def generate
       prepare_site
+      prepare_categories
       scan_files
       generate_files
       copy_assets
@@ -62,9 +63,14 @@ module Dimples
       end
     end
 
+    def prepare_categories
+      @config["categories"].each do |category|
+        @categories[category["slug"]] = Dimples::Category.new(category["slug"], category["name"])
+      end
+    end
+
     def scan_files
       scan_templates
-      scan_categories
       scan_pages
       scan_posts
     end
@@ -73,15 +79,6 @@ module Dimples
       Dir.glob(File.join(@source_paths[:templates], '**', '*.*')).each do |path|
         template = Dimples::Template.new(self, path)
         @templates[template.slug] = template
-      end
-    end
-
-    def scan_categories
-      Dir.glob(File.join(@source_paths[:categories], '*.*')).each do |path|
-        slug = File.basename(path, File.extname(path))
-        category = Dimples::Category.new(slug, path)
-
-        @categories[category.slug] = category
       end
     end
 
