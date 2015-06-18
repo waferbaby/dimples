@@ -50,8 +50,10 @@ module Dimples
       @categories = {}
 
       slugs.each do |slug|
+        @site.categories[slug] ||= Dimples::Category.new(slug)
         @site.categories[slug].posts << self
-        @categories[slug] = @site.categories[slug]
+
+        @categories[slug] ||= @site.categories[slug]
       end
     end
 
