@@ -1,13 +1,14 @@
 require File.expand_path('lib/dimples')
 
 require 'minitest'
+require 'tilt/erubis'
 require "codeclimate-test-reporter"
 
 CodeClimate::TestReporter.start
 
 def test_site
   Dimples::Site.new({
-    'source_path' => File.join(__dir__),
-    'destination_path' => File.join(__dir__, 'test_site')
+    'source_path' => File.join(__dir__, 'site'),
+    'destination_path' => File.join(__dir__, 'build')
   })
 end
