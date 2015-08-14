@@ -1,7 +1,7 @@
 $:.unshift File.expand_path('./lib')
- 
+
 require 'dimples/version'
- 
+
 Gem::Specification.new do |s|
   s.name        = "dimples"
   s.version     = Dimples::VERSION
@@ -12,9 +12,16 @@ Gem::Specification.new do |s|
   s.summary     = "A basic static site generator"
   s.description = "A very, very, very simple gem for building static websites."
   s.license     = "LICENSE"
- 
+
   s.files        = Dir.glob("lib/**/*")
   s.require_path = 'lib'
 
   s.add_dependency 'tilt', '~> 2.0'
+
+  s.add_development_dependency "bundler"
+  s.add_development_dependency "rake"
+  s.add_development_dependency "minitest"
+  s.add_development_dependency "erubis"
+  s.add_development_dependency "redcarpet"
+  s.add_development_dependency "codeclimate-test-reporter"
 end
