@@ -18,10 +18,9 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'tilt', '~> 2.0'
 
-  s.add_development_dependency "bundler"
-  s.add_development_dependency "rake"
-  s.add_development_dependency "minitest"
-  s.add_development_dependency "erubis"
-  s.add_development_dependency "redcarpet"
-  s.add_development_dependency "codeclimate-test-reporter"
+  s.add_development_dependency "bundler", "~> 1.10"
+  s.add_development_dependency "rake", "~> 10.0"
+  s.add_development_dependency "minitest", "~> 5.8"
+  s.add_development_dependency "redcarpet", "~> 3.3"
+  s.add_development_dependency "codeclimate-test-reporter", "~> 0.4"
 end
