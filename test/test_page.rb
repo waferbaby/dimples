@@ -1,5 +1,7 @@
 $:.unshift(__dir__)
 
+require 'helper'
+
 describe "Page" do
   before { @site = test_site }
   subject { Dimples::Page.new(@site, File.join(@site.source_paths[:pages], 'about.markdown')) }
