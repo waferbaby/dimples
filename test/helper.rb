@@ -1,7 +1,7 @@
 require File.expand_path('lib/dimples')
 
 require 'minitest'
-require 'tilt/erubis'
+require 'tilt/redcarpet'
 require "codeclimate-test-reporter"
 
 CodeClimate::TestReporter.start
