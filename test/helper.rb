@@ -1,8 +1,6 @@
-require 'minitest'
 require 'minitest/autorun'
-require "codeclimate-test-reporter"
-
-require File.expand_path('lib/dimples')
+require 'codeclimate-test-reporter'
+require 'dimples'
 
 CodeClimate::TestReporter.start
 
