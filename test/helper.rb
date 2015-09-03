@@ -1,6 +1,7 @@
 require 'minitest/autorun'
 require 'codeclimate-test-reporter'
 require 'tilt/redcarpet'
+require 'tilt/erubis'
 require 'dimples'
 
 CodeClimate::TestReporter.start
