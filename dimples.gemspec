@@ -21,5 +21,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rake", "~> 10.0"
   s.add_development_dependency "minitest", "~> 5.8"
   s.add_development_dependency "redcarpet", "~> 3.3"
+  s.add_development_dependency "erubis", "~> 2.7"
   s.add_development_dependency "codeclimate-test-reporter", "~> 0.4"
 end
