@@ -36,7 +36,7 @@ module Dimples
         raise Errors::RenderingError.new(problem_file, e.message)
       end
 
-      if use_layout && @layout && @site.templates[@layout]
+      if use_layout && defined?(@layout) && @site.templates[@layout]
         output = @site.templates[@layout].render(context, output)
       end
 
