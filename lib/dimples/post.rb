@@ -1,7 +1,8 @@
 module Dimples
   class Post
     include Frontable
-    include Publishable
+    include Writeable
+    include Renderable
 
     attr_accessor :path
     attr_accessor :title
