@@ -1,0 +1,10 @@
+---
+layout: default
+---
+
+<h2>Posts</h2>
+
+<% @posts.each do |post| %>
+  <h3><%= post.title %></h3>
+  <%= yield %>
+<% end %>
