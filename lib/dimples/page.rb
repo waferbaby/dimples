@@ -23,7 +23,9 @@ module Dimples
         @filename = File.basename(path, File.extname(path))
         @contents = read_with_yaml(path)
       else
+        @path = nil
         @filename = 'index'
+        @contents = ''
       end
     end
 
