@@ -1,7 +1,7 @@
 module Dimples
   class Template
     include Frontable
-    include Publishable
+    include Renderable
 
     attr_accessor :slug
     attr_accessor :title
