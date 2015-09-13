@@ -1,5 +1,5 @@
-require 'minitest/autorun'
 require 'codeclimate-test-reporter'
+require 'minitest/autorun'
 require 'tilt/redcarpet'
 require 'tilt/erubis'
 require 'dimples'
