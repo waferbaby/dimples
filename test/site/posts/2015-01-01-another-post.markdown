@@ -1,9 +1,9 @@
 ---
 title: My second post
 categories:
+- a
+- b
 - c
-- d
-- e
 ---
 
 ### Welcome back
