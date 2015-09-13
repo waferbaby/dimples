@@ -12,11 +12,13 @@ describe "Page" do
   end
 
   it "renders its contents" do
-    expected_output = "<h2>About this site</h2>
+    expected_output = <<OUTPUT
+<h2>About this site</h2>
 
-<p>Hello! I&#39;m an about page.</p>"
+<p>Hello! I&#39;m an about page.</p>
+OUTPUT
 
-    assert_equal expected_output, subject.render
+    assert_equal expected_output.strip, subject.render
   end
 
   it "publishes to a file" do

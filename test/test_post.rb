@@ -12,11 +12,13 @@ describe "Post" do
   end
 
   it "renders its contents" do
-    expected_output = "<h3>Hello</h3>
+    expected_output = <<OUTPUT
+<h3>Hello</h3>
 
-<p>Welcome to my first post. This is <em>awesome</em>.</p>"
+<p>Welcome to my first post. This is <em>awesome</em>.</p>
+OUTPUT
 
-    assert_equal expected_output, subject.render
+    assert_equal expected_output.strip, subject.render
   end
 
   it "publishes to a file" do
