@@ -12,17 +12,6 @@ module Dimples
         scope.instance_variable_set("@#{key}".to_sym, value)
       end
 
-      proc = Proc.new { |template| contents() }
-
-      renderer = if @path
-        extension = File.extname(@path)[1..-1]
-        options = @site.config['rendering'][extension] || {}
-
-        Tilt.new(@path, options, &proc)
-      else
-        Tilt::StringTemplate.new(&proc)
-      end
-
       begin
         output = renderer.render(scope) { body }.strip
         @rendered_contents = output
@@ -41,6 +30,19 @@ module Dimples
       end
 
       output
+    end
+
+    def renderer
+      proc = Proc.new { |template| contents() }
+
+      if @path
+        extension = File.extname(@path)[1..-1]
+        options = @site.config['rendering'][extension] || {}
+
+        Tilt.new(@path, options, &proc)
+      else
+        Tilt::StringTemplate.new(&proc)
+      end
     end
   end
 end
