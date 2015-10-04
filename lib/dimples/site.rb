@@ -39,7 +39,9 @@ module Dimples
       @output_paths[:posts] = File.join(@output_paths[:site], @config['paths']['posts'])
     end
 
-    def generate
+    def generate(options = {})
+      @generation_options = options.merge!(default_generation_options)
+
       prepare_site
       prepare_categories
       scan_files
@@ -91,6 +93,7 @@ module Dimples
     def scan_posts
       Dir.glob(File.join(@source_paths[:posts], '*.*')).reverse.each do |path|
         post = @post_class.new(self, path)
+        next if !@generation_options[:include_drafts] && post.draft
 
         %w[year month day].each do |date_type|
           if @config['generation']["#{date_type}_archives"]
@@ -231,6 +234,14 @@ module Dimples
 
         page.write(output_path, {posts: posts.slice((index - 1) * per_page, per_page), pagination: pagination})
       end
+    end
+
+    private
+
+    def default_generation_options
+      {
+        include_drafts: false
+      }
     end
   end
 end
