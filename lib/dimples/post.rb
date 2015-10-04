@@ -18,6 +18,7 @@ module Dimples
     attr_accessor :rendered_contents
     attr_accessor :previous_post
     attr_accessor :next_post
+    attr_accessor :draft
 
     attr_writer :contents
 
@@ -36,11 +37,14 @@ module Dimples
       @layout = @site.config['layouts']['post']
       @categories = {}
 
+      @draft = false
+
       @year = @date.strftime('%Y')
       @month = @date.strftime('%m')
       @day = @date.strftime('%d')
 
       @contents = read_with_yaml(path)
+
     end
 
     def contents
