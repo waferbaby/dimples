@@ -27,6 +27,8 @@ module Dimples
       @page_class = Dimples::Page
       @post_class = Dimples::Post
 
+      @generation_options = {}
+
       @config = Dimples::Configuration.new(config)
 
       @source_paths[:root] = File.expand_path(@config['source_path'])
