@@ -27,9 +27,8 @@ module Dimples
       @page_class = Dimples::Page
       @post_class = Dimples::Post
 
-      @generation_options = {}
-
       @config = Dimples::Configuration.new(config)
+      @generation_options = default_generation_options
 
       @source_paths[:root] = File.expand_path(@config['source_path'])
       @output_paths[:site] = File.expand_path(@config['destination_path'])
@@ -42,7 +41,7 @@ module Dimples
     end
 
     def generate(options = {})
-      @generation_options = options.merge!(default_generation_options)
+      @generation_options.merge!(options)
 
       prepare_site
       prepare_categories
