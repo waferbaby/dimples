@@ -9,6 +9,7 @@ require 'dimples'
 def test_site
   @site ||= Dimples::Site.new({
     'source_path' => File.join(__dir__, 'site'),
-    'destination_path' => File.join(__dir__, 'build')
+    'destination_path' => File.join(__dir__, 'build'),
+    'categories' => [{'slug' => 'a', 'name' => 'A'}]
   })
 end
