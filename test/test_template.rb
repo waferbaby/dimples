@@ -19,6 +19,6 @@ Welcome
 </html>
 EXPECTED
 
-    assert_equal expected_output.strip, subject.render({}, 'Welcome')
+    subject.render({}, 'Welcome').must_equal(expected_output.strip)
   end
 end

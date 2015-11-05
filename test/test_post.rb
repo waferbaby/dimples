@@ -7,8 +7,8 @@ describe "Post" do
   subject { Dimples::Post.new(@site, File.join(@site.source_paths[:posts], '2015-01-01-a-post.markdown')) }
 
   it "parses its YAML frontmatter" do
-    assert_equal 'My first post', subject.title
-    assert_equal %w[a b c], subject.categories.keys.sort
+    subject.title.must_equal('My first post')
+    subject.categories.keys.sort.must_equal(%w[a b c])
   end
 
   it "renders its contents" do
@@ -18,13 +18,13 @@ describe "Post" do
 <p>Welcome to my first post. This is <em>awesome</em>.</p>
 OUTPUT
 
-    assert_equal expected_output.strip, subject.render
+    subject.render.must_equal(expected_output.strip)
   end
 
   it "publishes to a file" do
     path = @site.output_paths[:posts]
 
     subject.write(path)
-    assert_equal true, File.exist?(subject.output_file_path(path))
+    File.exist?(subject.output_file_path(path)).must_equal(true)
   end
 end

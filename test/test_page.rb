@@ -7,8 +7,8 @@ describe "Page" do
   subject { Dimples::Page.new(@site, File.join(@site.source_paths[:pages], 'about', 'index.markdown')) }
 
   it "parses its YAML frontmatter" do
-    assert_equal 'About', subject.title
-    assert_equal 'default', subject.layout
+    subject.title.must_equal('About')
+    subject.layout.must_equal('default')
   end
 
   it "renders its contents" do
@@ -18,13 +18,13 @@ describe "Page" do
 <p>Hello! I&#39;m an about page.</p>
 OUTPUT
 
-    assert_equal expected_output.strip, subject.render
+    subject.render.must_equal(expected_output.strip)
   end
 
   it "publishes to a file" do
     path = @site.output_paths[:site]
 
     subject.write(path)
-    assert_equal true, File.exist?(subject.output_file_path(path))
+    File.exist?(subject.output_file_path(path)).must_equal(true)
   end
 end
