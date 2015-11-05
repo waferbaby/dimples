@@ -5,33 +5,36 @@ require 'helper'
 describe "Site" do
   subject { @site = test_site }
 
-  it "creates the output directory" do
-    subject.prepare_site
-    assert_equal true, Dir.exist?(subject.output_paths[:site])
-  end
+  describe "building a complete site" do
+    before { subject.generate }
 
-  describe "scanning files" do
-    before { subject.scan_files }
-
-    it "finds all the templates" do
-      assert_equal 4, subject.templates.length
+    it "prepares the output directory" do
+      Dir.exist?(subject.output_paths[:site]).must_equal(true)
     end
 
-    it "finds all the pages" do
-      assert_equal 1, subject.pages.length
+    it "prepares the categories" do
+      subject.categories["a"].name.must_equal("A")
     end
 
-    it "finds all the posts" do
-      assert_equal 2, subject.posts.length
+    describe "scanning for files" do
+
+      it "finds all the templates" do
+        subject.templates.length.must_equal(4)
+      end
+
+      it "finds all the pages" do
+        subject.pages.length.must_equal(1)
+      end
+
+      it "finds all the posts" do
+        subject.posts.length.must_equal(2)
+      end
     end
-  end
 
-  it "generates categories" do
-    subject.scan_files
-    subject.generate_categories
-
-    subject.categories.keys.each do |slug|
-      expected_output = <<OUTPUT
+    describe "generating files" do
+      it "generates categories" do
+        subject.categories.keys.each do |slug|
+          expected_output = <<OUTPUT
 <!DOCTYPE html>
 <html lang="en-US" xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -48,10 +51,12 @@ describe "Site" do
 </html>
 OUTPUT
 
-      category_file_path = File.join(subject.output_paths[:posts], slug, "index.html")
+          category_file_path = File.join(subject.output_paths[:posts], slug, "index.html")
 
-      assert_equal true, File.exist?(category_file_path)
-      assert_equal expected_output.strip, File.read(category_file_path)
+          File.exist?(category_file_path).must_equal(true)
+          File.read(category_file_path).must_equal(expected_output.strip)
+        end
+      end
     end
   end
 end
