@@ -30,6 +30,7 @@ module Dimples
         'paths' => {
           'posts' => 'archives',
           'post' => '%Y/%m/%d',
+          'categories' => 'archives/categories'
         },
 
         'layouts' => {
