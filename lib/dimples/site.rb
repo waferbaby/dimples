@@ -38,6 +38,7 @@ module Dimples
       end
 
       @output_paths[:posts] = File.join(@output_paths[:site], @config['paths']['posts'])
+      @output_paths[:categories] = File.join(@output_paths[:site], @config['paths']['categories'])
     end
 
     def generate(options = {})
@@ -143,7 +144,7 @@ module Dimples
 
     def generate_categories
       @categories.each_value do |category|
-        paginate(posts: category.posts, title: category.name, paths: [@output_paths[:posts], category.slug], layout: @config['layouts']['category'])
+        paginate(posts: category.posts, title: category.name, paths: [@output_paths[:categories], category.slug], layout: @config['layouts']['category'])
       end
     end
 
@@ -181,7 +182,7 @@ module Dimples
 
     def generate_category_feeds
       @categories.each_value do |category|
-        generate_feed(File.join(@output_paths[:posts], category.slug), {posts: category.posts[0..@config['pagination']['per_page'] - 1], category: category.slug})
+        generate_feed(File.join(@output_paths[:categories], category.slug), {posts: category.posts[0..@config['pagination']['per_page'] - 1], category: category.slug})
       end
     end
 
