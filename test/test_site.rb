@@ -51,7 +51,7 @@ describe "Site" do
 </html>
 OUTPUT
 
-          category_file_path = File.join(subject.output_paths[:posts], slug, "index.html")
+          category_file_path = File.join(subject.output_paths[:categories], slug, "index.html")
 
           File.exist?(category_file_path).must_equal(true)
           File.read(category_file_path).must_equal(expected_output.strip)
