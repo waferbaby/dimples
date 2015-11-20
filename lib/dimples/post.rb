@@ -50,21 +50,6 @@ module Dimples
       @contents
     end
 
-    def categories=(slugs)
-      @categories = {}
-
-      slugs.each do |slug|
-        @site.categories[slug] ||= Dimples::Category.new(slug)
-        @site.categories[slug].posts << self
-
-        @categories[slug] ||= @site.categories[slug]
-      end
-    end
-
-    def categories
-      @categories
-    end
-
     def output_file_path(parent_path)
       parts = [parent_path]
 
