@@ -44,7 +44,6 @@ module Dimples
       @day = @date.strftime('%d')
 
       @contents = read_with_yaml(path)
-
     end
 
     def contents
