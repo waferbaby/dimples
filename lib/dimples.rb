@@ -11,7 +11,6 @@ require 'dimples/writeable'
 require 'dimples/renderable'
 
 require 'dimples/configuration'
-require 'dimples/category'
 require 'dimples/page'
 require 'dimples/post'
 require 'dimples/site'
