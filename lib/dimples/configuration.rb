@@ -68,7 +68,7 @@ module Dimples
           'day' => '%Y-%m-%d',
         },
 
-        'categories' => {}
+        'category_names' => {}
       }
     end
   end
