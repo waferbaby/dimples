@@ -12,10 +12,6 @@ describe "Site" do
       Dir.exist?(subject.output_paths[:site]).must_equal(true)
     end
 
-    it "prepares the categories" do
-      subject.categories["a"].name.must_equal("A")
-    end
-
     describe "scanning for files" do
 
       it "finds all the templates" do
