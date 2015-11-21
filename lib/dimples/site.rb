@@ -192,20 +192,14 @@ module Dimples
       end
     end
 
-    def pagination_url(page, paths)
-      path = '/'
-
-      path += File.split(paths[0])[-1] + "/" if paths[0] != @output_paths[:site]
-      path += paths[1..-1].join('/') + "/" if paths.length > 1
-
-      path
-    end
-
     def paginate(posts:, title: nil, paths:, layout: false)
       fail "'#{layout}' template not found" unless @templates.has_key?(layout)
 
       per_page = @config['pagination']['per_page']
       page_count = (posts.length.to_f / per_page.to_i).ceil
+
+      pagination_path = paths[0].gsub(@output_paths[:site], '') + '/'
+      pagination_path += paths[1..-1].join('/') + "/" if paths.length > 1
 
       for index in 1..page_count
         page = @page_class.new(self)
@@ -217,7 +211,7 @@ module Dimples
           page: index,
           pages: page_count,
           post_count: posts.length,
-          path: pagination_url(index, paths)
+          path: pagination_path
         }
 
         pagination[:previous_page] = pagination[:page] - 1 if (pagination[:page] - 1) > 0
