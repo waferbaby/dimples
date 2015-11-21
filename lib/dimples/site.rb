@@ -45,7 +45,6 @@ module Dimples
       @generation_options.merge!(options)
 
       prepare_site
-      prepare_categories
       scan_files
       generate_files
       copy_assets
@@ -64,12 +63,6 @@ module Dimples
         Dir.mkdir(@output_paths[:site])
       rescue => e
         raise "Failed to prepare the site directory (#{e})"
-      end
-    end
-
-    def prepare_categories
-      @config["categories"].each do |category|
-        @categories[category["slug"]] = Dimples::Category.new(category["slug"], category["name"])
       end
     end
 
@@ -96,6 +89,10 @@ module Dimples
       Dir.glob(File.join(@source_paths[:posts], '*.*')).reverse.each do |path|
         post = @post_class.new(self, path)
         next if !@generation_options[:include_drafts] && post.draft
+
+        post.categories.each do |slug|
+          (@categories[slug] ||= []) << post
+        end
 
         %w[year month day].each do |date_type|
           if @config['generation']["#{date_type}_archives"]
@@ -143,8 +140,9 @@ module Dimples
     end
 
     def generate_categories
-      @categories.each_value do |category|
-        paginate(posts: category.posts, title: category.name, paths: [@output_paths[:categories], category.slug], layout: @config['layouts']['category'])
+      @categories.each do |slug, posts|
+        category_name = @config['category_names'][slug] || slug.capitalize
+        paginate(posts: posts, title: category_name, paths: [@output_paths[:categories], slug], layout: @config['layouts']['category'])
       end
     end
 
@@ -181,8 +179,8 @@ module Dimples
     end
 
     def generate_category_feeds
-      @categories.each_value do |category|
-        generate_feed(File.join(@output_paths[:categories], category.slug), {posts: category.posts[0..@config['pagination']['per_page'] - 1], category: category.slug})
+      @categories.each do |slug, posts|
+        generate_feed(File.join(@output_paths[:categories], slug), {posts: posts[0..@config['pagination']['per_page'] - 1], category: slug})
       end
     end
 
