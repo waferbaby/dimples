@@ -52,17 +52,8 @@ module Dimples
     end
 
     def output_file_path(parent_path)
-      parts = [parent_path]
-
-      if @site.config['paths']['post']
-        path = @date.strftime(@site.config['paths']['post'])
-        parts.concat(path.split('/')) if path
-      end
-
-      parts << @slug
-      parts << "#{@filename}.#{@extension}"
-
-      File.join(parts)
+      parent_path = @date.strftime(parent_path) if parent_path =~ /%/
+      File.join([parent_path, @slug, "#{@filename}.#{@extension}"])
     end
   end
 end
