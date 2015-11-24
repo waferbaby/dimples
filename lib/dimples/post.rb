@@ -6,6 +6,7 @@ module Dimples
 
     attr_accessor :path
     attr_accessor :title
+    attr_accessor :categories
     attr_accessor :template
     attr_accessor :filename
     attr_accessor :extension
