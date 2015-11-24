@@ -37,6 +37,7 @@ module Dimples
         @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
       end
 
+      @output_paths[:archives] = File.join(@output_paths[:site], @config['paths']['archives'])
       @output_paths[:posts] = File.join(@output_paths[:site], @config['paths']['posts'])
       @output_paths[:categories] = File.join(@output_paths[:site], @config['paths']['categories'])
     end
@@ -129,7 +130,7 @@ module Dimples
       end
 
       if @config['generation']['paginated_posts']
-        paginate(posts: @posts, paths: [@output_paths[:posts]], layout: @config['layouts']['posts'])
+        paginate(posts: @posts, paths: [@output_paths[:archives]], layout: @config['layouts']['posts'])
       end
     end
 
@@ -154,7 +155,7 @@ module Dimples
           template = @config['layouts'][date_type] || @config['layouts']['archives'] || @config['layouts']['posts']
           archives[date_type.to_sym].each_pair do |date_title, posts|
 
-            paths = [@output_paths[:posts], posts[0].year]
+            paths = [@output_paths[:archives], posts[0].year]
             paths << posts[0].month if date_type =~ /month|day/
             paths << posts[0].day if date_type == 'day'
 
