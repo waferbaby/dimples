@@ -28,8 +28,8 @@ module Dimples
         'destination_path' => File.join(current_path, 'site'),
 
         'paths' => {
-          'posts' => 'archives',
-          'post' => '%Y/%m/%d',
+          'archives' => 'archives',
+          'posts' => 'archives/%Y/%m/%d',
           'categories' => 'archives/categories'
         },
 
