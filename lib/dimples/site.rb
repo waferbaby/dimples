@@ -143,7 +143,7 @@ module Dimples
     def generate_categories
       @categories.each do |slug, posts|
         category_name = @config['category_names'][slug] || slug.capitalize
-        paginate(posts: posts, title: category_name, paths: [@output_paths[:categories], slug], layout: @config['layouts']['category'])
+        paginate(posts: posts, title: category_name, paths: [@output_paths[:categories], slug], layout: @config['layouts']['category'], context: {category: slug})
       end
     end
 
@@ -193,7 +193,7 @@ module Dimples
       end
     end
 
-    def paginate(posts:, title: nil, paths:, layout: false)
+    def paginate(posts:, title: nil, paths:, layout: false, context: {})
       fail "'#{layout}' template not found" unless @templates.has_key?(layout)
 
       per_page = @config['pagination']['per_page']
@@ -226,8 +226,9 @@ module Dimples
         pagination[:next_page_url] = pagination[:path] + "page" + pagination[:next_page].to_s if pagination[:next_page]
 
         output_path = File.join(paths, index != 1 ? "page#{index}" : '')
+        context.merge!({posts: posts.slice((index - 1) * per_page, per_page), pagination: pagination})
 
-        page.write(output_path, {posts: posts.slice((index - 1) * per_page, per_page), pagination: pagination})
+        page.write(output_path, context)
       end
     end
 
