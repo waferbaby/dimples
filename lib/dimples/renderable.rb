@@ -1,8 +1,9 @@
 module Dimples
   module Renderable
     def render(context = {}, body = nil, use_layout = true)
-      context[:site] = @site unless context[:site]
-      context[:this] = self unless context[:this]
+      context[:site] ||= @site
+      context[:this] ||= self
+      context[:type] ||= self.class.name.split('::').last.downcase.to_sym
 
       scope = Object.new
 
