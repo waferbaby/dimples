@@ -76,13 +76,16 @@ module Dimples
     def scan_templates
       Dir.glob(File.join(@source_paths[:templates], '**', '*.*')).each do |path|
         template = Dimples::Template.new(self, path)
+        prepare_template(template)
         @templates[template.slug] = template
       end
     end
 
     def scan_pages
       Dir.glob(File.join(@source_paths[:pages], '**', '*.*')).each do |path|
-        @pages << @page_class.new(self, path)
+        page = @page_class.new(self, path)
+        prepare_page(page)
+        @pages << page
       end
     end
 
@@ -90,6 +93,8 @@ module Dimples
       Dir.glob(File.join(@source_paths[:posts], '*.*')).reverse.each do |path|
         post = @post_class.new(self, path)
         next if !@generation_options[:include_drafts] && post.draft
+
+        prepare_post(post)
 
         post.categories.each do |slug|
           (@categories[slug] ||= []) << post
@@ -112,6 +117,15 @@ module Dimples
       end
 
       @latest_post = @posts.first
+    end
+
+    def prepare_template(template)
+    end
+
+    def prepare_page(page)
+    end
+
+    def prepare_post(post)
     end
 
     def generate_files
