@@ -33,13 +33,13 @@ module Dimples
       @source_paths[:root] = File.expand_path(@config['source_path'])
       @output_paths[:site] = File.expand_path(@config['destination_path'])
 
-      %w{pages posts public templates}.each do |path|
+      %w[pages posts public templates].each do |path|
         @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
       end
 
-      @output_paths[:archives] = File.join(@output_paths[:site], @config['paths']['archives'])
-      @output_paths[:posts] = File.join(@output_paths[:site], @config['paths']['posts'])
-      @output_paths[:categories] = File.join(@output_paths[:site], @config['paths']['categories'])
+      %w[archives posts categories].each do |path|
+        @output_paths[path.to_sym] = File.join(@output_paths[:site], @config['paths'][path])
+      end
     end
 
     def generate(options = {})
