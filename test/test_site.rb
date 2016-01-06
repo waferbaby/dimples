@@ -15,7 +15,7 @@ describe "Site" do
     describe "scanning for files" do
 
       it "finds all the templates" do
-        subject.templates.length.must_equal(4)
+        subject.templates.length.must_equal(7)
       end
 
       it "finds all the pages" do
@@ -28,29 +28,29 @@ describe "Site" do
     end
 
     describe "generating files" do
+      %w[year month day].each do |date_type|
+        it "generates #{date_type} archives" do
+          expected_output = render_fixture("#{date_type}_archives.erb")
+
+          paths = [subject.output_paths[:site], 'archives', '2015']
+          paths << '01' if date_type =~ /month|day/
+          paths << '01' if date_type == 'day'
+          paths << 'index.html'
+
+          file_path = File.join(paths)
+
+          File.exist?(file_path).must_equal(true)
+          File.read(file_path).must_equal(expected_output)
+        end
+      end
+
       it "generates categories" do
         subject.categories.keys.each do |slug|
-          expected_output = <<OUTPUT
-<!DOCTYPE html>
-<html lang="en-US" xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>My site</title>
-</head>
-<body>
-<h2>#{slug.upcase} Posts</h2>
-
-<ul>
-  <li><a href="/archives/2015/01/01/another-post/">My second post</a></li>
-  <li><a href="/archives/2015/01/01/a-post/">My first post</a></li>
-</ul>
-</body>
-</html>
-OUTPUT
-
-          category_file_path = File.join(subject.output_paths[:categories], slug, "index.html")
+          expected_output = render_fixture('categories.erb', slug: slug)
+          category_file_path = File.join(subject.output_paths[:categories], slug, 'index.html')
 
           File.exist?(category_file_path).must_equal(true)
-          File.read(category_file_path).must_equal(expected_output.strip)
+          File.read(category_file_path).must_equal(expected_output)
         end
       end
     end
