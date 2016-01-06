@@ -13,3 +13,7 @@ def test_site
     'categories' => [{'slug' => 'a', 'name' => 'A'}]
   })
 end
+
+def render_fixture(filename, locals = {})
+  Tilt.new(File.join(__dir__, 'fixtures', filename)).render(nil, locals)
+end
