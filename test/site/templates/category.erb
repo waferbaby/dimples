@@ -6,6 +6,6 @@ layout: default
 
 <ul>
 <% @posts.each do |post| %>
-  <li><a href="/archives/<%= post.year %>/<%= post.month %>/<%= post.day %>/<%= post.slug %>/"><%= post.title %></a></li>
+<li><a href="/archives/<%= post.year %>/<%= post.month %>/<%= post.day %>/<%= post.slug %>/"><%= post.title %></a></li>
 <% end %>
 </ul>
