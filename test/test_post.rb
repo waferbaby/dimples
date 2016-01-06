@@ -12,13 +12,8 @@ describe "Post" do
   end
 
   it "renders its contents" do
-    expected_output = <<OUTPUT
-<h3>Hello</h3>
-
-<p>Welcome to my first post. This is <em>awesome</em>.</p>
-OUTPUT
-
-    subject.render.must_equal(expected_output.strip)
+    expected_output = render_fixture('post.erb')
+    subject.render.must_equal(expected_output)
   end
 
   it "publishes to a file" do

@@ -12,13 +12,8 @@ describe "Page" do
   end
 
   it "renders its contents" do
-    expected_output = <<OUTPUT
-<h2>About this site</h2>
-
-<p>Hello! I&#39;m an about page.</p>
-OUTPUT
-
-    subject.render.must_equal(expected_output.strip)
+    expected_output = render_fixture('page.erb')
+    subject.render.must_equal(expected_output)
   end
 
   it "publishes to a file" do
