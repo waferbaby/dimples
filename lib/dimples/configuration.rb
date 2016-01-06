@@ -37,6 +37,9 @@ module Dimples
           'posts' => 'posts',
           'post' => 'post',
           'category' => 'category',
+          'year_archives' => 'year_archives',
+          'month_archives' => 'month_archives',
+          'day_archives' => 'day_archives'
         },
 
         'rendering' => {
