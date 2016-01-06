@@ -100,13 +100,9 @@ module Dimples
           (@categories[slug] ||= []) << post
         end
 
-        %w[year month day].each do |date_type|
-          if @config['generation']["#{date_type}_archives"]
-
-            date_key = post.date.strftime(@config['date_formats'][date_type])
-            (@archives[date_type.to_sym][date_key] ||= []) << post
-          end
-        end
+        (@archives[:year][post.year] ||= []) << post
+        (@archives[:month]["#{post.year}/#{post.month}"] ||= []) << post
+        (@archives[:day]["#{post.year}/#{post.month}/#{post.day}"] ||= []) << post
 
         @posts << post
       end
@@ -165,15 +161,23 @@ module Dimples
       %w[year month day].each do |date_type|
 
         if @config['generation']["#{date_type}_archives"]
+          template = @config['layouts']["#{date_type}_archives"]
 
-          template = @config['layouts'][date_type] || @config['layouts']['archives'] || @config['layouts']['posts']
-          archives[date_type.to_sym].each_pair do |date_title, posts|
-
+          @archives[date_type.to_sym].each_value do |posts|
+            title = posts[0].date.strftime(@config['date_formats'][date_type])
             paths = [@output_paths[:archives], posts[0].year]
-            paths << posts[0].month if date_type =~ /month|day/
-            paths << posts[0].day if date_type == 'day'
+            dates = {year: posts[0].year}
 
-            paginate(posts: posts, title: date_title, paths: paths, layout: template)
+            case date_type
+              when 'month'
+                paths << posts[0].month
+                dates[:month] = posts[0].month
+              when 'day'
+                paths.concat([posts[0].month, posts[0].day])
+                dates[:day] = posts[0].month
+            end
+
+            paginate(posts: posts, title: title, paths: paths, layout: template, context: dates)
           end
         end
       end
