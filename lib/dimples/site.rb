@@ -90,7 +90,7 @@ module Dimples
     end
 
     def scan_posts
-      Dir.glob(File.join(@source_paths[:posts], '*.*')).reverse.each do |path|
+      Dir.glob(File.join(@source_paths[:posts], '*.*')).reverse_each do |path|
         post = @post_class.new(self, path)
         next if !@generation_options[:include_drafts] && post.draft
 
