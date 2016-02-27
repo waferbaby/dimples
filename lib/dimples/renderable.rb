@@ -30,7 +30,7 @@ module Dimples
     end
 
     def renderer
-      proc = Proc.new { |template| contents() }
+      proc = Proc.new { contents() }
 
       if @path
         extension = File.extname(@path)[1..-1]
