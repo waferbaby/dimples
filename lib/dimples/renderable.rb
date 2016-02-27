@@ -1,6 +1,21 @@
 module Dimples
   module Renderable
     def render(context = {}, body = nil, use_layout = true)
+      begin
+        output = renderer.render(build_scope(context)) { body }.strip
+        @rendered_contents = output
+      rescue RuntimeError, TypeError, NoMethodError, SyntaxError, NameError => e
+        raise Errors::RenderingError.new(@path || "dynamic #{self.class}", e.message)
+      end
+
+      if use_layout && defined?(@layout) && @site.templates[@layout]
+        output = @site.templates[@layout].render(context, output)
+      end
+
+      output
+    end
+
+    def build_scope(context)
       context[:site] ||= @site
       context[:this] ||= self
       context[:type] ||= self.class.name.split('::').last.downcase.to_sym
@@ -11,24 +26,7 @@ module Dimples
         scope.instance_variable_set("@#{key}".to_sym, value)
       end
 
-      begin
-        output = renderer.render(scope) { body }.strip
-        @rendered_contents = output
-      rescue RuntimeError, TypeError, NoMethodError, SyntaxError, NameError => e
-        problem_file = if @path
-          @path.gsub(@site.source_paths[:root], '')
-        else
-          "dynamic #{self.class}"
-        end
-
-        raise Errors::RenderingError.new(problem_file, e.message)
-      end
-
-      if use_layout && defined?(@layout) && @site.templates[@layout]
-        output = @site.templates[@layout].render(context, output)
-      end
-
-      output
+      scope
     end
 
     def renderer
