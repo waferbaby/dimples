@@ -47,7 +47,7 @@ module Dimples
 
         'pagination' => {
           'enabled' => true,
-          'per_page' => 10,
+          'per_page' => 10
         },
 
         'generation' => {
@@ -57,18 +57,18 @@ module Dimples
           'month_archives' => true,
           'day_archives' => true,
           'feed' => true,
-          'category_feeds' => true,
+          'category_feeds' => true
         },
 
         'file_extensions' => {
           'pages' => 'html',
-          'posts' => 'html',
+          'posts' => 'html'
         },
 
         'date_formats' => {
           'year' => '%Y',
           'month' => '%Y-%m',
-          'day' => '%Y-%m-%d',
+          'day' => '%Y-%m-%d'
         },
 
         'category_names' => {}

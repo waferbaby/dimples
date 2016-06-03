@@ -5,7 +5,8 @@ module Dimples
         output = renderer.render(build_scope(context)) { body }.strip
         @rendered_contents = output
       rescue RuntimeError, TypeError, NoMethodError, SyntaxError, NameError => e
-        raise Errors::RenderingError.new(@path || "dynamic #{self.class}", e.message)
+        file = @path || "dynamic #{self.class}"
+        raise Errors::RenderingError.new(file, e.message)
       end
 
       if use_layout && defined?(@layout) && @site.templates[@layout]
@@ -30,7 +31,7 @@ module Dimples
     end
 
     def renderer
-      proc = Proc.new { contents() }
+      proc = proc { contents }
 
       if @path
         extension = File.extname(@path)[1..-1]

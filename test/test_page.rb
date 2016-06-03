@@ -1,22 +1,25 @@
-$:.unshift(__dir__)
+$LOAD_PATH.unshift(__dir__)
 
 require 'helper'
 
-describe "Page" do
+describe 'Page' do
   before { @site = test_site }
-  subject { Dimples::Page.new(@site, File.join(@site.source_paths[:pages], 'about', 'index.markdown')) }
+  subject do
+    path = File.join(@site.source_paths[:pages], 'about', 'index.markdown')
+    Dimples::Page.new(@site, path)
+  end
 
-  it "parses its YAML frontmatter" do
+  it 'parses its YAML frontmatter' do
     subject.title.must_equal('About')
     subject.layout.must_equal('default')
   end
 
-  it "renders its contents" do
+  it 'renders its contents' do
     expected_output = render_fixture('page.erb')
     subject.render.must_equal(expected_output)
   end
 
-  it "publishes to a file" do
+  it 'publishes to a file' do
     path = @site.output_paths[:site]
 
     subject.write(path)

@@ -1,7 +1,7 @@
 module Dimples
   module Writeable
     def write(path, context = {})
-      output = context ? render(context) : contents()
+      output = context ? render(context) : contents
 
       publish_path = output_file_path(path)
       parent_path = File.dirname(publish_path)

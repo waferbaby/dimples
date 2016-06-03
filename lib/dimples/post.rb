@@ -30,7 +30,8 @@ module Dimples
       @filename = 'index'
       @extension = @site.config['file_extensions']['posts']
 
-      parts = File.basename(path, File.extname(path)).match(/(\d{4})-(\d{2})-(\d{2})-(.+)/)
+      date_format = /(\d{4})-(\d{2})-(\d{2})-(.+)/
+      parts = File.basename(path, File.extname(path)).match(date_format)
 
       @slug = parts[4]
       @date = Time.mktime(parts[1], parts[2], parts[3])

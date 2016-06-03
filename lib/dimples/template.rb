@@ -10,7 +10,7 @@ module Dimples
     attr_accessor :rendered_contents
 
     def initialize(site, path)
-    	@site = site
+      @site = site
       @slug = File.basename(path, File.extname(path))
       @path = path
 

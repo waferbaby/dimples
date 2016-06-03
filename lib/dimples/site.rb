@@ -17,7 +17,7 @@ module Dimples
       @output_paths = {}
       @templates = {}
       @categories = {}
-      @archives = {year: {}, month: {}, day: {}}
+      @archives = { year: {}, month: {}, day: {} }
 
       @pages = []
       @posts = []
@@ -33,12 +33,13 @@ module Dimples
       @source_paths[:root] = File.expand_path(@config['source_path'])
       @output_paths[:site] = File.expand_path(@config['destination_path'])
 
-      %w[pages posts public templates].each do |path|
+      %w(pages posts public templates).each do |path|
         @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
       end
 
-      %w[archives posts categories].each do |path|
-        @output_paths[path.to_sym] = File.join(@output_paths[:site], @config['paths'][path])
+      %w(archives posts categories).each do |path|
+        output_path = File.join(@output_paths[:site], @config['paths'][path])
+        @output_paths[path.to_sym] = output_path
       end
     end
 
@@ -55,16 +56,17 @@ module Dimples
     rescue Errors::PublishingError => e
       puts "Error: Failed to publish #{e.file}: #{e.message}"
     rescue => e
-      puts "Error: #{e}"
+      puts "Error: #{e.backtrace}"
     end
 
     def prepare_site
-      begin
-        FileUtils.remove_dir(@output_paths[:site]) if Dir.exist?(@output_paths[:site])
-        Dir.mkdir(@output_paths[:site])
-      rescue => e
-        raise "Failed to prepare the site directory (#{e})"
+      if Dir.exist?(@output_paths[:site])
+        FileUtils.remove_dir(@output_paths[:site])
       end
+
+      Dir.mkdir(@output_paths[:site])
+    rescue => e
+      raise "Failed to prepare the site directory (#{e})"
     end
 
     def scan_files
@@ -100,19 +102,36 @@ module Dimples
           (@categories[slug] ||= []) << post
         end
 
-        (@archives[:year][post.year] ||= []) << post
-        (@archives[:month]["#{post.year}/#{post.month}"] ||= []) << post
-        (@archives[:day]["#{post.year}/#{post.month}/#{post.day}"] ||= []) << post
+        archive_year(post.year) << post
+        archive_month(post.year, post.month) << post
+        archive_day(post.year, post.month, post.day) << post
 
         @posts << post
       end
 
       @posts.each_index do |index|
-        @posts[index].next_post = @posts.fetch(index - 1, nil) if index - 1 >= 0
-        @posts[index].previous_post = @posts.fetch(index + 1, nil) if index + 1 < @posts.count
+        if index - 1 >= 0
+          @posts[index].next_post = @posts.fetch(index - 1, nil)
+        end
+
+        if index + 1 < @posts.count
+          @posts[index].previous_post = @posts.fetch(index + 1, nil)
+        end
       end
 
       @latest_post = @posts.first
+    end
+
+    def archive_year(year)
+      @archives[:year][year] ||= []
+    end
+
+    def archive_month(year, month)
+      @archives[:month]["#{year}/#{month}"] ||= []
+    end
+
+    def archive_day(year, month, day)
+      @archives[:day]["#{year}/#{month}/#{day}"] ||= []
     end
 
     def prepare_template(template)
@@ -140,7 +159,10 @@ module Dimples
       end
 
       if @config['generation']['paginated_posts']
-        paginate(posts: @posts, paths: [@output_paths[:archives]], layout: @config['layouts']['posts'])
+        paths = [@output_paths[:archives]]
+        layout = @config['layouts']['posts']
+
+        paginate(posts: @posts, paths: paths, layout: layout)
       end
     end
 
@@ -152,32 +174,43 @@ module Dimples
 
     def generate_categories
       @categories.each do |slug, posts|
-        category_name = @config['category_names'][slug] || slug.capitalize
-        paginate(posts: posts, title: category_name, paths: [@output_paths[:categories], slug], layout: @config['layouts']['category'], context: {category: slug})
+        name = @config['category_names'][slug] || slug.capitalize
+        paths = [@output_paths[:categories], slug]
+        layout = @config['layouts']['category']
+        context = { category: slug }
+
+        paginate(posts: posts, title: name, paths: paths, layout: layout, context: context)
       end
     end
 
     def generate_archives
-      %w[year month day].each do |date_type|
-
+      %w(year month day).each do |date_type|
         if @config['generation']["#{date_type}_archives"]
           template = @config['layouts']["#{date_type}_archives"]
 
           @archives[date_type.to_sym].each_value do |posts|
             title = posts[0].date.strftime(@config['date_formats'][date_type])
             paths = [@output_paths[:archives], posts[0].year]
-            dates = {year: posts[0].year}
+            dates = { year: posts[0].year }
 
             case date_type
-              when 'month'
-                paths << posts[0].month
-                dates[:month] = posts[0].month
-              when 'day'
-                paths.concat([posts[0].month, posts[0].day])
-                dates[:day] = posts[0].month
+            when 'month'
+              paths << posts[0].month
+              dates[:month] = posts[0].month
+            when 'day'
+              paths.concat([posts[0].month, posts[0].day])
+              dates[:day] = posts[0].month
             end
 
-            paginate(posts: posts, title: title, paths: paths, layout: template, context: dates)
+            options = {
+              posts: posts,
+              title: title,
+              paths: paths,
+              layout: template,
+              context: dates
+            }
+
+            paginate(options)
           end
         end
       end
@@ -194,60 +227,84 @@ module Dimples
     end
 
     def generate_posts_feed
-      generate_feed(@output_paths[:site], {posts: @posts[0..@config['pagination']['per_page'] - 1]})
+      posts = @posts[0..@config['pagination']['per_page'] - 1]
+      generate_feed(@output_paths[:site], posts: posts)
     end
 
     def generate_category_feeds
       @categories.each do |slug, posts|
-        generate_feed(File.join(@output_paths[:categories], slug), {posts: posts[0..@config['pagination']['per_page'] - 1], category: slug})
+        path = File.join(@output_paths[:categories], slug)
+        posts = posts[0..@config['pagination']['per_page'] - 1]
+
+        generate_feed(path, posts: posts, category: slug)
       end
     end
 
     def copy_assets
-      begin
-        FileUtils.cp_r(File.join(@source_paths[:public], '.'), @output_paths[:site]) if Dir.exist?(@source_paths[:public])
-      rescue => e
-        raise "Failed to copy site assets (#{e})"
+      if Dir.exist?(@source_paths[:public])
+        path = File.join(@source_paths[:public], '.')
+        FileUtils.cp_r(path, @output_paths[:site])
       end
+    rescue => e
+      raise "Failed to copy site assets (#{e})"
     end
 
     def paginate(posts:, title: nil, paths:, layout: false, context: {})
-      fail "'#{layout}' template not found" unless @templates.has_key?(layout)
+      raise "'#{layout}' template not found" unless @templates.key?(layout)
 
       per_page = @config['pagination']['per_page']
       page_count = (posts.length.to_f / per_page.to_i).ceil
 
-      pagination_path = paths[0].gsub(@output_paths[:site], '') + '/'
-      pagination_path += paths[1..-1].join('/') + "/" if paths.length > 1
+      page_path = paths[0].gsub(@output_paths[:site], '') + '/'
+      page_path += paths[1..-1].join('/') + '/' if paths.length > 1
 
-      for index in 1..page_count
+      (1..page_count).each do |index|
         page = @page_class.new(self)
 
         page.layout = layout
         page.title = title || @templates[layout].title
 
-        pagination = {
-          page: index,
-          pages: page_count,
-          post_count: posts.length,
-          path: pagination_path
-        }
-
-        pagination[:previous_page] = pagination[:page] - 1 if (pagination[:page] - 1) > 0
-        pagination[:next_page] = pagination[:page] + 1 if (pagination[:page] + 1) <= pagination[:pages]
-
-        if pagination[:previous_page]
-          pagination[:previous_page_url] = pagination[:path]
-          pagination[:previous_page_url] += "page" + pagination[:previous_page].to_s if pagination[:previous_page] != 1
-        end
-
-        pagination[:next_page_url] = pagination[:path] + "page" + pagination[:next_page].to_s if pagination[:next_page]
-
+        pagination = build_pagination(index, page_count, posts.count, page_path)
         output_path = File.join(paths, index != 1 ? "page#{index}" : '')
-        context.merge!({posts: posts.slice((index - 1) * per_page, per_page), pagination: pagination})
+
+        context[:posts] = posts.slice((index - 1) * per_page, per_page)
+        context[:pagination] = pagination
 
         page.write(output_path, context)
       end
+    end
+
+    def build_pagination(index, page_count, item_count, path)
+      pagination = {
+        page: index,
+        pages: page_count,
+        post_count: item_count,
+        path: path
+      }
+
+      if (pagination[:page] - 1) > 0
+        pagination[:previous_page] = pagination[:page] - 1
+      end
+
+      if (pagination[:page] + 1) <= pagination[:pages]
+        pagination[:next_page] = pagination[:page] + 1
+      end
+
+      if pagination[:previous_page]
+        pagination[:previous_page_url] = pagination[:path]
+
+        if pagination[:previous_page] != 1
+          page_string = "page#{pagination[:previous_page]}"
+          pagination[:previous_page_url] += page_string
+        end
+      end
+
+      if pagination[:next_page]
+        page_string = "#{pagination[:path]}page#{pagination[:next_page]}"
+        pagination[:next_page_url] = page_string
+      end
+
+      pagination
     end
 
     private

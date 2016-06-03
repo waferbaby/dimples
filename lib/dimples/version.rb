@@ -1,3 +1,3 @@
 module Dimples
-  VERSION = "1.7"
+  VERSION = '1.7'.freeze
 end

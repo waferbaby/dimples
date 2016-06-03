@@ -36,7 +36,10 @@ module Dimples
     def output_file_path(parent_path)
       parts = [parent_path]
 
-      parts << File.dirname(@path).gsub(@site.source_paths[:pages], '') unless @path.nil?
+      unless @path.nil?
+        parts << File.dirname(@path).gsub(@site.source_paths[:pages], '')
+      end
+
       parts << "#{@filename}.#{@extension}"
 
       File.join(parts)
