@@ -14,17 +14,19 @@ module Dimples
         end
       end
 
-      if metadata
-        metadata.each_pair do |key, value|
-          unless respond_to?(key.to_sym)
-            self.class.send(:attr_accessor, key.to_sym)
-          end
-
-          send("#{key}=", value)
-        end
-      end
+      apply_metadata(metadata) if metadata
 
       contents
+    end
+
+    def apply_metadata(metadata)
+      metadata.each_pair do |key, value|
+        unless respond_to?(key.to_sym)
+          self.class.send(:attr_accessor, key.to_sym)
+        end
+
+        send("#{key}=", value)
+      end
     end
   end
 end
