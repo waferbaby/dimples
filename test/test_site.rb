@@ -54,5 +54,67 @@ describe 'Site' do
         end
       end
     end
+
+    describe 'when paginating' do
+      describe 'the first page' do
+        before { @pagination = subject.build_pagination(1, 3, 3, '/') }
+
+        it 'has no previous page number' do
+          assert_nil @pagination[:previous_page]
+        end
+
+        it 'has no URL for the previous page' do
+          assert_nil @pagination[:previous_page_url]
+        end
+
+        it 'has a next page number' do
+          assert_equal 2, @pagination[:next_page]
+        end
+
+        it 'has a URL for the next page' do
+          assert_equal '/page2', @pagination[:next_page_url]
+        end
+      end
+
+      describe 'the middle page' do
+        before { @pagination = subject.build_pagination(2, 3, 3, '/') }
+
+        it 'has a previous page number' do
+          assert_equal 1, @pagination[:previous_page]
+        end
+
+        it 'has a numberless URL for the first page' do
+          assert_equal '/', @pagination[:previous_page_url]
+        end
+
+        it 'has a next page number' do
+          assert_equal 3, @pagination[:next_page]
+        end
+
+        it 'has a URL for the next page' do
+          assert_equal '/page3', @pagination[:next_page_url]
+        end
+      end
+
+      describe 'the last page' do
+        before { @pagination = subject.build_pagination(3, 3, 3, '/') }
+
+        it 'has a previous page number' do
+          assert_equal 2, @pagination[:previous_page]
+        end
+
+        it 'has a URL for the previous page' do
+          assert_equal '/page2', @pagination[:previous_page_url]
+        end
+
+        it 'has no next page number' do
+          assert_nil @pagination[:next_page]
+        end
+
+        it 'has no URL for the next page' do
+          assert_nil @pagination[:next_page_url]
+        end
+      end
+    end
   end
 end
