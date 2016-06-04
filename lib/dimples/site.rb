@@ -186,7 +186,7 @@ module Dimples
     def generate_archives
       %w(year month day).each do |date_type|
         if @config['generation']["#{date_type}_archives"]
-          template = @config['layouts']["#{date_type}_archives"]
+          layout = @config['layouts']["#{date_type}_archives"]
 
           @archives[date_type.to_sym].each_value do |posts|
             title = posts[0].date.strftime(@config['date_formats'][date_type])
@@ -199,18 +199,10 @@ module Dimples
               dates[:month] = posts[0].month
             when 'day'
               paths.concat([posts[0].month, posts[0].day])
-              dates[:day] = posts[0].month
+              dates.merge(month: posts[0].month, day: posts[0].day)
             end
 
-            options = {
-              posts: posts,
-              title: title,
-              paths: paths,
-              layout: template,
-              context: dates
-            }
-
-            paginate(options)
+            paginate(posts: posts, title: title, paths: paths, layout: layout, context: dates)
           end
         end
       end
