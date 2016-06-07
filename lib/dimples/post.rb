@@ -11,6 +11,7 @@ module Dimples
     attr_accessor :filename
     attr_accessor :extension
     attr_accessor :layout
+    attr_accessor :contents
     attr_accessor :slug
     attr_accessor :date
     attr_accessor :year
@@ -20,8 +21,6 @@ module Dimples
     attr_accessor :previous_post
     attr_accessor :next_post
     attr_accessor :draft
-
-    attr_writer :contents
 
     def initialize(site, path)
       @site = site
@@ -48,9 +47,6 @@ module Dimples
       @contents = read_with_yaml(path)
     end
 
-    def contents
-      @contents
-    end
 
     def output_file_path(parent_path)
       parent_path = @date.strftime(parent_path) if parent_path =~ /%/
