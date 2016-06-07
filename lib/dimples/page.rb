@@ -10,27 +10,21 @@ module Dimples
     attr_accessor :filename
     attr_accessor :extension
     attr_accessor :layout
+    attr_accessor :contents
     attr_accessor :rendered_contents
-
-    attr_writer :contents
 
     def initialize(site, path = nil)
       @site = site
       @extension = @site.config['file_extensions']['pages']
+      @path = path
 
-      if path
-        @path = path
-        @filename = File.basename(path, File.extname(path))
-        @contents = read_with_yaml(path)
+      if @path
+        @filename = File.basename(@path, File.extname(@path))
+        @contents = read_with_yaml(@path)
       else
-        @path = nil
         @filename = 'index'
         @contents = ''
       end
-    end
-
-    def contents
-      @contents
     end
 
     def output_file_path(parent_path)
