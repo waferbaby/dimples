@@ -51,12 +51,12 @@ module Dimples
       generate_files
       copy_assets
 
-    rescue Errors::RenderingError => e
-      puts "Error: Failed to render #{e.file}: #{e.message}"
-    rescue Errors::PublishingError => e
-      puts "Error: Failed to publish #{e.file}: #{e.message}"
-    rescue => e
-      puts "Error: #{e.backtrace}"
+    # rescue Errors::RenderingError => e
+    #   puts "Error: Failed to render #{e.file}: #{e.message}"
+    # rescue Errors::PublishingError => e
+    #   puts "Error: Failed to publish #{e.file}: #{e.message}"
+    # rescue => e
+    #   puts "Error: #{e.backtrace}"
     end
 
     def prepare_site
@@ -155,7 +155,7 @@ module Dimples
 
     def generate_posts
       @posts.each do |post|
-        post.write(@output_paths[:posts])
+        generate_post(post)
       end
 
       if @config['generation']['paginated_posts']
@@ -166,21 +166,33 @@ module Dimples
       end
     end
 
+    def generate_post(post)
+      post.write(@output_paths[:posts])
+    end
+
     def generate_pages
       @pages.each do |page|
-        page.write(@output_paths[:site])
+        generate_page(page)
       end
+    end
+
+    def generate_page(page)
+      page.write(@output_paths[:site])
     end
 
     def generate_categories
       @categories.each do |slug, posts|
-        name = @config['category_names'][slug] || slug.capitalize
-        paths = [@output_paths[:categories], slug]
-        layout = @config['layouts']['category']
-        context = { category: slug }
-
-        paginate(posts: posts, title: name, paths: paths, layout: layout, context: context)
+        generate_category(slug, posts)
       end
+    end
+
+    def generate_category(slug, posts)
+      name = @config['category_names'][slug] || slug.capitalize
+      paths = [@output_paths[:categories], slug]
+      layout = @config['layouts']['category']
+      context = { category: slug }
+
+      paginate(posts: posts, title: name, paths: paths, layout: layout, context: context)
     end
 
     def generate_archives
