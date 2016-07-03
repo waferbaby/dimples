@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.homepage    = 'http://github.com/waferbaby/dimples'
   s.summary     = 'A basic static site generator'
   s.description = 'A very, very, very simple gem for building static websites.'
-  s.license     = 'LICENSE'
+  s.license     = 'MIT'
 
   s.files        = Dir.glob('lib/**/*')
   s.require_path = 'lib'
