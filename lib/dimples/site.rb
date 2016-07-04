@@ -43,8 +43,7 @@ module Dimples
     end
 
     def generate
-
-      prepare_site
+      prepare_output_directory
       scan_files
       generate_files
       copy_assets
@@ -52,11 +51,9 @@ module Dimples
       puts "Error: Failed to render #{e.file}: #{e.message}"
     rescue Errors::PublishingError => e
       puts "Error: Failed to publish #{e.file}: #{e.message}"
-    rescue => e
-      puts "Error: #{e.backtrace}"
     end
 
-    def prepare_site
+    def prepare_output_directory
       if Dir.exist?(@output_paths[:site])
         FileUtils.remove_dir(@output_paths[:site])
       end
