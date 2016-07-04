@@ -7,20 +7,15 @@ Rake::TestTask.new(:test) do |t|
 end
 
 task :build do
-  require 'fileutils'
-
-  if Dir.exist?('build')
-    path = File.join('build', '*.gem')
-    FileUtils.rm(Dir.glob(path))
-  else
-    Dir.mkdir('build')
-  end
-
-  Dir.chdir('build') do
-    puts `gem build ../dimples.gemspec`
-  end
+  Rake::Task['cleanup'].invoke
+  puts `gem build dimples.gemspec`
 end
 
 task :publish do
-  puts `gem push build/*.gem`
+  puts `gem push dimples*.gem`
+  Rake::Task['cleanup'].invoke
+end
+
+task :cleanup do
+  FileUtils.rm(Dir.glob('dimples*.gem'))
 end
