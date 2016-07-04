@@ -28,7 +28,6 @@ module Dimples
       @post_class = Dimples::Post
 
       @config = Dimples::Configuration.new(config)
-      @generation_options = default_generation_options
 
       @source_paths[:root] = File.expand_path(@config['source_path'])
       @output_paths[:site] = File.expand_path(@config['destination_path'])
@@ -43,20 +42,18 @@ module Dimples
       end
     end
 
-    def generate(options = {})
-      @generation_options.merge!(options)
+    def generate
 
       prepare_site
       scan_files
       generate_files
       copy_assets
-
-    # rescue Errors::RenderingError => e
-    #   puts "Error: Failed to render #{e.file}: #{e.message}"
-    # rescue Errors::PublishingError => e
-    #   puts "Error: Failed to publish #{e.file}: #{e.message}"
-    # rescue => e
-    #   puts "Error: #{e.backtrace}"
+    rescue Errors::RenderingError => e
+      puts "Error: Failed to render #{e.file}: #{e.message}"
+    rescue Errors::PublishingError => e
+      puts "Error: Failed to publish #{e.file}: #{e.message}"
+    rescue => e
+      puts "Error: #{e.backtrace}"
     end
 
     def prepare_site
@@ -94,9 +91,9 @@ module Dimples
     def scan_posts
       Dir.glob(File.join(@source_paths[:posts], '*.*')).reverse_each do |path|
         post = @post_class.new(self, path)
-        next if !@generation_options[:include_drafts] && post.draft
-
         prepare_post(post)
+
+        next if post.draft
 
         post.categories.each do |slug|
           (@categories[slug] ||= []) << post
@@ -309,14 +306,6 @@ module Dimples
       end
 
       pagination
-    end
-
-    private
-
-    def default_generation_options
-      {
-        include_drafts: false
-      }
     end
   end
 end
