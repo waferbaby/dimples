@@ -1,6 +1,6 @@
 module Dimples
   module Errors
-    class Error < RuntimeError
+    class Error < StandardError
       attr_reader :file
 
       def initialize(file, message)
