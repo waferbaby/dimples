@@ -161,7 +161,7 @@ module Dimples
     end
 
     def generate_post(post)
-      post.write(@output_paths[:posts])
+      post.write(post.output_path(@output_paths[:posts]))
     end
 
     def generate_pages
@@ -171,7 +171,7 @@ module Dimples
     end
 
     def generate_page(page)
-      page.write(@output_paths[:site])
+      page.write(page.output_path(@output_paths[:site]))
     end
 
     def generate_categories
@@ -221,7 +221,7 @@ module Dimples
       feed.extension = 'atom'
       feed.layout = 'feed'
 
-      feed.write(path, options)
+      feed.write(feed.output_path(path), options)
     end
 
     def generate_posts_feed
@@ -268,7 +268,7 @@ module Dimples
         context[:posts] = posts.slice((index - 1) * per_page, per_page)
         context[:pagination] = pagination
 
-        page.write(output_path, context)
+        page.write(page.output_path(output_path), context)
       end
     end
 
