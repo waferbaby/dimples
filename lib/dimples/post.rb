@@ -49,7 +49,7 @@ module Dimples
 
     def output_path(parent_path)
       parent_path = @date.strftime(parent_path) if parent_path =~ /%/
-      File.join([parent_path, @slug, "#{@filename}.#{@extension}"])
+      File.join([parent_path, @slug.to_s, "#{@filename}.#{@extension}"])
     end
   end
 end
