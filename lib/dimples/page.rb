@@ -27,7 +27,7 @@ module Dimples
       end
     end
 
-    def output_file_path(parent_path)
+    def output_path(parent_path)
       parts = [parent_path]
 
       unless @path.nil?
