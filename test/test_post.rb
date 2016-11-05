@@ -20,9 +20,9 @@ describe 'Post' do
   end
 
   it 'publishes to a file' do
-    path = @site.output_paths[:posts]
+    path = subject.output_path(@site.output_paths[:posts])
 
     subject.write(path)
-    File.exist?(subject.output_file_path(path)).must_equal(true)
+    File.exist?(path).must_equal(true)
   end
 end
