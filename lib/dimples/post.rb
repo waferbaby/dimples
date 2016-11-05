@@ -47,8 +47,7 @@ module Dimples
       @contents = read_with_yaml(path)
     end
 
-
-    def output_file_path(parent_path)
+    def output_path(parent_path)
       parent_path = @date.strftime(parent_path) if parent_path =~ /%/
       File.join([parent_path, @slug, "#{@filename}.#{@extension}"])
     end
