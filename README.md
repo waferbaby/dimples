@@ -11,3 +11,17 @@ A very, very, *very* simple static site generator gem.
 ## Installation
 
 > gem install dimples
+
+## Usage
+
+Dimples is designed to be called via Ruby directly, so there's no included binary for generating a scaffold site. It's fairly straightforward:
+
+    require 'dimples'
+    require 'yaml'
+    
+    config = YAML.load_file('my_config.yml')
+    site = Dimples::Site.new(config)
+    
+    site.generate
+
+That's it!
