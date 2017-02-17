@@ -31,15 +31,15 @@ module Dimples
     end
 
     def renderer
-      proc = proc { contents }
+      callback = proc { contents }
 
       if @path
         extension = File.extname(@path)[1..-1]
         options = @site.config['rendering'][extension] || {}
 
-        Tilt.new(@path, options, &proc)
+        Tilt.new(@path, options, &callback)
       else
-        Tilt::StringTemplate.new(&proc)
+        Tilt::StringTemplate.new(&callback)
       end
     end
   end
