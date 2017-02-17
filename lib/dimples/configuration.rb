@@ -17,9 +17,8 @@ module Dimples
     end
 
     def class_override(type)
-      @settings['class_overrides']["#{type}"].tap do |klass|
-        nil unless klass && Object.const_defined?(klass)
-      end
+      klass = @settings['class_overrides']["#{type}"]
+      Object.const_get(klass) unless klass.nil?
     end
 
     def self.default_settings
