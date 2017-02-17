@@ -12,7 +12,7 @@ module Dimples
     attr_accessor :page_class
     attr_accessor :post_class
 
-    def initialize(config = {})
+    def initialize(config)
       @source_paths = {}
       @output_paths = {}
       @templates = {}
@@ -24,10 +24,10 @@ module Dimples
 
       @latest_post = false
 
-      @page_class = Dimples::Page
-      @post_class = Dimples::Post
+      @config = config
 
-      @config = Dimples::Configuration.new(config)
+      @page_class = @config.class_override(:page) || Dimples::Page
+      @post_class = @config.class_override(:post) || Dimples::Post
 
       @source_paths[:root] = File.expand_path(@config['source_path'])
       @output_paths[:site] = File.expand_path(@config['destination_path'])
