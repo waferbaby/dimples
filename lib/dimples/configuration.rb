@@ -16,12 +16,19 @@ module Dimples
       @settings[key]
     end
 
+    def class_override(type)
+      @settings['class_overrides']["#{type}"].tap do |klass|
+        nil unless klass && Object.const_defined?(klass)
+      end
+    end
+
     def self.default_settings
       current_path = Dir.pwd
 
       {
         'source_path' => current_path,
         'destination_path' => File.join(current_path, 'site'),
+        'class_overrides' => { site: nil, post: nil, page: nil },
         'rendering' => {},
         'category_names' => {},
         'paths' => default_paths,
