@@ -7,7 +7,11 @@ require 'tilt/erubis'
 require 'dimples'
 
 def test_site
-  @site ||= Dimples::Site.new(
+  @site ||= Dimples::Site.new(test_configuration)
+end
+
+def test_configuration
+  @config ||= Dimples::Configuration.new(
     'source_path' => File.join(__dir__, 'site'),
     'destination_path' => File.join(__dir__, 'build'),
     'categories' => [{ 'slug' => 'a', 'name' => 'A' }]
