@@ -1,0 +1,57 @@
+#!/usr/bin/env ruby
+
+require 'dimples'
+require 'dimples/version'
+require 'trollop'
+
+valid_commands = %w[build]
+
+options = Trollop::options do
+  version "dimples v#{Dimples::VERSION}"
+  banner <<EOS
+A very, very simple static site generator.
+
+Usage:
+  dimples [#{valid_commands.join('|')}] [options]
+
+Options:
+EOS
+  opt :config, "Config file path", default: File.join('config', 'site.yml')
+  opt :lib, "Library file path", default: 'lib'
+end
+
+Trollop::educate if ARGV.empty?
+command = ARGV[0]
+
+unless valid_commands.include?(command)
+  Trollop::die "Command must be '#{valid_commands.join('\', \'')}'"
+end
+
+config_path = File.join(Dir.pwd, options[:config])
+lib_path = File.join(Dir.pwd, options[:lib])
+
+unless File.exist?(config_path)
+  Trollop::die "Missing config file (#{config_path})"
+end
+
+if Dir.exist?(lib_path)
+  Dir.glob(File.join(lib_path, '**', '*')) do |path|
+    require path
+  end
+end
+
+begin
+  config_hash = YAML.load_file(config_path)
+  config = Dimples::Configuration.new(config_hash)
+rescue
+  Trollop::die "Invalid or malformed YAML config file"
+end
+
+site_klass = config.class_override(:site) || Dimples::Site
+site = site_klass.new(config)
+
+case command.to_sym
+when :build
+  puts "Generating site at #{site.output_paths[:site]}"
+  site.generate
+end
