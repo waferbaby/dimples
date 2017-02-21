@@ -13,6 +13,8 @@ Gem::Specification.new do |s|
   s.description = 'A very, very, very simple gem for building static websites.'
   s.license     = 'MIT'
 
+  s.executables << 'dimples'
+
   s.files        = Dir.glob('lib/**/*')
   s.require_path = 'lib'
 
