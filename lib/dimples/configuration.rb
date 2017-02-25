@@ -80,7 +80,8 @@ module Dimples
     def self.default_file_extensions
       {
         'pages' => 'html',
-        'posts' => 'html'
+        'posts' => 'html',
+        'feeds' => 'atom'
       }
     end
 
