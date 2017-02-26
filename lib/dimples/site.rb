@@ -43,15 +43,29 @@ module Dimples
     end
 
     def generate
-      prepare_output_directory
-      scan_files
-      generate_files
-      copy_assets
+      Dimples.logger.info("Building site at #{@output_paths[:site]}...")
+
+      result = Benchmark.measure do
+        prepare_output_directory
+        scan_files
+        generate_files
+        copy_assets
+      end
+
+      generation_time = result.real.round(2)
+
+      message = "Done! Site built in #{generation_time} second"
+      message += 's' if generation_time != 1
+      message += '.'
+
+      Dimples.logger.info(message)
     rescue Errors::RenderingError => e
-      puts "Error: Failed to render #{e.file}: #{e.message}"
+      Dimples.logger.error("Failed to render #{e.file}: #{e.message}")
     rescue Errors::PublishingError => e
-      puts "Error: Failed to publish #{e.file}: #{e.message}"
+      Dimples.logger.error("Failed to publish #{e.file}: #{e.message}")
     end
+
+    private
 
     def prepare_output_directory
       if Dir.exist?(@output_paths[:site])
@@ -148,6 +162,8 @@ module Dimples
     end
 
     def generate_posts
+      Dimples.logger.debug_generation('posts', @posts.length) if @config['verbose_logging']
+
       @posts.each do |post|
         generate_post(post)
       end
@@ -165,6 +181,8 @@ module Dimples
     end
 
     def generate_pages
+      Dimples.logger.debug_generation('pages', @pages.length) if @config['verbose_logging']
+
       @pages.each do |page|
         generate_page(page)
       end
@@ -175,6 +193,8 @@ module Dimples
     end
 
     def generate_categories
+      Dimples.logger.debug_generation('category pages', @categories.length) if @config['verbose_logging']
+
       @categories.each do |slug, posts|
         generate_category(slug, posts)
       end
@@ -192,9 +212,15 @@ module Dimples
     def generate_archives
       %w(year month day).each do |date_type|
         if @config['generation']["#{date_type}_archives"]
+          date_type_sym = date_type.to_sym
+
+          if @config['verbose_logging']
+            Dimples.logger.debug_generation("#{date_type} archives", @archives[date_type_sym].count)
+          end
+
           layout = @config['layouts']["#{date_type}_archives"]
 
-          @archives[date_type.to_sym].each_value do |posts|
+          @archives[date_type_sym].each_value do |posts|
             title = posts[0].date.strftime(@config['date_formats'][date_type])
             paths = [@output_paths[:archives], posts[0].year]
             dates = { year: posts[0].year }
@@ -240,6 +266,8 @@ module Dimples
 
     def copy_assets
       if Dir.exist?(@source_paths[:public])
+        Dimples.logger.debug("Copying assets...") if @config['verbose_logging']
+
         path = File.join(@source_paths[:public], '.')
         FileUtils.cp_r(path, @output_paths[:site])
       end
