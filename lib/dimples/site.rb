@@ -218,7 +218,7 @@ module Dimples
       feed = @page_class.new(self)
 
       feed.filename = 'feed'
-      feed.extension = 'atom'
+      feed.extension = @config['file_extensions']['feeds']
       feed.layout = 'feed'
 
       feed.write(feed.output_path(path), options)
