@@ -1,9 +1,10 @@
 $LOAD_PATH.unshift(__dir__)
 
+require 'benchmark'
 require 'fileutils'
-require 'yaml'
-require 'tilt'
 require 'logger'
+require 'tilt'
+require 'yaml'
 
 require 'dimples/errors'
 require 'dimples/logger'
@@ -21,9 +22,7 @@ require 'dimples/template'
 module Dimples
   class << self
     def logger
-      @logger ||= Logger.new(STDOUT).tap do |logger|
-        logger.formatter = Dimples::LogFormatter
-      end
+      @logger ||= Dimples::Logger.new(STDOUT)
     end
   end
 end
