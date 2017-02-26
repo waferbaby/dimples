@@ -12,12 +12,13 @@ options = Trollop::options do
 A very, very simple static site generator.
 
 Usage:
-  dimples [#{valid_commands.join('|')}] [options]
+  dimples <#{valid_commands.join('|')}> [options]
 
 Options:
 EOS
   opt :config, "Config file path", default: File.join('config', 'site.yml')
   opt :lib, "Library file path", default: 'lib'
+  opt :verbose, "Verbose mode", default: false
 end
 
 Trollop::educate if ARGV.empty?
@@ -52,6 +53,5 @@ site = site_klass.new(config)
 
 case command.to_sym
 when :build
-  puts "Generating site at #{site.output_paths[:site]}"
   site.generate
 end
