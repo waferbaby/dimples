@@ -56,6 +56,18 @@ describe 'Site' do
     end
 
     describe 'when paginating' do
+      before do
+        class Dimples::Site
+          public :build_pagination
+        end
+      end
+
+      after do
+        class Dimples::Site
+          private :build_pagination
+        end
+      end
+
       describe 'the first page' do
         before { @pagination = subject.build_pagination(1, 3, 3, '/') }
 
