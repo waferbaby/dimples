@@ -27,6 +27,7 @@ module Dimples
       {
         'source_path' => current_path,
         'destination_path' => File.join(current_path, 'site'),
+        'verbose_logging' => false,
         'class_overrides' => { site: nil, post: nil, page: nil },
         'rendering' => {},
         'category_names' => {},
