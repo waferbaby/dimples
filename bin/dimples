@@ -43,6 +43,8 @@ end
 
 begin
   config_hash = YAML.load_file(config_path)
+  config_hash['verbose_logging'] = true if options[:verbose]
+
   config = Dimples::Configuration.new(config_hash)
 rescue
   Trollop::die "Invalid or malformed YAML config file"
