@@ -107,7 +107,12 @@ module Dimples
         next if post.draft
 
         post.categories.each do |slug|
-          (@categories[slug] ||= []) << post
+          unless @categories[slug]
+            name = @config['category_names'][slug] || slug.capitalize
+            @categories[slug] = Dimples::Category.new(name, slug)
+          end
+
+          @categories[slug].posts << post
         end
 
         archive_year(post.year) << post
@@ -195,18 +200,17 @@ module Dimples
     def generate_categories
       Dimples.logger.debug_generation('category pages', @categories.length) if @config['verbose_logging']
 
-      @categories.each do |slug, posts|
-        generate_category(slug, posts)
+      @categories.each_value do |category|
+        generate_category(category)
       end
     end
 
-    def generate_category(slug, posts)
-      name = @config['category_names'][slug] || slug.capitalize
-      paths = [@output_paths[:categories], slug]
+    def generate_category(category)
+      paths = [@output_paths[:categories], category.slug]
       layout = @config['layouts']['category']
-      context = { category: slug }
+      context = { category: category.slug }
 
-      paginate(posts: posts, title: name, paths: paths, layout: layout, context: context)
+      paginate(posts: category.posts, title: category.name, paths: paths, layout: layout, context: context)
     end
 
     def generate_archives
@@ -256,11 +260,11 @@ module Dimples
     end
 
     def generate_category_feeds
-      @categories.each do |slug, posts|
-        path = File.join(@output_paths[:categories], slug)
-        posts = posts[0..@config['pagination']['per_page'] - 1]
+      @categories.each_value do |category|
+        path = File.join(@output_paths[:categories], category.slug)
+        posts = category.posts[0..@config['pagination']['per_page'] - 1]
 
-        generate_feed(path, posts: posts, category: slug)
+        generate_feed(path, posts: category.posts, category: category.slug)
       end
     end
 
