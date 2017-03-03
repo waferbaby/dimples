@@ -13,6 +13,7 @@ require 'dimples/frontable'
 require 'dimples/writeable'
 require 'dimples/renderable'
 
+require 'dimples/category'
 require 'dimples/configuration'
 require 'dimples/page'
 require 'dimples/post'
