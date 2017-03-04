@@ -43,22 +43,10 @@ module Dimples
     end
 
     def generate
-      Dimples.logger.info("Building site at #{@output_paths[:site]}...")
-
-      result = Benchmark.measure do
-        prepare_output_directory
-        scan_files
-        generate_files
-        copy_assets
-      end
-
-      generation_time = result.real.round(2)
-
-      message = "\033[92mDone!\033[0m Site built in #{generation_time} second"
-      message += 's' if generation_time != 1
-      message += '.'
-
-      Dimples.logger.info(message)
+      prepare_output_directory
+      scan_files
+      generate_files
+      copy_assets
     rescue Errors::RenderingError, Errors::PublishingError, Errors::GenerationError => e
       Dimples.logger.error("Failed to generate the site: #{e.message}.")
     end
@@ -87,7 +75,6 @@ module Dimples
     def scan_templates
       Dir.glob(File.join(@source_paths[:templates], '**', '*.*')).each do |path|
         template = Dimples::Template.new(self, path)
-        prepare_template(template)
         @templates[template.slug] = template
       end
     end
@@ -95,7 +82,6 @@ module Dimples
     def scan_pages
       Dir.glob(File.join(@source_paths[:pages], '**', '*.*')).each do |path|
         page = @page_class.new(self, path)
-        prepare_page(page)
         @pages << page
       end
     end
@@ -103,7 +89,6 @@ module Dimples
     def scan_posts
       Dir.glob(File.join(@source_paths[:posts], '*.*')).reverse_each do |path|
         post = @post_class.new(self, path)
-        prepare_post(post)
 
         next if post.draft
 
@@ -146,15 +131,6 @@ module Dimples
 
     def archive_day(year, month, day)
       @archives[:day]["#{year}/#{month}/#{day}"] ||= []
-    end
-
-    def prepare_template(template)
-    end
-
-    def prepare_page(page)
-    end
-
-    def prepare_post(post)
     end
 
     def generate_files
