@@ -16,7 +16,14 @@ module Dimples
 
   class LogFormatter < Logger::Formatter
     def self.call(severity, time, program_name, message)
-      "#{time.strftime('%r')}: #{'- ' if severity == 'DEBUG'}#{message}\n"
+      prefix = case severity
+      when "ERROR"
+        "\033[31mError:\033[0m "
+      when 'DEBUG'
+        "\033[93mDebug: "
+      end
+
+      "#{prefix}#{message}\033[0m\n"
     end
   end
 end
