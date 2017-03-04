@@ -1,18 +1,12 @@
 module Dimples
   module Errors
-    class Error < StandardError
-      attr_reader :file
-
-      def initialize(file, message)
-        @file = file
-        super(message)
-      end
+    class PublishingError < StandardError
     end
 
-    class PublishingError < Error
+    class RenderingError < StandardError
     end
 
-    class RenderingError < Error
+    class GenerationError < StandardError
     end
   end
 end
