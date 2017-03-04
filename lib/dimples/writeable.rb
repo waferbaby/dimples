@@ -11,7 +11,7 @@ module Dimples
           file.write(output)
         end
       rescue SystemCallError => e
-        raise Errors::PublishingError.new(path, e.message)
+        raise Errors::PublishingError.new("Failed to write #{path}")
       end
     end
   end
