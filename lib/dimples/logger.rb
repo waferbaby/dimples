@@ -20,7 +20,7 @@ module Dimples
       when "ERROR"
         "\033[31mError:\033[0m "
       when 'DEBUG'
-        "\033[93mDebug: "
+        "\033[93m- "
       end
 
       "#{prefix}#{message}\033[0m\n"
