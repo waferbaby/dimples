@@ -54,15 +54,13 @@ module Dimples
 
       generation_time = result.real.round(2)
 
-      message = "Done! Site built in #{generation_time} second"
+      message = "\033[92mDone!\033[0m Site built in #{generation_time} second"
       message += 's' if generation_time != 1
       message += '.'
 
       Dimples.logger.info(message)
-    rescue Errors::RenderingError => e
-      Dimples.logger.error("Failed to render #{e.file}: #{e.message}")
-    rescue Errors::PublishingError => e
-      Dimples.logger.error("Failed to publish #{e.file}: #{e.message}")
+    rescue Errors::RenderingError, Errors::PublishingError, Errors::GenerationError => e
+      Dimples.logger.error("Failed to generate the site: #{e.message}.")
     end
 
     private
@@ -74,7 +72,10 @@ module Dimples
 
       Dir.mkdir(@output_paths[:site])
     rescue => e
-      raise "Failed to prepare the site directory (#{e})"
+      error_message = "Couldn't prepare the output directory"
+      error_message << " (#{e.message})" if @config['verbose_logging']
+
+      raise Errors::GenerationError(error_message)
     end
 
     def scan_files
@@ -276,7 +277,10 @@ module Dimples
         FileUtils.cp_r(path, @output_paths[:site])
       end
     rescue => e
-      raise "Failed to copy site assets (#{e})"
+      error_message = "Site assets failed to copy"
+      error_message << " (#{e.message})" if @config['verbose_logging']
+
+      raise Errors::GenerationError.new(error_message)
     end
 
     def paginate(posts:, title: nil, paths:, layout: false, context: {})
