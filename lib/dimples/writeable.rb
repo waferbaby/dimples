@@ -11,7 +11,10 @@ module Dimples
           file.write(output)
         end
       rescue SystemCallError => e
-        raise Errors::PublishingError.new("Failed to write #{path}")
+        error_message = "Failed to write #{path}"
+        error_message << " (#{e.message})" if @site.config['verbose_logging']
+
+        raise Errors::PublishingError.new(error_message)
       end
     end
   end
