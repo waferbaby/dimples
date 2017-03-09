@@ -61,14 +61,12 @@ module Dimples
 
     def self.default_pagination
       {
-        'enabled' => true,
         'per_page' => 10
       }
     end
 
     def self.default_generation
       {
-        'paginated_posts' => false,
         'categories' => true,
         'year_archives' => true,
         'month_archives' => true,
