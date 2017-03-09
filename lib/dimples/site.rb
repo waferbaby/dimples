@@ -150,12 +150,10 @@ module Dimples
         generate_post(post)
       end
 
-      if @config['generation']['paginated_posts']
-        paths = [@output_paths[:archives]]
-        layout = @config['layouts']['posts']
+      paths = [@output_paths[:archives]]
+      layout = @config['layouts']['posts']
 
-        paginate(posts: @posts, paths: paths, layout: layout)
-      end
+      paginate(posts: @posts, paths: paths, layout: layout)
     end
 
     def generate_post(post)
