@@ -161,6 +161,8 @@ And here's what it all means:
 
 ## The basics
 
+I think you're great.
+
 Key | Default | Description
 ----|---------|-------------
 `source_path` | The current directory. | Where Dimples should look for all the goodies.
@@ -193,6 +195,8 @@ category_names:
 
 ## Paths
 
+Defines where your generated posts will land.
+
 Key | Default | Description
 ----|---------|-------------
 `archives` | `archives` | Where all your posts will end up.
@@ -200,6 +204,8 @@ Key | Default | Description
 `categories` | `archives/categories` | Where individual category pages end up, suffixed with the category slug.
 
 ## Layouts
+
+The default layouts for various posts and pages.
 
 Key | Default | Description
 ----|---------|-------------
@@ -212,11 +218,15 @@ Key | Default | Description
 
 ## Pagination
 
+There's only one option here, but it's pretty great.
+
 Key | Default | Description
 ----|---------|-------------
-`per_page` | 10 | The number of posts to show per page.
+`per_page` | 10 | The number of posts to show per page. This applies to your feeds, too.
 
 ## Generation
+
+A bunch of switches to set what's generated when running `dimples build`.
 
 Key | Default | Description
 ----|---------|-------------
@@ -229,6 +239,8 @@ Key | Default | Description
 
 ## File extensions
 
+Default extensions for generated files - you can override this in your front matter.
+
 Key | Default | Description
 ----|---------|-------------
 `pages` | `html` | The default file extension for generated pages.
@@ -237,7 +249,7 @@ Key | Default | Description
 
 ## Date formats
 
-These are currently used to define the auto-generated title for each type of archive page, and are also passed to Ruby's `strftime` [Time method](http://ruby-doc.org/core-2.4.0/Time.html#method-i-strftime "The strftime method of the Time class.") method.
+These are currently used to define the auto-generated title for each type of archive page, and are also passed to Ruby's `strftime` [Time method](http://ruby-doc.org/core-2.4.0/Time.html#method-i-strftime "The strftime method of the Time class.").
 
 Key | Default | Description
 ----|---------|-------------
