@@ -22,7 +22,7 @@ And then run `bundle`.
 
 Dimples includes a very simple command-line tool, imaginatively named `dimples`, which lets you generate a site in the current directory by running `dimples build`.
 
-It assumes your folder layout will possibly look something like this:
+It assumes your directory structure will possibly look something like this:
 
 ```
 config/
@@ -101,7 +101,7 @@ extension: txt
 ---
 ```
 
-You tell Dimples what template to use by setting the `layout` element, which will map to the filename of any file in `templates/`, sans-extension (so `templates/post.erb` is available as `post`, and so on). This works for posts, pages _and_ templates. Dimples makes no assumptions here, so unless you specify a layout, you ain't getting one.
+You tell Dimples what template to use by setting the `layout` element, which will map to the filename of any file in `templates/`, sans-extension (so `templates/post.erb` is available as `post`, and so on). This works for posts, pages _and_ templates. Dimples makes no assumptions here, so unless you specify a layout, it won't use one.
 
 ```yaml
 ---
@@ -109,4 +109,138 @@ layout: feed
 ---
 ```
 
-And no, I really don't know why I'm using both 'layouts' and 'templates' either. Madness, I tell you.
+### Hey! Why both 'layouts' and 'templates'?
+
+A template represents the actual file on disk, whereas a layout signals which one to use. Make sense? Yeah, I didn't think so.
+
+## Configuration
+
+As a fussy and opinionated gem, Dimples has a lot of feelings about how it should generate a site, but that doesn't mean you don't get to have a say in it. Here's what the default config looks like, in YAML:
+
+```yaml
+source_path: (current directory)
+destination_path: (current directory plus "site")
+verbose_logging: false
+class_overrides:
+  :site:
+  :post:
+  :page:
+rendering: {}
+category_names: {}
+paths:
+  archives: archives
+  posts: archives/%Y/%m/%d
+  categories: archives/categories
+layouts:
+  posts: posts
+  post: post
+  category: category
+  year_archives: year_archives
+  month_archives: month_archives
+  day_archives: day_archives
+pagination:
+  per_page: 10
+generation:
+  categories: true
+  year_archives: true
+  month_archives: true
+  day_archives: true
+  feed: true
+  category_feeds: true
+file_extensions:
+  pages: html
+  posts: html
+  feeds: atom
+date_formats:
+  year: "%Y"
+  month: "%Y-%m"
+  day: "%Y-%m-%d"
+```
+
+And here's what it all means:
+
+## The basics
+
+Key | Default | Description
+----|---------|-------------
+`source_path` | The current directory. | Where Dimples should look for all the goodies.
+`destination_path` | The current directory, plus 'site'. | Where Dimples will build a site. This directory is generated for you, if it doesn't exist (and it's destroyed if it does!).
+`verbose_logging` | `false` | In case you _really_ need to know what Dimples is doing while generating.
+
+## Class overrides
+
+In case Dimples doesn't do exactly what you want, you can substitute subclasses of the default gem classes and override whatever makes sense to you, you crazy kid.
+
+Key | Default | Description
+----|---------|-------------
+`site` | nil | A class to use in place of `Dimples::Site`.
+`post` | nil | A class to use in place of `Dimples::Post`.
+`page` | nil | A class to use in place of `Dimples::Page`.
+
+## Rendering
+
+These options will be passed directly to the renderer Tilt picks for your posts, pages and templates, based on the file extension.
+
+## Category names
+
+By default, Dimples will capitalise your categories as their titles so you can display 'em nicely, but you can override that with your own formatting:
+
+```yaml
+category_names:
+  bsd: 'BSD'
+  mac: 'Macintosh'
+```
+
+## Paths
+
+Key | Default | Description
+----|---------|-------------
+`archives` | `archives` | Where all your posts will end up.
+`posts` | `archives/%Y/%m/%d` | Where individual posts end up, suffixed with the post slug. This string is passed to Ruby's `strftime` [Time method](http://ruby-doc.org/core-2.4.0/Time.html#method-i-strftime "The strftime method of the Time class."), so you can use any of its options to flesh this out.
+`categories` | `archives/categories` | Where individual category pages end up, suffixed with the category slug.
+
+## Layouts
+
+Key | Default | Description
+----|---------|-------------
+`posts` | `posts` | The default layout used for a collection of posts.
+`post` | `post` | The default layout used for a single post.
+`category` | `category` | The default layout used for category pages.
+`year_archives` | `year_archives` | The default layout used for year archive pages.
+`month_archives` | `month_archives` | The default layout used for month archive pages.
+`day_archives` | `day_archives` | The default layout used for day archive pages.
+
+## Pagination
+
+Key | Default | Description
+----|---------|-------------
+`per_page` | 10 | The number of posts to show per page.
+
+## Generation
+
+Key | Default | Description
+----|---------|-------------
+`categories` | true | If we should build category pages.
+`year_archives` | true | If we should build year archive pages.
+`month_archives` | true | If we should build month archive pages.
+`day_archives` | true | If we should build day archive pages.
+`feed` | true | If we should build a main feed from your posts.
+`category_feeds` | true | If we should build a feed of posts for each category on your site.
+
+## File extensions
+
+Key | Default | Description
+----|---------|-------------
+`pages` | `html` | The default file extension for generated pages.
+`posts` | `html` | The default file extension for generated posts.
+`feeds` | `atom` | The default file extension for generated feeds.
+
+## Date formats
+
+These are currently used to define the auto-generated title for each type of archive page, and are also passed to Ruby's `strftime` [Time method](http://ruby-doc.org/core-2.4.0/Time.html#method-i-strftime "The strftime method of the Time class.") method.
+
+Key | Default | Description
+----|---------|-------------
+`year` | `%Y` | The year format.
+`month` | `%Y-%m` | The month format.
+`day` | `%Y-%m-%d` | The day format.
