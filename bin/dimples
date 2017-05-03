@@ -36,15 +36,15 @@ end
 lib_path = File.join(Dir.pwd, options[:lib])
 config_path = File.join(Dir.pwd, options[:config] || 'config', 'site.yml')
 
-if File.exist?(config_path)
+config_hash = if File.exist?(config_path)
   begin
-    config_hash = YAML.load_file(config_path)
+    YAML.load_file(config_path) || {}
   rescue
     Trollop::die "Invalid or malformed YAML config file"
   end
 else
   Trollop::die "Unable to find config file" if options[:config]
-  config_hash = {}
+  {}
 end
 
 config_hash['verbose_logging'] = true if options[:verbose]
@@ -63,15 +63,23 @@ case command.to_sym
 when :build
   Dimples.logger.info("Building site at #{site.output_paths[:site]}...")
 
+  generated = false
+
   result = Benchmark.measure do
     site.generate
   end
 
-  generation_time = result.real.round(2)
+  if site.generated?
+    generation_time = result.real.round(2)
 
-  message = "\033[92mDone!\033[0m Site built in #{generation_time} second"
-  message += 's' if generation_time != 1
-  message += '.'
+    message = "\033[92mDone!\033[0m Site built in #{generation_time} second"
+    message += 's' if generation_time != 1
+    message += '.'
 
-  Dimples.logger.info(message)
+    Dimples.logger.info(message)
+  else
+    site.errors.each do |error|
+      Dimples.logger.error(error)
+    end
+  end
 end
