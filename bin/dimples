@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+$LOAD_PATH.unshift(File.join(__dir__, "..", "lib"))
+
 require 'dimples'
 require 'dimples/version'
 require 'trollop'
