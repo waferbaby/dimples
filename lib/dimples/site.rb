@@ -141,13 +141,18 @@ module Dimples
     end
 
     def generate_files
-      generate_posts
-      generate_pages
-      generate_archives
+      unless @pages.empty?
+        generate_pages
+      end
 
-      generate_categories if @config['generation']['categories']
-      generate_posts_feed if @config['generation']['feed']
-      generate_category_feeds if @config['generation']['category_feeds']
+      unless @posts.empty?
+        generate_posts
+        generate_archives
+
+        generate_categories if @config['generation']['categories']
+        generate_posts_feed if @config['generation']['feed']
+        generate_category_feeds if @config['generation']['category_feeds']
+      end
     end
 
     def generate_posts
