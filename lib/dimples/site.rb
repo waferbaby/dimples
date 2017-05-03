@@ -11,6 +11,7 @@ module Dimples
     attr_accessor :latest_post
     attr_accessor :page_class
     attr_accessor :post_class
+    attr_accessor :errors
 
     def initialize(config)
       @source_paths = {}
@@ -32,6 +33,8 @@ module Dimples
       @source_paths[:root] = File.expand_path(@config['source_path'])
       @output_paths[:site] = File.expand_path(@config['destination_path'])
 
+      @errors = []
+
       %w(pages posts public templates).each do |path|
         @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
       end
@@ -48,7 +51,11 @@ module Dimples
       generate_files
       copy_assets
     rescue Errors::RenderingError, Errors::PublishingError, Errors::GenerationError => e
-      Dimples.logger.error("Failed to generate the site: #{e.message}.")
+      @errors << "Failed to generate the site: #{e.message}."
+    end
+
+    def generated?
+      @errors.count == 0
     end
 
     private
@@ -258,7 +265,7 @@ module Dimples
     end
 
     def paginate(posts:, title: nil, paths:, layout: false, context: {})
-      raise "'#{layout}' template not found" unless @templates.key?(layout)
+      raise Errors::GenerationError.new("'#{layout}' template not found") unless @templates.key?(layout)
 
       per_page = @config['pagination']['per_page']
       page_count = (posts.length.to_f / per_page.to_i).ceil
