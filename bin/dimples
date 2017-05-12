@@ -65,8 +65,6 @@ case command.to_sym
 when :build
   Dimples.logger.info("Building site at #{site.output_paths[:site]}...")
 
-  generated = false
-
   result = Benchmark.measure do
     site.generate
   end
