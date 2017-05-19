@@ -26,5 +26,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'redcarpet', '~> 3.3'
   s.add_development_dependency 'erubis', '~> 2.7'
   s.add_development_dependency 'simplecov', '~> 0.14'
-  s.add_development_dependency 'codeclimate-test-reporter', '~> 1.0.0'
+  s.add_development_dependency 'codeclimate-test-reporter', '~> 1.0', '>= 1.0.0'
 end
