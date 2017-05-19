@@ -150,7 +150,7 @@ module Dimples
         generate_archives
 
         generate_categories if @config['generation']['categories']
-        generate_posts_feed if @config['generation']['feed']
+        generate_posts_feeds if @config['generation']['feeds']
         generate_category_feeds if @config['generation']['category_feeds']
       end
     end
@@ -231,19 +231,23 @@ module Dimples
       end
     end
 
-    def generate_feed(path, options)
-      feed = @page_class.new(self)
+    def generate_feeds(path, options)
+      @config['feed_formats'].each do |format|
+        if @templates[format]
+          feed = @page_class.new(self)
 
-      feed.filename = 'feed'
-      feed.extension = @config['file_extensions']['feeds']
-      feed.layout = 'feed'
+          feed.filename = 'feed'
+          feed.extension = format
+          feed.layout = format
 
-      feed.write(feed.output_path(path), options)
+          feed.write(feed.output_path(path), options)
+        end
+      end
     end
 
-    def generate_posts_feed
+    def generate_posts_feeds
       posts = @posts[0..@config['pagination']['per_page'] - 1]
-      generate_feed(@output_paths[:site], posts: posts)
+      generate_feeds(@output_paths[:site], posts: posts)
     end
 
     def generate_category_feeds
@@ -251,7 +255,7 @@ module Dimples
         path = File.join(@output_paths[:categories], category.slug)
         posts = category.posts[0..@config['pagination']['per_page'] - 1]
 
-        generate_feed(path, posts: category.posts, category: category.slug)
+        generate_feeds(path, posts: category.posts, category: category.slug)
       end
     end
 
