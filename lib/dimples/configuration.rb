@@ -35,7 +35,7 @@ module Dimples
         'layouts' => default_layouts,
         'pagination' => default_pagination,
         'generation' => default_generation,
-        'file_extensions' => default_file_extensions,
+        'feed_formats' => default_feed_formats,
         'date_formats' => default_date_formats
       }
     end
@@ -71,17 +71,13 @@ module Dimples
         'year_archives' => true,
         'month_archives' => true,
         'day_archives' => true,
-        'feed' => true,
+        'feeds' => true,
         'category_feeds' => true
       }
     end
 
-    def self.default_file_extensions
-      {
-        'pages' => 'html',
-        'posts' => 'html',
-        'feeds' => 'atom'
-      }
+    def self.default_feed_formats
+      ['atom']
     end
 
     def self.default_date_formats
