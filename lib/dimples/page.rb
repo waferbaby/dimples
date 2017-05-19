@@ -15,7 +15,7 @@ module Dimples
 
     def initialize(site, path = nil)
       @site = site
-      @extension = @site.config['file_extensions']['pages']
+      @extension = 'html'
       @path = path
 
       if @path

@@ -27,7 +27,7 @@ module Dimples
       @path = path
 
       @filename = 'index'
-      @extension = @site.config['file_extensions']['posts']
+      @extension = 'html'
 
       date_format = /(\d{4})-(\d{2})-(\d{2})-(.+)/
       parts = File.basename(path, File.extname(path)).match(date_format)
