@@ -51,7 +51,7 @@ module Dimples
       generate_files
       copy_assets
     rescue Errors::RenderingError, Errors::PublishingError, Errors::GenerationError => e
-      @errors << "Failed to generate the site: #{e.message}."
+      @errors << e.message
     end
 
     def generated?
@@ -67,10 +67,7 @@ module Dimples
 
       Dir.mkdir(@output_paths[:site])
     rescue => e
-      error_message = "Couldn't prepare the output directory"
-      error_message << " (#{e.message})" if @config['verbose_logging']
-
-      raise Errors::GenerationError(error_message)
+      raise Errors::GenerationError("Couldn't prepare the output directory (#{e.message})")
     end
 
     def scan_files
@@ -267,14 +264,11 @@ module Dimples
         FileUtils.cp_r(path, @output_paths[:site])
       end
     rescue => e
-      error_message = "Site assets failed to copy"
-      error_message << " (#{e.message})" if @config['verbose_logging']
-
-      raise Errors::GenerationError.new(error_message)
+      raise Errors::GenerationError.new("Site assets failed to copy (#{e.message})")
     end
 
     def paginate(posts:, title: nil, paths:, layout: false, context: {})
-      raise Errors::GenerationError.new("'#{layout}' template not found") unless @templates.key?(layout)
+      raise Errors::GenerationError.new("'#{layout}' template not found during pagination") unless @templates.key?(layout)
 
       per_page = @config['pagination']['per_page']
       page_count = (posts.length.to_f / per_page.to_i).ceil

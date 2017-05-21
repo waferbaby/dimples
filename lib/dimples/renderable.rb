@@ -5,12 +5,10 @@ module Dimples
         output = renderer.render(build_scope(context)) { body }.strip
         @rendered_contents = output
       rescue RuntimeError, TypeError, NoMethodError, SyntaxError, NameError => e
-        file = @path || "a dynamic #{self.class}"
+        sanitised_error_name = e.class.to_s.gsub(/([A-Z])/, " \\1").strip.downcase
+        error_message = "Unable to render #{@path || "a dynamic #{self.class}"} (#{sanitised_error_name})"
 
-        error_message = "Unable to render #{file}"
-        error_message << " (#{e.message})" if @site.config['verbose_logging']
-
-        raise Errors::RenderingError.new(e.message)
+        raise Errors::RenderingError.new(error_message)
       end
 
       if use_layout && defined?(@layout) && @site.templates[@layout]
