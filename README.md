@@ -145,12 +145,10 @@ generation:
   year_archives: true
   month_archives: true
   day_archives: true
-  feed: true
+  feeds: true
   category_feeds: true
-file_extensions:
-  pages: html
-  posts: html
-  feeds: atom
+feed_formats:
+- atom
 date_formats:
   year: "%Y"
   month: "%Y-%m"
@@ -234,18 +232,12 @@ Key | Default | Description
 `year_archives` | true | If we should build year archive pages.
 `month_archives` | true | If we should build month archive pages.
 `day_archives` | true | If we should build day archive pages.
-`feed` | true | If we should build a main feed from your posts.
+`feeds` | true | If we should build the main feeds based on your posts.
 `category_feeds` | true | If we should build a feed of posts for each category on your site.
 
-## File extensions
+## Feed formats
 
-Default extensions for generated files - you can override this in your front matter.
-
-Key | Default | Description
-----|---------|-------------
-`pages` | `html` | The default file extension for generated pages.
-`posts` | `html` | The default file extension for generated posts.
-`feeds` | `atom` | The default file extension for generated feeds.
+This is a simple list of feed types your site supports, where the name matches up with a template - `atom` would match `templates/atom.erb`.
 
 ## Date formats
 
