@@ -1,21 +1,22 @@
+# frozen_string_literal: true
+
 module Dimples
+  # A mixin class that handles rendering via a Tilt template.
   module Renderable
     def render(context = {}, body = nil, use_layout = true)
-      begin
-        output = renderer.render(build_scope(context)) { body }.strip
-        @rendered_contents = output
-      rescue RuntimeError, TypeError, NoMethodError, SyntaxError, NameError => e
-        sanitised_error_name = e.class.to_s.gsub(/([A-Z])/, " \\1").strip.downcase
-        error_message = "Unable to render #{@path || "a dynamic #{self.class}"} (#{sanitised_error_name})"
-
-        raise Errors::RenderingError.new(error_message)
-      end
+      output = renderer.render(build_scope(context)) { body }.strip
+      @rendered_contents = output
 
       if use_layout && defined?(@layout) && @site.templates[@layout]
         output = @site.templates[@layout].render(context, output)
       end
 
       output
+    rescue => e
+      error_name = e.class.to_s.gsub(/([A-Z])/, ' \\1').strip.downcase
+      error_message = "Unable to render #{@path || self.class} (#{error_name})"
+
+      raise Errors::RenderingError.new, error_message
     end
 
     def build_scope(context)

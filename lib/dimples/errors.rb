@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Dimples
   module Errors
     class PublishingError < StandardError

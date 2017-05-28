@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Dimples
+  # A class that models a single site page.
   class Page
     include Frontable
     include Writeable
@@ -20,7 +23,7 @@ module Dimples
 
       if @path
         @filename = File.basename(@path, File.extname(@path))
-        @contents = read_with_yaml(@path)
+        @contents = read_with_front_matter(@path)
       else
         @filename = 'index'
         @contents = ''

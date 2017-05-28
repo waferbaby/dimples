@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $LOAD_PATH.unshift(__dir__)
 
 require 'helper'
@@ -11,7 +13,7 @@ describe 'Post' do
 
   it 'parses its YAML frontmatter' do
     subject.title.must_equal('My first post')
-    subject.categories.sort.must_equal(%w(a b c))
+    subject.categories.sort.must_equal(%w[a b c])
   end
 
   it 'renders its contents' do

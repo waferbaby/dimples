@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Dimples
+  # A class that models a site's configuration.
   class Configuration
     def initialize(config = {})
       @settings = Dimples::Configuration.default_settings
@@ -17,16 +20,14 @@ module Dimples
     end
 
     def class_override(type)
-      klass = @settings['class_overrides']["#{type}"]
+      klass = @settings['class_overrides'][type.to_s]
       Object.const_get(klass) unless klass.nil?
     end
 
     def self.default_settings
-      current_path = Dir.pwd
-
       {
-        'source_path' => current_path,
-        'destination_path' => File.join(current_path, 'site'),
+        'source_path' => Dir.pwd,
+        'destination_path' => File.join(Dir.pwd, 'site'),
         'verbose_logging' => false,
         'class_overrides' => { site: nil, post: nil, page: nil },
         'rendering' => {},

@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Dimples
+  # A class that models a single template.
   class Template
     include Frontable
     include Renderable
@@ -14,7 +17,7 @@ module Dimples
       @slug = File.basename(path, File.extname(path))
       @path = path
 
-      @contents = read_with_yaml(path)
+      @contents = read_with_front_matter(path)
     end
   end
 end

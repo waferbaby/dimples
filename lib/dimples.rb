@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $LOAD_PATH.unshift(__dir__)
 
 require 'benchmark'
@@ -20,6 +22,7 @@ require 'dimples/post'
 require 'dimples/site'
 require 'dimples/template'
 
+# A static site generator.
 module Dimples
   class << self
     def logger

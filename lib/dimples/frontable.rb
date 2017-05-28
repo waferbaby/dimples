@@ -1,20 +1,18 @@
+# frozen_string_literal: true
+
 module Dimples
+  # A mixin class that handles reading and parsing front matter from a file.
   module Frontable
-    def read_with_yaml(path)
-      if File.extname(path) == '.yml'
-        contents = ''
-        metadata = YAML.load_file(path)
-      else
-        contents = File.read(path)
-        matches = contents.match(/^(-{3}\n.*?\n?)^(-{3}*$\n?)/m)
+    def read_with_front_matter(path)
+      contents = File.read(path)
+      matches = contents.match(/^(-{3}\n.*?\n?)^(-{3}*$\n?)/m)
 
-        if matches
-          metadata = YAML.load(matches[1])
-          contents = matches.post_match.strip
-        end
+      if matches
+        metadata = YAML.safe_load(matches[1])
+        contents = matches.post_match.strip
+
+        apply_metadata(metadata) if metadata
       end
-
-      apply_metadata(metadata) if metadata
 
       contents
     end

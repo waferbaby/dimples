@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Dimples
+  # A mixin class that neatly handles writing out a file.
   module Writeable
     def write(path, context = {})
       output = context ? render(context) : contents
@@ -10,7 +13,8 @@ module Dimples
         file.write(output)
       end
     rescue SystemCallError => e
-      raise Errors::PublishingError.new("Failed to write #{path} (#{e.message})")
+      error_message = "Failed to write #{path} (#{e.message})"
+      raise Errors::PublishingError, error_message
     end
   end
 end

@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Dimples
+  # A class that models a single site.
   class Site
     attr_accessor :source_paths
     attr_accessor :output_paths
@@ -14,32 +17,40 @@ module Dimples
     attr_accessor :errors
 
     def initialize(config)
-      @source_paths = {}
-      @output_paths = {}
+      @config = config
+
       @templates = {}
       @categories = {}
-      @archives = { year: {}, month: {}, day: {} }
-
       @pages = []
       @posts = []
+      @errors = []
 
+      @archives = { year: {}, month: {}, day: {} }
       @latest_post = false
-
-      @config = config
 
       @page_class = @config.class_override(:page) || Dimples::Page
       @post_class = @config.class_override(:post) || Dimples::Post
 
-      @source_paths[:root] = File.expand_path(@config['source_path'])
-      @output_paths[:site] = File.expand_path(@config['destination_path'])
+      set_source_paths
+      set_output_paths
+    end
 
-      @errors = []
+    def set_source_paths
+      @source_paths = {
+        root: File.expand_path(@config['source_path'])
+      }
 
-      %w(pages posts public templates).each do |path|
+      %w[pages posts public templates].each do |path|
         @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
       end
+    end
 
-      %w(archives posts categories).each do |path|
+    def set_output_paths
+      @output_paths = {
+        site: File.expand_path(@config['destination_path'])
+      }
+
+      %w[archives posts categories].each do |path|
         output_path = File.join(@output_paths[:site], @config['paths'][path])
         @output_paths[path.to_sym] = output_path
       end
@@ -50,12 +61,14 @@ module Dimples
       scan_files
       generate_files
       copy_assets
-    rescue Errors::RenderingError, Errors::PublishingError, Errors::GenerationError => e
+    rescue Errors::RenderingError,
+           Errors::PublishingError,
+           Errors::GenerationError => e
       @errors << e.message
     end
 
     def generated?
-      @errors.count == 0
+      @errors.count.zero?
     end
 
     private
@@ -67,7 +80,8 @@ module Dimples
 
       Dir.mkdir(@output_paths[:site])
     rescue => e
-      raise Errors::GenerationError("Couldn't prepare the output directory (#{e.message})")
+      error_message = "Couldn't prepare the output directory (#{e.message})"
+      raise Errors::GenerationError, error_message
     end
 
     def scan_files
@@ -85,44 +99,47 @@ module Dimples
 
     def scan_pages
       Dir.glob(File.join(@source_paths[:pages], '**', '*.*')).each do |path|
-        page = @page_class.new(self, path)
-        @pages << page
+        @pages << scan_page(path)
       end
+    end
+
+    def scan_page(path)
+      @page_class.new(self, path)
     end
 
     def scan_posts
       Dir.glob(File.join(@source_paths[:posts], '*.*')).reverse_each do |path|
-        post = @post_class.new(self, path)
-
-        next if post.draft
-
-        post.categories.each do |slug|
-          unless @categories[slug]
-            name = @config['category_names'][slug] || slug.capitalize
-            @categories[slug] = Dimples::Category.new(name, slug)
-          end
-
-          @categories[slug].posts << post
-        end
-
-        archive_year(post.year) << post
-        archive_month(post.year, post.month) << post
-        archive_day(post.year, post.month, post.day) << post
-
-        @posts << post
+        @posts << scan_post(path)
       end
 
       @posts.each_index do |index|
-        if index - 1 >= 0
+        if (index - 1) >= 0
           @posts[index].next_post = @posts.fetch(index - 1, nil)
         end
 
-        if index + 1 < @posts.count
+        if (index + 1) < @posts.count
           @posts[index].previous_post = @posts.fetch(index + 1, nil)
         end
       end
 
       @latest_post = @posts.first
+    end
+
+    def scan_post(path)
+      @post_class.new(self, path).tap do |post|
+        post.categories.each do |slug|
+          @categories[slug] ||= Dimples::Category.new(self, slug)
+          @categories[slug].posts << post
+        end
+
+        add_post_to_archives(post)
+      end
+    end
+
+    def add_post_to_archives(post)
+      archive_year(post.year) << post
+      archive_month(post.year, post.month) << post
+      archive_day(post.year, post.month, post.day) << post
     end
 
     def archive_year(year)
@@ -138,31 +155,29 @@ module Dimples
     end
 
     def generate_files
-      unless @pages.empty?
-        generate_pages
-      end
+      generate_pages unless @pages.count.zero?
 
-      unless @posts.empty?
-        generate_posts
-        generate_archives
+      return if @posts.count.zero?
 
-        generate_categories if @config['generation']['categories']
-        generate_posts_feeds if @config['generation']['feeds']
-        generate_category_feeds if @config['generation']['category_feeds']
-      end
+      generate_posts
+      generate_archives
+      generate_categories if @config['generation']['categories']
     end
 
     def generate_posts
-      Dimples.logger.debug_generation('posts', @posts.length) if @config['verbose_logging']
+      if @config['verbose_logging']
+        Dimples.logger.debug_generation('posts', @posts.length)
+      end
 
       @posts.each do |post|
         generate_post(post)
       end
 
-      paths = [@output_paths[:archives]]
       layout = @config['layouts']['posts']
 
-      paginate(posts: @posts, paths: paths, layout: layout)
+      paginate(posts: @posts, path: @output_paths[:archives], layout: layout)
+
+      generate_posts_feeds if @config['generation']['feeds']
     end
 
     def generate_post(post)
@@ -170,7 +185,9 @@ module Dimples
     end
 
     def generate_pages
-      Dimples.logger.debug_generation('pages', @pages.length) if @config['verbose_logging']
+      if @config['verbose_logging']
+        Dimples.logger.debug_generation('pages', @pages.length)
+      end
 
       @pages.each do |page|
         generate_page(page)
@@ -182,63 +199,73 @@ module Dimples
     end
 
     def generate_categories
-      Dimples.logger.debug_generation('category pages', @categories.length) if @config['verbose_logging']
+      if @config['verbose_logging']
+        Dimples.logger.debug_generation('category pages', @categories.length)
+      end
 
       @categories.each_value do |category|
         generate_category(category)
       end
+
+      generate_category_feeds if @config['generation']['category_feeds']
     end
 
     def generate_category(category)
-      paths = [@output_paths[:categories], category.slug]
-      layout = @config['layouts']['category']
-      context = { category: category.slug }
+      params = {
+        posts: category.posts,
+        title: category.name,
+        path: File.join(@output_paths[:categories], category.slug),
+        layout: @config['layouts']['category'],
+        context: { category: category.slug }
+      }
 
-      paginate(posts: category.posts, title: category.name, paths: paths, layout: layout, context: context)
+      paginate(params)
     end
 
     def generate_archives
-      %w(year month day).each do |date_type|
+      %w[year month day].each do |date_type|
         if @config['generation']["#{date_type}_archives"]
-          date_type_sym = date_type.to_sym
-
-          if @config['verbose_logging']
-            Dimples.logger.debug_generation("#{date_type} archives", @archives[date_type_sym].count)
-          end
-
-          layout = @config['layouts']["#{date_type}_archives"]
-
-          @archives[date_type_sym].each_value do |posts|
-            title = posts[0].date.strftime(@config['date_formats'][date_type])
-            paths = [@output_paths[:archives], posts[0].year]
-            dates = { year: posts[0].year }
-
-            case date_type
-            when 'month'
-              paths << posts[0].month
-              dates[:month] = posts[0].month
-            when 'day'
-              paths.concat([posts[0].month, posts[0].day])
-              dates.merge(month: posts[0].month, day: posts[0].day)
-            end
-
-            paginate(posts: posts, title: title, paths: paths, layout: layout, context: dates)
-          end
+          generate_archive_posts(date_type)
         end
+      end
+    end
+
+    def generate_archive_posts(date_type)
+      @archives[date_type.to_sym].each_value do |posts|
+        post = posts[0]
+
+        dates = case date_type
+                when 'year'
+                  { year: post.year }
+                when 'month'
+                  { year: post.year, month: post.month }
+                when 'day'
+                  { year: post.year, month: post.month, day: post.day }
+                end
+
+        params = {
+          posts: posts,
+          title: post.date.strftime(@config['date_formats'][date_type]),
+          path: File.join(@output_paths[:archives], dates.values),
+          layout: @config['layouts']["#{date_type}_archives"],
+          context: dates
+        }
+
+        paginate(params)
       end
     end
 
     def generate_feeds(path, options)
       @config['feed_formats'].each do |format|
-        if @templates[format]
-          feed = @page_class.new(self)
+        next unless @templates[format]
 
-          feed.filename = 'feed'
-          feed.extension = format
-          feed.layout = format
+        feed = @page_class.new(self)
 
-          feed.write(feed.output_path(path), options)
-        end
+        feed.filename = 'feed'
+        feed.extension = format
+        feed.layout = format
+
+        feed.write(feed.output_path(path), options)
       end
     end
 
@@ -252,64 +279,52 @@ module Dimples
         path = File.join(@output_paths[:categories], category.slug)
         posts = category.posts[0..@config['pagination']['per_page'] - 1]
 
-        generate_feeds(path, posts: category.posts, category: category.slug)
+        generate_feeds(path, posts: posts, category: category.slug)
       end
     end
 
     def copy_assets
       if Dir.exist?(@source_paths[:public])
-        Dimples.logger.debug("Copying assets...") if @config['verbose_logging']
+        Dimples.logger.debug('Copying assets...') if @config['verbose_logging']
 
         path = File.join(@source_paths[:public], '.')
         FileUtils.cp_r(path, @output_paths[:site])
       end
     rescue => e
-      raise Errors::GenerationError.new("Site assets failed to copy (#{e.message})")
+      raise Errors::GenerationError, "Site assets failed to copy (#{e.message})"
     end
 
-    def paginate(posts:, title: nil, paths:, layout: false, context: {})
-      raise Errors::GenerationError.new("'#{layout}' template not found during pagination") unless @templates.key?(layout)
-
+    def paginate(posts:, title: nil, path:, layout: false, context: {})
       per_page = @config['pagination']['per_page']
-      page_count = (posts.length.to_f / per_page.to_i).ceil
+      pages = (posts.length.to_f / per_page.to_i).ceil
+      url = path.gsub(@output_paths[:site], '') + '/'
 
-      page_path = paths[0].gsub(@output_paths[:site], '') + '/'
-      page_path += paths[1..-1].join('/') + '/' if paths.length > 1
-
-      (1..page_count).each do |index|
+      (1..pages).each do |index|
         page = @page_class.new(self)
 
         page.layout = layout
         page.title = title || @templates[layout].title
 
-        pagination = build_pagination(index, page_count, posts.count, page_path)
-        output_path = File.join(paths, index != 1 ? "page#{index}" : '')
+        output_path = File.join(path, index != 1 ? "page#{index}" : '')
 
         context[:posts] = posts.slice((index - 1) * per_page, per_page)
-        context[:pagination] = pagination
+        context[:pagination] = build_pagination(index, pages, posts.count, url)
 
         page.write(page.output_path(output_path), context)
       end
     end
 
-    def build_pagination(index, page_count, item_count, path)
+    def build_pagination(index, pages, item_count, url)
       pagination = {
         page: index,
-        pages: page_count,
+        pages: pages,
         post_count: item_count,
-        path: path
+        url: url
       }
 
-      if (pagination[:page] - 1) > 0
-        pagination[:previous_page] = pagination[:page] - 1
-      end
-
-      if (pagination[:page] + 1) <= pagination[:pages]
-        pagination[:next_page] = pagination[:page] + 1
-      end
-
-      if pagination[:previous_page]
-        pagination[:previous_page_url] = pagination[:path]
+      if (index - 1).positive?
+        pagination[:previous_page] = index - 1
+        pagination[:previous_page_url] = url
 
         if pagination[:previous_page] != 1
           page_string = "page#{pagination[:previous_page]}"
@@ -317,8 +332,9 @@ module Dimples
         end
       end
 
-      if pagination[:next_page]
-        page_string = "#{pagination[:path]}page#{pagination[:next_page]}"
+      if (index + 1) <= pages
+        pagination[:next_page] = index + 1
+        page_string = "#{url}page#{pagination[:next_page]}"
         pagination[:next_page_url] = page_string
       end
 

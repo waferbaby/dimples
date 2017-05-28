@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Dimples
+  # A simple Logger subclass.
   class Logger < Logger
     def initialize(*)
       super
@@ -14,13 +17,14 @@ module Dimples
     end
   end
 
+  # A simple Logger formatting subclass.
   class LogFormatter < Logger::Formatter
-    def self.call(severity, time, program_name, message)
-      prefix = case severity
-      when "ERROR"
-        "\033[31mError:\033[0m "
+    def self.call(severity, _time, _program_name, message)
+      case severity
+      when 'ERROR'
+        prefix = "\033[31mError:\033[0m "
       when 'DEBUG'
-        "\033[93m- "
+        prefix = "\033[93m- "
       end
 
       "#{prefix}#{message}\033[0m\n"

@@ -1,52 +1,54 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
-$LOAD_PATH.unshift(File.join(__dir__, "..", "lib"))
+$LOAD_PATH.unshift(File.join(__dir__, '..', 'lib'))
 
 require 'dimples'
 require 'dimples/version'
 require 'trollop'
 
 trap('SIGINT') do
-  puts "Generation cancelled!"
+  puts 'Generation cancelled!'
   exit!
 end
 
 valid_commands = %w[build]
 
-options = Trollop::options do
+options = Trollop.options do
   version "dimples v#{Dimples::VERSION}"
-  banner <<EOS
-A very, very simple static site generator.
+  banner <<~EOS
+    A very, very simple static site generator.
 
-Usage:
-  dimples <#{valid_commands.join('|')}> [options]
+    Usage:
+    dimples <#{valid_commands.join('|')}> [options]
 
-Options:
+    Options:
 EOS
-  opt :config, "Config file path", type: :string
-  opt :lib, "Library file path", default: 'lib'
-  opt :verbose, "Verbose mode", default: false
+  opt :config, 'Config file path', type: :string
+  opt :lib, 'Library file path', default: 'lib'
+  opt :verbose, 'Verbose mode', default: false
 end
 
-Trollop::educate if ARGV.empty?
+Trollop.educate if ARGV.empty?
 command = ARGV[0]
 
 unless valid_commands.include?(command)
-  Trollop::die "Command must be '#{valid_commands.join('\', \'')}'"
+  Trollop.die "Command must be '#{valid_commands.join('\', \'')}'"
 end
 
 lib_path = File.join(Dir.pwd, options[:lib])
 config_path = File.join(Dir.pwd, options[:config] || 'config', 'site.yml')
 
-config_hash = if File.exist?(config_path)
+config_hash = {}
+
+if File.exist?(config_path)
   begin
-    YAML.load_file(config_path) || {}
+    config_hash = YAML.load_file(config_path) || {}
   rescue
-    Trollop::die "Invalid or malformed YAML config file"
+    Trollop.die 'Invalid or malformed YAML config file'
   end
-else
-  Trollop::die "Unable to find config file" if options[:config]
-  {}
+elsif options[:config]
+  Trollop.die 'Unable to find config file'
 end
 
 config_hash['verbose_logging'] = true if options[:verbose]
@@ -58,7 +60,7 @@ if Dir.exist?(lib_path)
   end
 end
 
-site_klass = config.class_override(:site) || Dimples::Site
+site_klass = config.class_override(:site) || Dimples.Site
 site = site_klass.new(config)
 
 case command.to_sym

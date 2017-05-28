@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $LOAD_PATH.unshift(__dir__)
 
 require 'helper'
@@ -27,12 +29,12 @@ describe 'Site' do
     end
 
     describe 'generating files' do
-      %w(year month day).each do |date_type|
+      %w[year month day].each do |date_type|
         it 'generates #{date_type} archives' do
           expected_output = render_fixture("#{date_type}_archives.erb")
 
           paths = [subject.output_paths[:site], 'archives', '2015']
-          paths << '01' if date_type =~ /month|day/
+          paths << '01' if date_type.match?(/month|day/)
           paths << '01' if date_type == 'day'
           paths << 'index.html'
 
@@ -57,14 +59,18 @@ describe 'Site' do
 
     describe 'when paginating' do
       before do
-        class Dimples::Site
-          public :build_pagination
+        module Dimples
+          class Site
+            public :build_pagination
+          end
         end
       end
 
       after do
-        class Dimples::Site
-          private :build_pagination
+        module Dimples
+          class Site
+            private :build_pagination
+          end
         end
       end
 
