@@ -34,7 +34,7 @@ describe 'Site' do
           expected_output = render_fixture("#{date_type}_archives.erb")
 
           paths = [subject.output_paths[:site], 'archives', '2015']
-          paths << '01' if date_type.match?(/month|day/)
+          paths << '01' if date_type =~ /month|day/
           paths << '01' if date_type == 'day'
           paths << 'index.html'
 

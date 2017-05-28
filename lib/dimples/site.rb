@@ -322,7 +322,7 @@ module Dimples
         url: url
       }
 
-      if (index - 1).positive?
+      if (index - 1) > 0
         pagination[:previous_page] = index - 1
         pagination[:previous_page_url] = url
 
