@@ -16,13 +16,13 @@ valid_commands = %w[build]
 
 options = Trollop.options do
   version "dimples v#{Dimples::VERSION}"
-  banner <<~EOS
-    A very, very simple static site generator.
+  banner <<-EOS
+A very, very simple static site generator.
 
-    Usage:
-    dimples <#{valid_commands.join('|')}> [options]
+Usage:
+dimples <#{valid_commands.join('|')}> [options]
 
-    Options:
+Options:
 EOS
   opt :config, 'Config file path', type: :string
   opt :lib, 'Library file path', default: 'lib'
