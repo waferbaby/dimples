@@ -93,7 +93,16 @@ module Dimples
     def scan_templates
       Dir.glob(File.join(@source_paths[:templates], '**', '*.*')).each do |path|
         template = Dimples::Template.new(self, path)
-        @templates[template.slug] = template
+
+        parent_path = File.dirname(path)
+        if parent_path == @source_paths[:templates]
+          slug = template.slug
+        else
+          relative_path = parent_path.gsub(@source_paths[:templates], '')[1..-1]
+          slug = relative_path.gsub(File::SEPARATOR, '.') + ".#{template.slug}"
+        end
+
+        @templates[slug] = template
       end
     end
 
@@ -256,7 +265,7 @@ module Dimples
     end
 
     def generate_feeds(path, options)
-      @config['feed_formats'].each do |format|
+      feed_templates.each do |format|
         next unless @templates[format]
 
         feed = @page_class.new(self)
@@ -281,6 +290,10 @@ module Dimples
 
         generate_feeds(path, posts: posts, category: category.slug)
       end
+    end
+
+    def feed_templates
+      @feed_templates ||= @templates.keys.select { |k| k =~ /^feeds\./ }
     end
 
     def copy_assets
