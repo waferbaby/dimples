@@ -24,18 +24,13 @@ Dimples includes a very simple command-line tool, imaginatively named `dimples`,
 
 It assumes your directory structure will possibly look something like this:
 
-```
-config/
-  site.yml
-lib/
-  (optional code to extend Dimples)
-pages/
-  (a bunch of awesome pages)
-posts/
-  (a bunch of clever, articulate posts)
-templates/
-  (a bunch of horribly attractive templates)
-```
+- `config/`
+  - `site.yml`
+- `lib/` (optional code to extend Dimples)
+- `pages/` (a bunch of awesome pages)
+- `posts/` (a bunch of clever, articulate posts)
+- `templates/` (a bunch of horribly attractive templates)
+  - `feeds/` (optional templates for feeds)
 
 All pages, posts and templates support front matter.
 
@@ -68,6 +63,8 @@ For example, a very basic template for a post might look something like:
     <%= yield %>
 </article>
 ```
+
+Any templates stored in a `feeds` subdirectory will be used as a feed format, mapping its filename to the generated feed's extension - `templates/feeds/atom.erb` becomes `feed.atom`, and so on.
 
 ### Lib
 
@@ -147,8 +144,6 @@ generation:
   day_archives: true
   feeds: true
   category_feeds: true
-feed_formats:
-- atom
 date_formats:
   year: "%Y"
   month: "%Y-%m"
@@ -234,10 +229,6 @@ Key | Default | Description
 `day_archives` | true | If we should build day archive pages.
 `feeds` | true | If we should build the main feeds based on your posts.
 `category_feeds` | true | If we should build a feed of posts for each category on your site.
-
-## Feed formats
-
-This is a simple list of feed types your site supports, where the name matches up with a template - `atom` would match `templates/atom.erb`.
 
 ## Date formats
 
