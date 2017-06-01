@@ -271,7 +271,7 @@ module Dimples
         feed = @page_class.new(self)
 
         feed.filename = 'feed'
-        feed.extension = format
+        feed.extension = @templates[format].slug
         feed.layout = format
 
         feed.write(feed.output_path(path), options)
