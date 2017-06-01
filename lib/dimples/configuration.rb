@@ -36,7 +36,6 @@ module Dimples
         'layouts' => default_layouts,
         'pagination' => default_pagination,
         'generation' => default_generation,
-        'feed_formats' => default_feed_formats,
         'date_formats' => default_date_formats
       }
     end
@@ -75,10 +74,6 @@ module Dimples
         'feeds' => true,
         'category_feeds' => true
       }
-    end
-
-    def self.default_feed_formats
-      ['atom']
     end
 
     def self.default_date_formats
