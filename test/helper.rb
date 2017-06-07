@@ -14,8 +14,8 @@ end
 
 def test_configuration
   @config ||= Dimples::Configuration.new(
-    'source_path' => File.join(__dir__, 'site'),
-    'destination_path' => File.join(__dir__, 'build'),
+    'source_path' => File.join(__dir__, 'build'),
+    'destination_path' => File.join(__dir__, 'site'),
     'categories' => [{ 'slug' => 'a', 'name' => 'A' }]
   )
 end
