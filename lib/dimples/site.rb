@@ -136,7 +136,7 @@ module Dimples
 
     def scan_post(path)
       @post_class.new(self, path).tap do |post|
-        post.categories.each do |slug|
+        post.categories&.each do |slug|
           @categories[slug] ||= Dimples::Category.new(self, slug)
           @categories[slug].posts << post
         end
