@@ -136,9 +136,11 @@ module Dimples
 
     def scan_post(path)
       @post_class.new(self, path).tap do |post|
-        post.categories&.each do |slug|
-          @categories[slug] ||= Dimples::Category.new(self, slug)
-          @categories[slug].posts << post
+        unless post.categories.nil?
+          post.categories.each do |slug|
+            @categories[slug] ||= Dimples::Category.new(self, slug)
+            @categories[slug].posts << post
+          end
         end
 
         add_post_to_archives(post)
