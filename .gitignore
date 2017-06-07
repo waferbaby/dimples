@@ -1,4 +1,4 @@
 Gemfile.lock
 coverage
 *.gem
-test/build
+test/site
