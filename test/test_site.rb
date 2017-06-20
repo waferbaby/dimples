@@ -135,8 +135,8 @@ describe 'Site' do
       end
     end
   end
-
-  def teardown
-    FileUtils.remove_dir(subject.output_paths[:site])
-  end
 end
+
+MiniTest.after_run {
+  FileUtils.remove_dir(test_site.output_paths[:site])
+}
