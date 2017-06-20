@@ -13,9 +13,7 @@ module Dimples
 
       output
     rescue => e
-      error_name = e.class.to_s.gsub(/([A-Z])/, ' \\1').strip.downcase
-      error_message = "Unable to render #{@path || self.class} (#{error_name})"
-
+      error_message = "Unable to render #{@path || self.class} (#{e})"
       raise Errors::RenderingError.new, error_message
     end
 
