@@ -30,7 +30,7 @@ describe 'Site' do
 
     describe 'generating files' do
       %w[year month day].each do |date_type|
-        it 'generates #{date_type} archives' do
+        it "generates #{date_type} archives" do
           expected_output = render_fixture("#{date_type}_archives.erb")
 
           paths = [subject.output_paths[:site], 'archives', '2015']
@@ -134,5 +134,9 @@ describe 'Site' do
         end
       end
     end
+  end
+
+  def teardown
+    FileUtils.remove_dir(subject.output_paths[:site])
   end
 end
