@@ -7,11 +7,11 @@ require 'helper'
 describe 'Site' do
   subject { @site = test_site }
 
-  describe 'building a complete site' do
+  describe 'building a site' do
     before { subject.generate }
 
-    it 'prepares the output directory' do
-      Dir.exist?(subject.output_paths[:site]).must_equal(true)
+    it 'creates the output directory' do
+      File.directory?(subject.output_paths[:site]).must_equal(true)
     end
 
     describe 'scanning for files' do
@@ -136,7 +136,3 @@ describe 'Site' do
     end
   end
 end
-
-MiniTest.after_run {
-  FileUtils.remove_dir(test_site.output_paths[:site])
-}
