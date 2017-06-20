@@ -15,7 +15,7 @@ end
 def test_configuration
   @config ||= Dimples::Configuration.new(
     'source_path' => File.join(__dir__, 'source'),
-    'destination_path' => File.join('tmp', "dimples-#{Time.new.to_i}"),
+    'destination_path' => File.join(File::SEPARATOR, 'tmp', "dimples-#{Time.new.to_i}"),
     'categories' => [{ 'slug' => 'a', 'name' => 'A' }]
   )
 end
