@@ -50,7 +50,7 @@ module Dimples
     end
 
     def output_path(parent_path)
-      parent_path = @date.strftime(parent_path) if parent_path =~ /%/
+      parent_path = @date.strftime(parent_path) if parent_path.match?(/%/)
       File.join([parent_path, @slug.to_s, "#{@filename}.#{@extension}"])
     end
   end
