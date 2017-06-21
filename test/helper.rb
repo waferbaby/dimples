@@ -15,9 +15,13 @@ end
 def test_configuration
   @config ||= Dimples::Configuration.new(
     'source_path' => File.join(__dir__, 'source'),
-    'destination_path' => File.join(File::SEPARATOR, 'tmp', "dimples-#{Time.new.to_i}"),
+    'destination_path' => site_destination,
     'categories' => [{ 'slug' => 'a', 'name' => 'A' }]
   )
+end
+
+def site_destination
+  File.join(File::SEPARATOR, 'tmp', "dimples-#{Time.new.to_i}")
 end
 
 def render_fixture(filename, locals = {})
