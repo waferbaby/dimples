@@ -136,11 +136,9 @@ module Dimples
 
     def scan_post(path)
       @post_class.new(self, path).tap do |post|
-        unless post.categories.nil?
-          post.categories.each do |slug|
-            @categories[slug] ||= Dimples::Category.new(self, slug)
-            @categories[slug].posts << post
-          end
+        post.categories&.each do |slug|
+          @categories[slug] ||= Dimples::Category.new(self, slug)
+          @categories[slug].posts << post
         end
 
         add_post_to_archives(post)
@@ -337,7 +335,7 @@ module Dimples
         url: url
       }
 
-      if (index - 1) > 0
+      if (index - 1).positive?
         pagination[:previous_page] = index - 1
         pagination[:previous_page_url] = url
 
