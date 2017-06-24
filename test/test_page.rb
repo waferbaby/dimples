@@ -5,10 +5,9 @@ $LOAD_PATH.unshift(__dir__)
 require 'helper'
 
 describe 'Page' do
-  before { @site = test_site }
   subject do
-    path = File.join(@site.source_paths[:pages], 'about', 'index.markdown')
-    Dimples::Page.new(@site, path)
+    path = File.join(test_site.source_paths[:pages], 'about', 'index.markdown')
+    Dimples::Page.new(test_site, path)
   end
 
   it 'parses its YAML frontmatter' do
@@ -22,7 +21,7 @@ describe 'Page' do
   end
 
   it 'publishes to a file' do
-    path = subject.output_path(@site.output_paths[:site])
+    path = subject.output_path(test_site.output_paths[:site])
 
     subject.write(path)
     File.exist?(path).must_equal(true)

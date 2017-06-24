@@ -5,26 +5,24 @@ $LOAD_PATH.unshift(__dir__)
 require 'helper'
 
 describe 'Site' do
-  subject { @site = test_site }
-
   describe 'building a site' do
-    before { subject.generate }
+    before { test_site.generate }
 
     it 'creates the output directory' do
-      File.directory?(subject.output_paths[:site]).must_equal(true)
+      File.directory?(test_site.output_paths[:site]).must_equal(true)
     end
 
     describe 'scanning for files' do
       it 'finds all the templates' do
-        subject.templates.length.must_equal(7)
+        test_site.templates.length.must_equal(7)
       end
 
       it 'finds all the pages' do
-        subject.pages.length.must_equal(1)
+        test_site.pages.length.must_equal(1)
       end
 
       it 'finds all the posts' do
-        subject.posts.length.must_equal(2)
+        test_site.posts.length.must_equal(2)
       end
     end
 
@@ -33,7 +31,7 @@ describe 'Site' do
         it "generates #{date_type} archives" do
           expected_output = render_fixture("#{date_type}_archives.erb")
 
-          paths = [subject.output_paths[:site], 'archives', '2015']
+          paths = [test_site.output_paths[:site], 'archives', '2015']
           paths << '01' if date_type.match?(/month|day/)
           paths << '01' if date_type == 'day'
           paths << 'index.html'
@@ -46,9 +44,9 @@ describe 'Site' do
       end
 
       it 'generates categories' do
-        subject.categories.keys.each do |slug|
+        test_site.categories.keys.each do |slug|
           expected_output = render_fixture('categories.erb', slug: slug)
-          categories_path = subject.output_paths[:categories]
+          categories_path = test_site.output_paths[:categories]
           file_path = File.join(categories_path, slug, 'index.html')
 
           File.exist?(file_path).must_equal(true)
@@ -75,7 +73,7 @@ describe 'Site' do
       end
 
       describe 'the first page' do
-        before { @pagination = subject.build_pagination(1, 3, 3, '/') }
+        before { @pagination = test_site.build_pagination(1, 3, 3, '/') }
 
         it 'has no previous page number' do
           assert_nil @pagination[:previous_page]
@@ -95,7 +93,7 @@ describe 'Site' do
       end
 
       describe 'the middle page' do
-        before { @pagination = subject.build_pagination(2, 3, 3, '/') }
+        before { @pagination = test_site.build_pagination(2, 3, 3, '/') }
 
         it 'has a previous page number' do
           assert_equal 1, @pagination[:previous_page]
@@ -115,7 +113,7 @@ describe 'Site' do
       end
 
       describe 'the last page' do
-        before { @pagination = subject.build_pagination(3, 3, 3, '/') }
+        before { @pagination = test_site.build_pagination(3, 3, 3, '/') }
 
         it 'has a previous page number' do
           assert_equal 2, @pagination[:previous_page]
