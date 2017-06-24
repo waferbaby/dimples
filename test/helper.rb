@@ -24,6 +24,6 @@ def site_destination
   File.join(File::SEPARATOR, 'tmp', "dimples-#{Time.new.to_i}")
 end
 
-def render_fixture(filename, locals = {})
-  Tilt.new(File.join(__dir__, 'fixtures', filename)).render(nil, locals)
+def render_template(filename, locals = {})
+  Tilt.new(File.join(__dir__, 'templates', "#{filename}.erb")).render(nil, locals)
 end
