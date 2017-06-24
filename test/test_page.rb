@@ -16,7 +16,7 @@ describe 'Page' do
   end
 
   it 'renders its contents' do
-    expected_output = render_fixture('page.erb')
+    expected_output = render_template('page')
     subject.render.must_equal(expected_output)
   end
 

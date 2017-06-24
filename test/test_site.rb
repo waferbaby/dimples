@@ -29,7 +29,7 @@ describe 'Site' do
     describe 'generating files' do
       %w[year month day].each do |date_type|
         it "generates #{date_type} archives" do
-          expected_output = render_fixture("#{date_type}_archives.erb")
+          expected_output = render_template("#{date_type}_archives")
 
           paths = [test_site.output_paths[:site], 'archives', '2015']
           paths << '01' if date_type.match?(/month|day/)
@@ -45,7 +45,7 @@ describe 'Site' do
 
       it 'generates categories' do
         test_site.categories.keys.each do |slug|
-          expected_output = render_fixture('categories.erb', slug: slug)
+          expected_output = render_template('categories', slug: slug)
           categories_path = test_site.output_paths[:categories]
           file_path = File.join(categories_path, slug, 'index.html')
 

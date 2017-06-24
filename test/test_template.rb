@@ -11,7 +11,7 @@ describe 'Template' do
   end
 
   it 'renders its contents' do
-    expected_output = render_fixture('template.erb')
+    expected_output = render_template('template')
     subject.render({}, 'Welcome').must_equal(expected_output)
   end
 end
