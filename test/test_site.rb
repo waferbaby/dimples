@@ -76,19 +76,19 @@ describe 'Site' do
         before { @pagination = test_site.build_pagination(1, 3, 3, '/') }
 
         it 'has no previous page number' do
-          assert_nil @pagination[:previous_page]
+          @pagination[:previous_page].must_be_nil
         end
 
         it 'has no URL for the previous page' do
-          assert_nil @pagination[:previous_page_url]
+          @pagination[:previous_page_url].must_be_nil
         end
 
         it 'has a next page number' do
-          assert_equal 2, @pagination[:next_page]
+          @pagination[:next_page].must_equal(2)
         end
 
         it 'has a URL for the next page' do
-          assert_equal '/page2', @pagination[:next_page_url]
+          @pagination[:next_page_url].must_equal('/page2')
         end
       end
 
@@ -96,19 +96,19 @@ describe 'Site' do
         before { @pagination = test_site.build_pagination(2, 3, 3, '/') }
 
         it 'has a previous page number' do
-          assert_equal 1, @pagination[:previous_page]
+          @pagination[:previous_page].must_equal(1)
         end
 
         it 'has a numberless URL for the first page' do
-          assert_equal '/', @pagination[:previous_page_url]
+          @pagination[:previous_page_url].must_equal('/')
         end
 
         it 'has a next page number' do
-          assert_equal 3, @pagination[:next_page]
+          @pagination[:next_page].must_equal(3)
         end
 
         it 'has a URL for the next page' do
-          assert_equal '/page3', @pagination[:next_page_url]
+          @pagination[:next_page_url].must_equal('/page3')
         end
       end
 
@@ -116,19 +116,19 @@ describe 'Site' do
         before { @pagination = test_site.build_pagination(3, 3, 3, '/') }
 
         it 'has a previous page number' do
-          assert_equal 2, @pagination[:previous_page]
+          @pagination[:previous_page].must_equal(2)
         end
 
         it 'has a URL for the previous page' do
-          assert_equal '/page2', @pagination[:previous_page_url]
+          @pagination[:previous_page_url].must_equal('/page2')
         end
 
         it 'has no next page number' do
-          assert_nil @pagination[:next_page]
+          @pagination[:next_page].must_be_nil
         end
 
         it 'has no URL for the next page' do
-          assert_nil @pagination[:next_page_url]
+          @pagination[:next_page_url].must_be_nil
         end
       end
     end
