@@ -35,6 +35,23 @@ module Dimples
       set_output_paths
     end
 
+    def generate
+      prepare_output_directory
+      scan_files
+      generate_files
+      copy_assets
+    rescue Errors::RenderingError,
+           Errors::PublishingError,
+           Errors::GenerationError => e
+      @errors << e.message
+    end
+
+    def generated?
+      @errors.count.zero?
+    end
+
+    private
+
     def set_source_paths
       @source_paths = {
         root: File.expand_path(@config['source_path'])
@@ -55,23 +72,6 @@ module Dimples
         @output_paths[path.to_sym] = output_path
       end
     end
-
-    def generate
-      prepare_output_directory
-      scan_files
-      generate_files
-      copy_assets
-    rescue Errors::RenderingError,
-           Errors::PublishingError,
-           Errors::GenerationError => e
-      @errors << e.message
-    end
-
-    def generated?
-      @errors.count.zero?
-    end
-
-    private
 
     def prepare_output_directory
       if Dir.exist?(@output_paths[:site])
