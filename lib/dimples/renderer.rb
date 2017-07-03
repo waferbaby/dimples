@@ -10,19 +10,18 @@ module Dimples
       callback = proc { @source.contents }
 
       @engine = if @source.path
-        Tilt.new(@source.path, {}, &callback)
-      else
-        Tilt::StringTemplate.new(&callback)
-      end
+                  Tilt.new(@source.path, {}, &callback)
+                else
+                  Tilt::StringTemplate.new(&callback)
+                end
     end
 
     def render(context = {}, body = nil)
       output = @engine.render(scope(context)) { body }.strip
       @source.rendered_contents = output
 
-      if template = @site.templates[@source.layout]
-        output = template.render(context, output)
-      end
+      template = @site.templates[@source.layout]
+      output = template.render(context, output) unless template.nil?
 
       output
     end

@@ -6,7 +6,8 @@ require 'helper'
 
 describe 'Post' do
   subject do
-    path = File.join(test_site.source_paths[:posts], '2015-01-01-a-post.markdown')
+    filename = Tilt.new(File.join(__dir__, 'templates', "#{filename}.erb"))
+    path = File.join(test_site.source_paths[:posts], filename)
     Dimples::Post.new(test_site, path)
   end
 

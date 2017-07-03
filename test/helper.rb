@@ -25,5 +25,6 @@ def site_destination
 end
 
 def render_template(filename, locals = {})
-  Tilt.new(File.join(__dir__, 'templates', "#{filename}.erb")).render(nil, locals)
+  template = Tilt.new(File.join(__dir__, 'templates', "#{filename}.erb"))
+  template.render(nil, locals)
 end
