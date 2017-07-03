@@ -12,12 +12,12 @@ require 'dimples/errors'
 require 'dimples/logger'
 
 require 'dimples/frontable'
-require 'dimples/renderable'
 
 require 'dimples/category'
 require 'dimples/configuration'
 require 'dimples/page'
 require 'dimples/post'
+require 'dimples/renderer'
 require 'dimples/site'
 require 'dimples/template'
 
