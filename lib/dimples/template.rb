@@ -4,11 +4,11 @@ module Dimples
   # A class that models a single template.
   class Template
     include Frontable
-    include Renderable
 
-    attr_accessor :slug
-    attr_accessor :title
     attr_accessor :path
+    attr_accessor :title
+    attr_accessor :slug
+    attr_accessor :layout
     attr_accessor :contents
     attr_accessor :rendered_contents
 
@@ -18,6 +18,14 @@ module Dimples
       @path = path
 
       @contents = read_with_front_matter(path)
+    end
+
+    def render(context = {}, body = nil)
+      renderer.render(context, body)
+    end
+
+    def renderer
+      @renderer ||= Renderer.new(@site, self)
     end
   end
 end

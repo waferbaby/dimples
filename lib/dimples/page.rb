@@ -4,11 +4,9 @@ module Dimples
   # A class that models a single site page.
   class Page
     include Frontable
-    include Renderable
 
     attr_accessor :path
     attr_accessor :title
-    attr_accessor :template
     attr_accessor :filename
     attr_accessor :extension
     attr_accessor :layout
@@ -39,6 +37,14 @@ module Dimples
       parts << "#{@filename}.#{@extension}"
 
       File.join(parts)
+    end
+
+    def render(context = {})
+      renderer.render(context)
+    end
+
+    def renderer
+      @renderer ||= Renderer.new(@site, self)
     end
 
     def write(path, context = {})
