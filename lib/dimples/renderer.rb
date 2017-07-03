@@ -18,6 +18,7 @@ module Dimples
 
     def render(context = {}, body = nil)
       output = @engine.render(scope(context)) { body }.strip
+      @source.rendered_contents = output
 
       if template = @site.templates[@source.layout]
         output = template.render(context, output)
