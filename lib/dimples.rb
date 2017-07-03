@@ -12,7 +12,6 @@ require 'dimples/errors'
 require 'dimples/logger'
 
 require 'dimples/frontable'
-require 'dimples/writeable'
 require 'dimples/renderable'
 
 require 'dimples/category'
