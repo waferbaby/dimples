@@ -60,7 +60,7 @@ if Dir.exist?(lib_path)
   end
 end
 
-site_klass = config.class_override(:site) || Dimples.Site
+site_klass = config.class_override(:site) || Dimples::Site
 site = site_klass.new(config)
 
 case command.to_sym
