@@ -2,7 +2,7 @@
 
 module Dimples
   # A simple Logger subclass.
-  class Logger < Logger
+  class Logger < ::Logger
     def initialize(*)
       super
       @formatter = LogFormatter
