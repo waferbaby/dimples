@@ -10,7 +10,9 @@ module Dimples
       callback = proc { @source.contents }
 
       @engine = if @source.path
-                  Tilt.new(@source.path, {}, &callback)
+                  ext = File.extname(@source.path)[1..-1]
+                  options = @site.config['rendering'][ext] || {}
+                  Tilt.new(@source.path, options, &callback)
                 else
                   Tilt::StringTemplate.new(&callback)
                 end
