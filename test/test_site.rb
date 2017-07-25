@@ -18,7 +18,7 @@ describe 'Site' do
       end
 
       it 'finds all the pages' do
-        test_site.pages.length.must_equal(1)
+        test_site.pages.length.must_equal(2)
       end
 
       it 'finds all the posts' do
