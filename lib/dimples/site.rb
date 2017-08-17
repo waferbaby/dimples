@@ -182,9 +182,11 @@ module Dimples
         generate_post(post)
       end
 
-      layout = @config['layouts']['posts']
-
-      paginate(posts: @posts, path: @output_paths[:archives], layout: layout)
+      Pager.new(self, @posts).paginate(
+        per_page: @config['pagination']['per_page'],
+        path: @output_paths[:archives],
+        layout: @config['layouts']['posts']
+      )
 
       generate_posts_feeds if @config['generation']['feeds']
     end
@@ -220,15 +222,15 @@ module Dimples
     end
 
     def generate_category(category)
-      params = {
-        posts: category.posts,
-        title: category.name,
+      Pager.new(self, category.posts).paginate(
+        per_page: @config['pagination']['per_page'],
         path: File.join(@output_paths[:categories], category.slug),
         layout: @config['layouts']['category'],
-        context: { category: category.slug }
-      }
-
-      paginate(params)
+        context: { category: category.slug },
+        options: {
+          title: category.name
+        }
+      )
     end
 
     def generate_archives
@@ -252,15 +254,15 @@ module Dimples
                   { year: post.year, month: post.month, day: post.day }
                 end
 
-        params = {
-          posts: posts,
-          title: post.date.strftime(@config['date_formats'][date_type]),
+        Pager.new(self, @posts).paginate(
+          per_page: @config['pagination']['per_page'],
           path: File.join(@output_paths[:archives], dates.values),
           layout: @config['layouts']["#{date_type}_archives"],
-          context: dates
-        }
-
-        paginate(params)
+          context: dates,
+          options: {
+            title: post.date.strftime(@config['date_formats'][date_type])
+          }
+        )
       end
     end
 
@@ -305,53 +307,6 @@ module Dimples
       end
     rescue => e
       raise Errors::GenerationError, "Site assets failed to copy (#{e.message})"
-    end
-
-    def paginate(posts:, title: nil, path:, layout: false, context: {})
-      per_page = @config['pagination']['per_page']
-      pages = (posts.length.to_f / per_page.to_i).ceil
-      url = path.gsub(@output_paths[:site], '') + '/'
-
-      (1..pages).each do |index|
-        page = @page_class.new(self)
-
-        page.layout = layout
-        page.title = title || @templates[layout].title
-
-        output_path = File.join(path, index != 1 ? "page#{index}" : '')
-
-        context[:posts] = posts.slice((index - 1) * per_page, per_page)
-        context[:pagination] = build_pagination(index, pages, posts.count, url)
-
-        page.write(page.output_path(output_path), context)
-      end
-    end
-
-    def build_pagination(index, pages, item_count, url)
-      pagination = {
-        page: index,
-        pages: pages,
-        post_count: item_count,
-        url: url
-      }
-
-      if (index - 1).positive?
-        pagination[:previous_page] = index - 1
-        pagination[:previous_page_url] = url
-
-        if pagination[:previous_page] != 1
-          page_string = "page#{pagination[:previous_page]}"
-          pagination[:previous_page_url] += page_string
-        end
-      end
-
-      if (index + 1) <= pages
-        pagination[:next_page] = index + 1
-        page_string = "#{url}page#{pagination[:next_page]}"
-        pagination[:next_page_url] = page_string
-      end
-
-      pagination
     end
   end
 end
