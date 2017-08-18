@@ -3,6 +3,8 @@
 module Dimples
   # A class that models a single site.
   class Site
+    include Pagination
+
     attr_accessor :source_paths
     attr_accessor :output_paths
     attr_accessor :config
@@ -12,7 +14,6 @@ module Dimples
     attr_accessor :pages
     attr_accessor :posts
     attr_accessor :latest_post
-    attr_accessor :page_class
     attr_accessor :post_class
     attr_accessor :errors
 
@@ -28,7 +29,6 @@ module Dimples
       @archives = { year: {}, month: {}, day: {} }
       @latest_post = false
 
-      @page_class = @config.class_override(:page) || Dimples::Page
       @post_class = @config.class_override(:post) || Dimples::Post
 
       set_source_paths
@@ -113,7 +113,7 @@ module Dimples
     end
 
     def scan_page(path)
-      @page_class.new(self, path)
+      Dimples::Page.new(self, path)
     end
 
     def scan_posts
@@ -141,14 +141,10 @@ module Dimples
           @categories[slug].posts << post
         end
 
-        add_post_to_archives(post)
+        archive_year(post.year) << post
+        archive_month(post.year, post.month) << post
+        archive_day(post.year, post.month, post.day) << post
       end
-    end
-
-    def add_post_to_archives(post)
-      archive_year(post.year) << post
-      archive_month(post.year, post.month) << post
-      archive_day(post.year, post.month, post.day) << post
     end
 
     def archive_year(year)
@@ -182,10 +178,14 @@ module Dimples
         generate_post(post)
       end
 
-      Pager.new(self, @posts).paginate(
+      paginate(
+        site: self,
+        items: @posts,
         per_page: @config['pagination']['per_page'],
         path: @output_paths[:archives],
-        layout: @config['layouts']['posts']
+        options: {
+          layout: @config['layouts']['posts']
+        }
       )
 
       generate_posts_feeds if @config['generation']['feeds']
@@ -222,13 +222,15 @@ module Dimples
     end
 
     def generate_category(category)
-      Pager.new(self, category.posts).paginate(
+      paginate(
+        site: self,
+        items: category.posts,
         per_page: @config['pagination']['per_page'],
         path: File.join(@output_paths[:categories], category.slug),
-        layout: @config['layouts']['category'],
-        context: { category: category.slug },
         options: {
-          title: category.name
+          context: { category: category.slug },
+          title: category.name,
+          layout: @config['layouts']['category']
         }
       )
     end
@@ -254,13 +256,15 @@ module Dimples
                   { year: post.year, month: post.month, day: post.day }
                 end
 
-        Pager.new(self, @posts).paginate(
+        paginate(
+          site: self,
+          items: posts,
           per_page: @config['pagination']['per_page'],
           path: File.join(@output_paths[:archives], dates.values),
-          layout: @config['layouts']["#{date_type}_archives"],
-          context: dates,
           options: {
-            title: post.date.strftime(@config['date_formats'][date_type])
+            context: dates,
+            title: post.date.strftime(@config['date_formats'][date_type]),
+            layout: @config['layouts']["#{date_type}_archives"]
           }
         )
       end
@@ -270,7 +274,7 @@ module Dimples
       feed_templates.each do |format|
         next unless @templates[format]
 
-        feed = @page_class.new(self)
+        feed = Dimples::Page.new(self)
 
         feed.filename = 'feed'
         feed.extension = @templates[format].slug
