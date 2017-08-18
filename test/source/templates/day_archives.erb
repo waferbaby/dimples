@@ -2,8 +2,8 @@
 layout: default
 ---
 
-<h2>Posts on <%= @posts[0].date.strftime('%B %-d, %Y') %></h2>
+<h2>Posts on <%= @items[0].date.strftime('%B %-d, %Y') %></h2>
 
-<% @posts.each do |post| %>
+<% @items.each do |post| %>
 <h3><%= post.title %></h3>
 <% end %>
