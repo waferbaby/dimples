@@ -29,7 +29,7 @@ module Dimples
         'source_path' => Dir.pwd,
         'destination_path' => File.join(Dir.pwd, 'site'),
         'verbose_logging' => false,
-        'class_overrides' => { site: nil, post: nil, page: nil },
+        'class_overrides' => { site: nil, post: nil },
         'rendering' => {},
         'category_names' => {},
         'paths' => default_paths,
