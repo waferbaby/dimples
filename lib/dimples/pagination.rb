@@ -42,8 +42,6 @@ module Dimples
       end
 
       def step_to(page)
-        return if page == @page
-
         @page = (1..@page_count).cover?(page) ? page : 1
         @previous_page = (@page - 1).positive? ? @page - 1 : nil
         @next_page = (@page + 1) <= @page_count ? @page + 1 : nil
