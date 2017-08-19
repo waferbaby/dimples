@@ -16,7 +16,7 @@ def test_configuration
   @config ||= Dimples::Configuration.new(
     'source_path' => File.join(__dir__, 'source'),
     'destination_path' => site_destination,
-    'categories' => [{ 'slug' => 'a', 'name' => 'A' }]
+    'category_names' => { 'green' => 'G R E E N' }
   )
 end
 
@@ -24,7 +24,6 @@ def site_destination
   File.join(File::SEPARATOR, 'tmp', "dimples-#{Time.new.to_i}")
 end
 
-def render_template(filename, locals = {})
-  template = Tilt.new(File.join(__dir__, 'templates', "#{filename}.erb"))
-  template.render(nil, locals)
+def read_fixture(filename, locals = {})
+  File.read(File.join(__dir__, 'fixtures', "#{filename}.html"))
 end
