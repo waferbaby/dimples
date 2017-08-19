@@ -50,40 +50,6 @@ module Dimples
       @errors.count.zero?
     end
 
-    private
-
-    def set_source_paths
-      @source_paths = {
-        root: File.expand_path(@config['source_path'])
-      }
-
-      %w[pages posts public templates].each do |path|
-        @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
-      end
-    end
-
-    def set_output_paths
-      @output_paths = {
-        site: File.expand_path(@config['destination_path'])
-      }
-
-      %w[archives posts categories].each do |path|
-        output_path = File.join(@output_paths[:site], @config['paths'][path])
-        @output_paths[path.to_sym] = output_path
-      end
-    end
-
-    def prepare_output_directory
-      if Dir.exist?(@output_paths[:site])
-        FileUtils.remove_dir(@output_paths[:site])
-      end
-
-      Dir.mkdir(@output_paths[:site])
-    rescue => e
-      error_message = "Couldn't prepare the output directory (#{e.message})"
-      raise Errors::GenerationError, error_message
-    end
-
     def scan_files
       scan_templates
       scan_pages
@@ -145,6 +111,40 @@ module Dimples
         archive_month(post.year, post.month) << post
         archive_day(post.year, post.month, post.day) << post
       end
+    end
+
+    private
+
+    def set_source_paths
+      @source_paths = {
+        root: File.expand_path(@config['source_path'])
+      }
+
+      %w[pages posts public templates].each do |path|
+        @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
+      end
+    end
+
+    def set_output_paths
+      @output_paths = {
+        site: File.expand_path(@config['destination_path'])
+      }
+
+      %w[archives posts categories].each do |path|
+        output_path = File.join(@output_paths[:site], @config['paths'][path])
+        @output_paths[path.to_sym] = output_path
+      end
+    end
+
+    def prepare_output_directory
+      if Dir.exist?(@output_paths[:site])
+        FileUtils.remove_dir(@output_paths[:site])
+      end
+
+      Dir.mkdir(@output_paths[:site])
+    rescue => e
+      error_message = "Couldn't prepare the output directory (#{e.message})"
+      raise Errors::GenerationError, error_message
     end
 
     def archive_year(year)
