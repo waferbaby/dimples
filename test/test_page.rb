@@ -5,6 +5,8 @@ $LOAD_PATH.unshift(__dir__)
 require 'helper'
 
 describe 'Page' do
+  before { test_site.scan_files }
+
   subject do
     path = File.join(test_site.source_paths[:pages], 'about', 'index.markdown')
     Dimples::Page.new(test_site, path)
@@ -16,7 +18,7 @@ describe 'Page' do
   end
 
   it 'renders its contents' do
-    expected_output = render_template('page')
+    expected_output = read_fixture('pages/about')
     subject.render.must_equal(expected_output)
   end
 
