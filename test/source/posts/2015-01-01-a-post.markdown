@@ -1,9 +1,8 @@
 ---
 title: My first post
 categories:
-- a
-- b
-- c
+- red
+- green
 ---
 
 ### Hello
