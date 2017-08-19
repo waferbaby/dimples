@@ -5,6 +5,8 @@ $LOAD_PATH.unshift(__dir__)
 require 'helper'
 
 describe 'Post' do
+  before { test_site.scan_files }
+
   subject do
     filename = '2015-01-01-a-post.markdown'
     path = File.join(test_site.source_paths[:posts], filename)
@@ -13,11 +15,11 @@ describe 'Post' do
 
   it 'parses its YAML frontmatter' do
     subject.title.must_equal('My first post')
-    subject.categories.sort.must_equal(%w[a b c])
+    subject.categories.sort.must_equal(%w[green red])
   end
 
   it 'renders its contents' do
-    expected_output = render_template('post')
+    expected_output = read_fixture('posts/2015-01-01-a-post')
     subject.render.must_equal(expected_output)
   end
 
