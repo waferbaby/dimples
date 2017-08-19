@@ -244,17 +244,12 @@ module Dimples
     end
 
     def generate_archive_posts(date_type)
-      @archives[date_type.to_sym].each_value do |posts|
-        post = posts[0]
+      @archives[date_type.to_sym].each do |date, posts|
+        year, month, day = date.split('/')
 
-        dates = case date_type
-                when 'year'
-                  { year: post.year }
-                when 'month'
-                  { year: post.year, month: post.month }
-                when 'day'
-                  { year: post.year, month: post.month, day: post.day }
-                end
+        dates = { year: year }
+        dates[:month] = month if month
+        dates[:day] = day if day
 
         paginate(
           site: self,
@@ -263,7 +258,7 @@ module Dimples
           path: File.join(@output_paths[:archives], dates.values),
           options: {
             context: dates,
-            title: post.date.strftime(@config['date_formats'][date_type]),
+            title: posts[0].date.strftime(@config['date_formats'][date_type]),
             layout: @config['layouts']["#{date_type}_archives"]
           }
         )
