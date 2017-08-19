@@ -31,7 +31,7 @@ module Dimples
 
     # A class that models the context of a single page during pagination.
     class Pager
-      attr_reader :previous_page, :next_page
+      attr_reader :page, :previous_page, :next_page
 
       def initialize(page, url, page_count, item_count)
         @url = url
