@@ -10,7 +10,8 @@ describe 'Renderer' do
   end
 
   subject do
-    path = File.join(test_site.source_paths[:pages], 'about', 'contact.markdown')
+    base_path = test_site.source_paths[:pages]
+    path = File.join(base_path, 'about', 'contact.markdown')
     Dimples::Page.new(test_site, path)
   end
 
