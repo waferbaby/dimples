@@ -24,6 +24,6 @@ def site_destination
   File.join(File::SEPARATOR, 'tmp', "dimples-#{Time.new.to_i}")
 end
 
-def read_fixture(filename, locals = {})
+def read_fixture(filename)
   File.read(File.join(__dir__, 'fixtures', "#{filename}.html"))
 end
