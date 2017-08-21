@@ -5,6 +5,4 @@ categories:
 - green
 ---
 
-### Hello
-
 Welcome to my first post. This is *awesome*.

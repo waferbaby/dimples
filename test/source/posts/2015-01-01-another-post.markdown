@@ -4,6 +4,4 @@ categories:
 - green
 ---
 
-### Welcome back
-
 Thanks for reading!
