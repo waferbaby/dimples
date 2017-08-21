@@ -6,10 +6,9 @@ module Dimples
     def paginate(site:, items:, per_page:, path:, options: {})
       context = options[:context] || {}
       url = path.gsub(site.output_paths[:site], '') + '/'
-      page_count = (items.length.to_f / per_page.to_i).ceil
-      item_count = items.count
+      pager = Pager.new(url, items, per_page)
 
-      (1..page_count).each do |index|
+      pager.each do |index, page_items|
         page = Dimples::Page.new(site)
 
         page.title ||= options[:title]
@@ -20,9 +19,7 @@ module Dimples
           index != 1 ? File.join(path, "page#{index}") : path
         )
 
-        pager = Pager.new(index, url, page_count, item_count)
-
-        context[:items] = items.slice((index - 1) * per_page, per_page)
+        context[:items] = page_items
         context[:pagination] = pager.to_h
 
         page.write(output_path, context)
@@ -31,20 +28,39 @@ module Dimples
 
     # A class that models the context of a single page during pagination.
     class Pager
-      attr_reader :page, :previous_page, :next_page
+      include Enumerable
 
-      def initialize(page, url, page_count, item_count)
+      attr_reader :current_page
+      attr_reader :previous_page
+      attr_reader :next_page
+      attr_reader :page_count
+      attr_reader :item_count
+
+      def initialize(url, items, per_page)
         @url = url
-        @page_count = page_count
-        @item_count = item_count
+        @items = items
+        @per_page = per_page
+        @page_count = (items.length.to_f / per_page.to_i).ceil
 
-        step_to(page)
+        step_to(1)
+      end
+
+      def each(&block)
+        (1..@page_count).each do |index|
+          yield step_to(index), items_at(index)
+        end
       end
 
       def step_to(page)
-        @page = (1..@page_count).cover?(page) ? page : 1
-        @previous_page = (@page - 1).positive? ? @page - 1 : nil
-        @next_page = (@page + 1) <= @page_count ? @page + 1 : nil
+        @current_page = (1..@page_count).cover?(page) ? page : 1
+        @previous_page = (@current_page - 1).positive? ? @current_page - 1 : nil
+        @next_page = (@current_page + 1) <= @page_count ? @current_page + 1 : nil
+
+        @current_page
+      end
+
+      def items_at(page)
+        @items.slice((page - 1) * @per_page, @per_page)
       end
 
       def previous_page_url
@@ -58,9 +74,9 @@ module Dimples
 
       def to_h
         output = {
-          page: @page,
+          page: @current_page,
           page_count: @page_count,
-          item_count: @item_count,
+          item_count: @items.count,
           url: @url
         }
 
