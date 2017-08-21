@@ -17,7 +17,7 @@ describe 'Site' do
     end
 
     it 'finds all the posts' do
-      test_site.posts.length.must_equal(2)
+      test_site.posts.length.must_equal(3)
     end
 
     it 'creates the output directory' do
