@@ -11,9 +11,9 @@ module Dimples
       pager.each do |index, page_items|
         page = Dimples::Page.new(site)
 
-        page.title ||= options[:title]
-        page.layout ||= options[:layout]
-        page.extension ||= options[:extension]
+        page.title = options[:title] if options[:title]
+        page.layout = options[:layout] if options[:layout]
+        page.extension = options[:extension] if options[:extension]
 
         output_path = page.output_path(
           index != 1 ? File.join(path, "page#{index}") : path
