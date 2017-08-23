@@ -3,16 +3,18 @@
 module Dimples
   # A module that supports pagination.
   module Pagination
-    def paginate(site:, items:, per_page:, path:, options: {})
+    def paginate(site, items, path, layout, options = {})
       context = options[:context] || {}
       url = path.gsub(site.output_paths[:site], '') + '/'
+      per_page = options[:per_page] || site.config['pagination']['per_page']
+
       pager = Pager.new(url, items, per_page)
 
       pager.each do |index, page_items|
         page = Dimples::Page.new(site)
+        page.layout = layout
 
-        page.title = options[:title] if options[:title]
-        page.layout = options[:layout] if options[:layout]
+        page.title = options[:title] || site.templates[layout].title
         page.extension = options[:extension] if options[:extension]
 
         output_path = page.output_path(
@@ -47,7 +49,7 @@ module Dimples
 
       def each(&block)
         (1..@page_count).each do |index|
-          yield step_to(index), items_at(index)
+          block.yield step_to(index), items_at(index)
         end
       end
 
