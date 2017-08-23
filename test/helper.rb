@@ -27,3 +27,8 @@ end
 def read_fixture(filename)
   File.read(File.join(__dir__, 'fixtures', "#{filename}.html"))
 end
+
+def match_expected_output(fixture_name, test_file_path)
+  expected_output = read_fixture(fixture_name)
+  File.read(test_file_path).must_equal(expected_output)
+end
