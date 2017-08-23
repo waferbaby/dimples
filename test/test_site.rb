@@ -9,15 +9,18 @@ describe 'Site' do
     before { test_site.generate }
 
     it 'finds all the templates' do
-      test_site.templates.length.must_equal(7)
+      path = File.join(test_site.source_paths[:templates], '**', '*.*')
+      test_site.templates.length.must_equal(Dir.glob(path).length)
     end
 
     it 'finds all the pages' do
-      test_site.pages.length.must_equal(2)
+      path = File.join(test_site.source_paths[:pages], '**', '*.*')
+      test_site.pages.length.must_equal(Dir.glob(path).length)
     end
 
     it 'finds all the posts' do
-      test_site.posts.length.must_equal(3)
+      path = File.join(test_site.source_paths[:posts], '*.*')
+      test_site.posts.length.must_equal(Dir.glob(path).length)
     end
 
     it 'creates the output directory' do
