@@ -1,0 +1,20 @@
+---
+layout: default
+title: Posts
+---
+
+<h2><%= @this.title %></h2>
+
+<ul>
+<% @items.each do |post| %>
+  <li><a href="/archives/<%= post.slug %>"><%= post.title %></a></li>
+<% end %>
+</ul>
+
+<% if @pagination && @pagination[:page_count] > 1 %>
+<p>
+This is page <%= @pagination[:page] %> of <%= @pagination[:page_count] %>, with <%= @pagination[:item_count] %> post<% if @pagination[:item_count] > 1 %>s in total.<% end %>
+<br>
+<% if @pagination[:previous_page] %><a href="<%= @pagination[:previous_page_url] %>" title="Go to page <%= @pagination[:previous_page] %>.">Previous Page</a><% else %><span>Previous Page</span><% end %> | <% if @pagination[:next_page] %><a href="<%= @pagination[:next_page_url] %>" title="Go to page <%= @pagination[:next_page] %>.">Next Page</a><% else %><span>Next Page</span><% end %>
+</p>
+<% end %>
