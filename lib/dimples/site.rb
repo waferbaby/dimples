@@ -178,15 +178,7 @@ module Dimples
         generate_post(post)
       end
 
-      paginate(
-        site: self,
-        items: @posts,
-        per_page: @config['pagination']['per_page'],
-        path: @output_paths[:archives],
-        options: {
-          layout: @config['layouts']['posts']
-        }
-      )
+      paginate(self, @posts, @output_paths[:archives], @config['layouts']['posts'])
 
       generate_posts_feeds if @config['generation']['feeds']
     end
@@ -222,17 +214,14 @@ module Dimples
     end
 
     def generate_category(category)
-      paginate(
-        site: self,
-        items: category.posts,
-        per_page: @config['pagination']['per_page'],
-        path: File.join(@output_paths[:categories], category.slug),
-        options: {
-          context: { category: category.slug },
-          title: category.name,
-          layout: @config['layouts']['category']
-        }
-      )
+      path = File.join(@output_paths[:categories], category.slug)
+
+      options = {
+        context: { category: category.slug },
+        title: category.name
+      }
+
+      paginate(self, category.posts, path, @config['layouts']['category'], options)
     end
 
     def generate_archives
@@ -251,17 +240,14 @@ module Dimples
         dates[:month] = month if month
         dates[:day] = day if day
 
-        paginate(
-          site: self,
-          items: posts,
-          per_page: @config['pagination']['per_page'],
-          path: File.join(@output_paths[:archives], dates.values),
-          options: {
-            context: dates,
-            title: posts[0].date.strftime(@config['date_formats'][date_type]),
-            layout: @config['layouts']["#{date_type}_archives"]
-          }
-        )
+        path = File.join(@output_paths[:archives], dates.values)
+
+        options = {
+          context: dates,
+          title: posts[0].date.strftime(@config['date_formats'][date_type])
+        }
+
+        paginate(self, posts, path, @config['layouts']["#{date_type}_archives"], options)
       end
     end
 
