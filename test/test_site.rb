@@ -27,6 +27,23 @@ describe 'Site' do
       File.directory?(test_site.output_paths[:site]).must_equal(true)
     end
 
+    it 'prepares the archive data' do
+      years = test_site.posts.map { |post| post.year }.uniq.sort
+      test_site.archives[:year].keys.sort.must_equal(years)
+
+      months = test_site.posts.map do |post|
+        "#{post.year}/#{post.month}"
+      end.uniq.sort
+
+      test_site.archives[:month].keys.sort.must_equal(months)
+
+      days = test_site.posts.map do |post|
+        "#{post.year}/#{post.month}/#{post.day}"
+      end.uniq.sort
+
+      test_site.archives[:day].keys.sort.must_equal(days)
+    end
+
     %w[year month day].each do |date_type|
       it "creates the #{date_type} archives" do
         expected_output = read_fixture("archives/#{date_type}")
