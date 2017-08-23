@@ -70,5 +70,19 @@ describe 'Site' do
         File.read(file_path).must_equal(expected_output)
       end
     end
+
+    it 'copies over all the assets' do
+      path = File.join(test_site.source_paths[:public], '**', '*')
+
+      Dir.glob(path).each do |asset_path|
+        output_path = asset_path.gsub(
+          test_site.source_paths[:public],
+          test_site.output_paths[:site]
+        )
+
+        File.exist?(output_path).must_equal(true)
+      end
+
+    end
   end
 end
