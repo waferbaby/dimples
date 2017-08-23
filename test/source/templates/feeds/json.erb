@@ -1,0 +1,18 @@
+{
+  "version": "https://jsonfeed.org/version/1",
+  "title": "My site<% if @category %> / <%= @category.capitalize %><% end %>",
+  "home_page_url": "https://example.com/",
+  "feed_url": "http://example.com/<% if @category %>/archives/<%= @category %>/<% end %>feed.json",
+  "items": [
+  <% @posts.each do |post| %>
+    {
+      "id": "http://example.com/archives/<%= post.slug %>/",
+      "title": "<%= post.title %>",
+      "url": "http://example.com/archives/<%= post.slug %>/",
+      "image": "http://example.com/images/archives/<%= post.slug %>/portrait.jpg",
+      "date_published": "<%= post.date.strftime('%FT%T') %>Z",
+      "content_html": <%= post.rendered_contents.to_json %>
+    }<%= "," unless post == @posts.last %>
+  <% end %>
+  ]
+}

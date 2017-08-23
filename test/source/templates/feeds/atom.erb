@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+<title>My site<% if @category %>: <%= @category.capitalize %><% end %></title>
+<link href="http://example.com/<% if @category %>/archives/<%= @category %>/<% end %>feed.atom" rel="self"/>
+<link href="http://example.com/"/>
+<updated><%= Time.new.strftime('%FT%T') %>Z</updated>
+<id>http://example.com/</id>
+
+<% @posts.each do |post| %>
+<entry>
+  <id>https://example.com/archives/<%= post.slug %>/</id>
+  <title><%= post.title %></title>
+  <link href="https://example.com/archives/<%= post.slug %>/"/>
+  <updated><%= post.date.strftime('%FT%T') %>Z</updated>
+  <content type="html">
+    <%== post.rendered_contents %>
+  </content>
+</entry>
+<% end %>
+
+</feed>
