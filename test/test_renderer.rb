@@ -21,7 +21,7 @@ describe 'Renderer' do
 
   describe 'when rendering' do
     it 'allows raw HTML in Markdown by default' do
-      expected_output = read_fixture('pages/contact_with_html')
+      expected_output = read_fixture('pages/general/contact_with_html')
       renderer.render.must_equal(expected_output)
     end
 
@@ -33,7 +33,8 @@ describe 'Renderer' do
       end
 
       it 'passes them on to the Tilt engine' do
-        expected_output = read_fixture('pages/contact_with_html_encoded')
+        path = 'pages/general/contact_with_html_encoded'
+        expected_output = read_fixture(path)
         renderer.render.must_equal(expected_output)
       end
     end

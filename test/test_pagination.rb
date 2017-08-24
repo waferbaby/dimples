@@ -24,14 +24,14 @@ describe 'Pagination' do
         path = File.join(paginated_path, 'index.html')
         File.exist?(path).must_equal(true)
 
-        match_expected_output('pages/paginated_index', path)
+        match_expected_output('pages/pagination/index', path)
       end
 
       it 'creates paged directories with index files' do
-        path = File.join(paginated_path, "page2", 'index.html')
+        path = File.join(paginated_path, 'page2', 'index.html')
         File.exist?(path).must_equal(true)
 
-        match_expected_output('pages/paginated_page_2', path)
+        match_expected_output('pages/pagination/page_2', path)
       end
     end
 
@@ -43,14 +43,20 @@ describe 'Pagination' do
           per_page: 1
         }
 
-        paginate(test_site, test_site.posts, paginated_path, 'paginated', options)
+        paginate(
+          test_site,
+          test_site.posts,
+          paginated_path,
+          'paginated',
+          options
+        )
       end
 
       it 'creates the main custom index file' do
         path = File.join(paginated_path, 'index.htm')
         File.exist?(path).must_equal(true)
 
-        match_expected_output('pages/custom_paginated_index', path)
+        match_expected_output('pages/pagination/custom_index', path)
       end
 
       it 'creates paged directories with index files' do
@@ -58,7 +64,7 @@ describe 'Pagination' do
           path = File.join(paginated_path, "page#{index}", 'index.htm')
           File.exist?(path).must_equal(true)
 
-          match_expected_output("pages/custom_paginated_page_#{index}", path)
+          match_expected_output("pages/pagination/custom_page_#{index}", path)
         end
       end
     end

@@ -18,7 +18,7 @@ describe 'Page' do
   end
 
   it 'renders its contents' do
-    expected_output = read_fixture('pages/about')
+    expected_output = read_fixture('pages/general/about')
     subject.render.must_equal(expected_output)
   end
 
