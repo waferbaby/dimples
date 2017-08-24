@@ -31,8 +31,22 @@ module Dimples
 
       @post_class = @config.class_override(:post) || Dimples::Post
 
-      set_source_paths
-      set_output_paths
+      @source_paths = {
+        root: File.expand_path(@config['source_path'])
+      }
+
+      %w[pages posts public templates].each do |path|
+        @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
+      end
+
+      @output_paths = {
+        site: File.expand_path(@config['destination_path'])
+      }
+
+      %w[archives posts categories].each do |path|
+        output_path = File.join(@output_paths[:site], @config['paths'][path])
+        @output_paths[path.to_sym] = output_path
+      end
     end
 
     def generate
@@ -112,29 +126,6 @@ module Dimples
       end
     end
 
-    private
-
-    def set_source_paths
-      @source_paths = {
-        root: File.expand_path(@config['source_path'])
-      }
-
-      %w[pages posts public templates].each do |path|
-        @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
-      end
-    end
-
-    def set_output_paths
-      @output_paths = {
-        site: File.expand_path(@config['destination_path'])
-      }
-
-      %w[archives posts categories].each do |path|
-        output_path = File.join(@output_paths[:site], @config['paths'][path])
-        @output_paths[path.to_sym] = output_path
-      end
-    end
-
     def prepare_output_directory
       if Dir.exist?(@output_paths[:site])
         FileUtils.remove_dir(@output_paths[:site])
@@ -144,18 +135,6 @@ module Dimples
     rescue => e
       error_message = "Couldn't prepare the output directory (#{e.message})"
       raise Errors::GenerationError, error_message
-    end
-
-    def archive_year(year)
-      @archives[:year][year] ||= []
-    end
-
-    def archive_month(year, month)
-      @archives[:month]["#{year}/#{month}"] ||= []
-    end
-
-    def archive_day(year, month, day)
-      @archives[:day]["#{year}/#{month}/#{day}"] ||= []
     end
 
     def generate_files
@@ -280,10 +259,6 @@ module Dimples
       end
     end
 
-    def feed_templates
-      @feed_templates ||= @templates.keys.select { |k| k =~ /^feeds\./ }
-    end
-
     def copy_assets
       if Dir.exist?(@source_paths[:public])
         Dimples.logger.debug('Copying assets...') if @config['verbose_logging']
@@ -293,6 +268,24 @@ module Dimples
       end
     rescue => e
       raise Errors::GenerationError, "Site assets failed to copy (#{e.message})"
+    end
+
+    private
+
+    def archive_year(year)
+      @archives[:year][year] ||= []
+    end
+
+    def archive_month(year, month)
+      @archives[:month]["#{year}/#{month}"] ||= []
+    end
+
+    def archive_day(year, month, day)
+      @archives[:day]["#{year}/#{month}/#{day}"] ||= []
+    end
+
+    def feed_templates
+      @feed_templates ||= @templates.keys.select { |k| k =~ /^feeds\./ }
     end
   end
 end
