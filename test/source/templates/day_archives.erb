@@ -4,6 +4,8 @@ layout: default
 
 <h2>Posts on <%= @items[0].date.strftime('%B %-d, %Y') %></h2>
 
+<ul>
 <% @items.each do |post| %>
-<h3><%= post.title %></h3>
+  <li><a href="/archives/<%= post.slug %>"><%= post.title %></a></li>
 <% end %>
+</ul>
