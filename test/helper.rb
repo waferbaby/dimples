@@ -25,10 +25,23 @@ def site_destination
 end
 
 def read_fixture(filename)
-  File.read(File.join(__dir__, 'fixtures', "#{filename}.html"))
+  File.read(File.join(__dir__, 'fixtures', filename))
 end
 
 def match_expected_output(fixture_name, test_file_path)
   expected_output = read_fixture(fixture_name)
   File.read(test_file_path).must_equal(expected_output)
+end
+
+def clean_generated_site
+  FileUtils.rmdir(test_site.output_paths[:site])
+end
+
+def archive_file_paths(date_type)
+  test_site.archives[date_type].each_key.map do |date|
+    dates = date.split('/')
+    path = File.join(test_site.output_paths[:archives], dates, 'index.html')
+
+    [dates.join('-'), path]
+  end
 end
