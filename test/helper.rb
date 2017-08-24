@@ -34,7 +34,8 @@ def match_expected_output(fixture_name, test_file_path)
 end
 
 def clean_generated_site
-  FileUtils.rmdir(test_site.output_paths[:site])
+  files = File.join(test_site.output_paths[:site], '*')
+  FileUtils.rm_r(Dir.glob(files), force: true)
 end
 
 def archive_file_paths(date_type)
