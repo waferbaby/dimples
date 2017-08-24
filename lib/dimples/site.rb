@@ -36,7 +36,6 @@ module Dimples
     end
 
     def generate
-      prepare_output_directory
       scan_files
       generate_files
       copy_assets
@@ -160,6 +159,8 @@ module Dimples
     end
 
     def generate_files
+      prepare_output_directory
+
       generate_pages unless @pages.count.zero?
 
       return if @posts.count.zero?
