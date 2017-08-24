@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en-US" xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>My site: 2015</title>
+</head>
+<body>
+<h2>Posts in 2015</h2>
+
+<ul>
+  <li><a href="/archives/another-post">My second post</a></li>
+  <li><a href="/archives/a-post">My first post</a></li>
+</ul>
+</body>
+</html>
