@@ -15,13 +15,18 @@ end
 def test_configuration
   @config ||= Dimples::Configuration.new(
     'source_path' => File.join(__dir__, 'source'),
-    'destination_path' => site_destination,
-    'category_names' => { 'green' => 'G R E E N' }
+    'destination_path' => site_destination
   )
 end
 
 def site_destination
   File.join(File::SEPARATOR, 'tmp', "dimples-#{Time.new.to_i}")
+end
+
+def site_feed_template_types
+  test_site.feed_templates.map do |template|
+    template.split('.')[1]
+  end
 end
 
 def read_fixture(filename)
