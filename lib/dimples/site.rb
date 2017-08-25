@@ -50,8 +50,20 @@ module Dimples
     end
 
     def generate
-      scan_files
-      generate_files
+      scan_templates
+      scan_pages
+      scan_posts
+
+      prepare_output_directory
+
+      generate_pages unless @pages.count.zero?
+
+      unless @posts.count.zero?
+        generate_posts
+        generate_archives
+        generate_categories if @config['generation']['categories']
+      end
+
       copy_assets
     rescue Errors::RenderingError,
            Errors::PublishingError,
@@ -61,12 +73,6 @@ module Dimples
 
     def generated?
       @errors.count.zero?
-    end
-
-    def scan_files
-      scan_templates
-      scan_pages
-      scan_posts
     end
 
     def scan_templates
@@ -135,18 +141,6 @@ module Dimples
     rescue => e
       error_message = "Couldn't prepare the output directory (#{e.message})"
       raise Errors::GenerationError, error_message
-    end
-
-    def generate_files
-      prepare_output_directory
-
-      generate_pages unless @pages.count.zero?
-
-      return if @posts.count.zero?
-
-      generate_posts
-      generate_archives
-      generate_categories if @config['generation']['categories']
     end
 
     def generate_posts
