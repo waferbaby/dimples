@@ -31,17 +31,12 @@ module Dimples
 
       @post_class = @config.class_override(:post) || Dimples::Post
 
-      @source_paths = {
-        root: File.expand_path(@config['source_path'])
-      }
+      @source_paths = { root: File.expand_path(@config['source_path']) }
+      @output_paths = { site: File.expand_path(@config['destination_path']) }
 
       %w[pages posts public templates].each do |path|
         @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
       end
-
-      @output_paths = {
-        site: File.expand_path(@config['destination_path'])
-      }
 
       %w[archives posts categories].each do |path|
         output_path = File.join(@output_paths[:site], @config['paths'][path])
@@ -152,7 +147,12 @@ module Dimples
         generate_post(post)
       end
 
-      paginate(self, @posts, @output_paths[:archives], @config['layouts']['posts'])
+      paginate(
+        self,
+        @posts,
+        @output_paths[:archives],
+        @config['layouts']['posts']
+      )
 
       generate_posts_feeds if @config['generation']['feeds']
     end
@@ -195,7 +195,13 @@ module Dimples
         title: category.name
       }
 
-      paginate(self, category.posts, path, @config['layouts']['category'], options)
+      paginate(
+        self,
+        category.posts,
+        path,
+        @config['layouts']['category'],
+        options
+      )
     end
 
     def generate_archives
@@ -221,7 +227,13 @@ module Dimples
           title: posts[0].date.strftime(@config['date_formats'][date_type])
         }
 
-        paginate(self, posts, path, @config['layouts']["#{date_type}_archives"], options)
+        paginate(
+          self,
+          posts,
+          path,
+          @config['layouts']["#{date_type}_archives"],
+          options
+        )
       end
     end
 
@@ -253,6 +265,10 @@ module Dimples
       end
     end
 
+    def feed_templates
+      @feed_templates ||= @templates.keys.select { |k| k =~ /^feeds\./ }
+    end
+
     def copy_assets
       if Dir.exist?(@source_paths[:public])
         Dimples.logger.debug('Copying assets...') if @config['verbose_logging']
@@ -276,10 +292,6 @@ module Dimples
 
     def archive_day(year, month, day)
       @archives[:day]["#{year}/#{month}/#{day}"] ||= []
-    end
-
-    def feed_templates
-      @feed_templates ||= @templates.keys.select { |k| k =~ /^feeds\./ }
     end
   end
 end
