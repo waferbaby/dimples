@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en-US" xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>My site: Green</title>
+</head>
+<body>
+<h2>Green Posts</h2>
+
+<ul>
+<li><a href="/archives/2015/02/01/another-post/">My second post</a></li>
+<li><a href="/archives/2015/01/01/a-post/">My first post</a></li>
+</ul>
+</body>
+</html>

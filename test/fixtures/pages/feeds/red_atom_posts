@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+<title>My site: Red</title>
+<link href="http://example.com//archives/red/feed.atom" rel="self"/>
+<link href="http://example.com/"/>
+<updated>2017-01-01T00:00:00Z</updated>
+<id>http://example.com/</id>
+
+<entry>
+  <id>https://example.com/archives/a-post/</id>
+  <title>My first post</title>
+  <link href="https://example.com/archives/a-post/"/>
+  <updated>2015-01-01T00:00:00Z</updated>
+  <content type="html">
+    &lt;p&gt;Welcome to my first post. This is &lt;em&gt;awesome&lt;/em&gt;.&lt;/p&gt;
+  </content>
+</entry>
+
+</feed>
