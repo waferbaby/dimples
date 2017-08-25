@@ -98,7 +98,7 @@ extension: txt
 ---
 ```
 
-You tell Dimples what template to use by setting the `layout` element, which will map to the filename of any file in `templates/`, sans-extension (so `templates/post.erb` is available as `post`, and so on). This works for posts, pages _and_ templates. Dimples makes no assumptions here, so unless you specify a layout, it won't use one.
+You tell Dimples what template to use by setting the `layout` element, which will map to the filename of any file in `templates/`, sans-extension (so `templates/post.erb` is available as `post`, and so on). This works for posts, pages _and_ templates. Dimples makes no assumptions here, so unless you specify a layout, **it won't use one**.
 
 ```yaml
 ---
@@ -121,7 +121,6 @@ verbose_logging: false
 class_overrides:
   :site:
   :post:
-  :page:
 rendering: {}
 category_names: {}
 paths:
@@ -164,13 +163,12 @@ Key | Default | Description
 
 ## Class overrides
 
-In case Dimples doesn't do exactly what you want, you can substitute subclasses of the default gem classes and override whatever makes sense to you, you crazy kid.
+In case Dimples doesn't do exactly what you want, you can substitute subclasses of the default site or post classes and override whatever makes sense to you, you go-getter.
 
 Key | Default | Description
 ----|---------|-------------
 `site` | nil | A class to use in place of `Dimples::Site`.
 `post` | nil | A class to use in place of `Dimples::Post`.
-`page` | nil | A class to use in place of `Dimples::Page`.
 
 ## Rendering
 
@@ -219,7 +217,7 @@ Key | Default | Description
 
 ## Generation
 
-A bunch of switches to set what's generated when running `dimples build`.
+A bunch of flags to toggle what's generated when running `dimples build`.
 
 Key | Default | Description
 ----|---------|-------------
