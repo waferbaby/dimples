@@ -3,78 +3,49 @@
 $LOAD_PATH.unshift(__dir__)
 
 require 'helper'
+require 'timecop'
 
 describe Dimples::Site do
-  describe 'when scanning files' do
-    before { test_site.scan_files }
-
-    it 'finds all the templates' do
-      path = File.join(test_site.source_paths[:templates], '**', '*.*')
-      test_site.templates.length.must_equal(Dir.glob(path).length)
-    end
-
-    it 'finds all the pages' do
-      path = File.join(test_site.source_paths[:pages], '**', '*.*')
-      test_site.pages.length.must_equal(Dir.glob(path).length)
-    end
-
-    it 'finds all the posts' do
-      path = File.join(test_site.source_paths[:posts], '*.*')
-      test_site.posts.length.must_equal(Dir.glob(path).length)
-    end
-
-    it 'prepares the archive data' do
-      years = test_site.posts.map(&:year).uniq.sort
-      test_site.archives[:year].keys.sort.must_equal(years)
-
-      months = test_site.posts.map do |post|
-        "#{post.year}/#{post.month}"
-      end.uniq.sort
-
-      test_site.archives[:month].keys.sort.must_equal(months)
-
-      days = test_site.posts.map do |post|
-        "#{post.year}/#{post.month}/#{post.day}"
-      end.uniq.sort
-
-      test_site.archives[:day].keys.sort.must_equal(days)
-    end
-  end
-
-  describe 'when generating the complete site' do
-    before { test_site.generate }
-
-    it 'prepares the output directory' do
-      File.directory?(test_site.output_paths[:site]).must_equal(true)
-    end
-
-    it 'copies all the asset files' do
-      path = File.join(test_site.source_paths[:public], '**', '*')
-
-      Dir.glob(path).each do |asset_path|
-        output_path = asset_path.gsub(
-          test_site.source_paths[:public],
-          test_site.output_paths[:site]
-          )
-
-        File.exist?(output_path).must_equal(true)
+  describe 'when generating' do
+    describe 'with default settings' do
+      before do
+        Timecop.freeze(Time.local(2017, 1, 1, 0, 0, 0))
+        test_site.generate
+        Timecop.return
       end
-    end
 
-    after { clean_generated_site }
-  end
+      %w[templates pages posts].each do |file_type|
+        it "finds all the #{file_type} files" do
+          file_type_sym = file_type.to_sym
 
-  describe 'when generating archives' do
-    before { test_site.scan_files }
-
-    %w[year month day].each do |date_type|
-      describe "with #{date_type} generation enabled" do
-        before do
-          test_site.config['generation']["#{date_type}_archives"] = true
-          test_site.generate_archives
+          path = File.join(test_site.source_paths[file_type_sym], '**', '*.*')
+          test_site.send(file_type_sym).length.must_equal(Dir.glob(path).length)
         end
+      end
 
-        it 'creates the archive index files' do
+      it 'prepares the archive data' do
+        years = test_site.posts.map(&:year).uniq.sort
+        test_site.archives[:year].keys.sort.must_equal(years)
+
+        months = test_site.posts.map do |post|
+          "#{post.year}/#{post.month}"
+        end.uniq.sort
+
+        test_site.archives[:month].keys.sort.must_equal(months)
+
+        days = test_site.posts.map do |post|
+          "#{post.year}/#{post.month}/#{post.day}"
+        end.uniq.sort
+
+        test_site.archives[:day].keys.sort.must_equal(days)
+      end
+
+      it 'prepares the output directory' do
+        File.directory?(test_site.output_paths[:site]).must_equal(true)
+      end
+
+      %w[year month day].each do |date_type|
+        it "creates the #{date_type} archives" do
           archive_file_paths(date_type.to_sym).each do |date, path|
             expected_output = read_fixture("pages/archives/#{date}")
 
@@ -82,20 +53,117 @@ describe Dimples::Site do
             File.read(path).must_equal(expected_output)
           end
         end
+      end
+
+      it 'creates all the category files' do
+        test_site.categories.keys.each do |slug|
+          expected_output = read_fixture("pages/categories/#{slug}")
+          categories_path = test_site.output_paths[:categories]
+          file_path = File.join(categories_path, slug, 'index.html')
+
+          File.exist?(file_path).must_equal(true)
+          File.read(file_path).must_equal(expected_output)
+
+          site_feed_template_types.each do |feed_type|
+            fixture = "pages/feeds/#{slug}_#{feed_type}_posts"
+            expected_output = read_fixture(fixture)
+            feed_path = File.join(categories_path, slug, "feed.#{feed_type}")
+
+            File.exist?(feed_path).must_equal(true)
+            File.read(feed_path).must_equal(expected_output)
+          end
+        end
+      end
+
+      it 'copies all the asset files' do
+        path = File.join(test_site.source_paths[:public], '**', '*')
+
+        Dir.glob(path).each do |asset_path|
+          output_path = asset_path.gsub(
+            test_site.source_paths[:public],
+            test_site.output_paths[:site]
+          )
+
+          File.exist?(output_path).must_equal(true)
+        end
+      end
+
+      after { clean_generated_site }
+    end
+
+    describe 'with custom settings' do
+      %w[year month day].each do |date_type|
+        describe "if #{date_type} generation is disabled" do
+          before do
+            test_site.config['generation']["#{date_type}_archives"] = false
+
+            test_site.scan_templates
+            test_site.scan_pages
+            test_site.scan_posts
+
+            test_site.generate_archives
+          end
+
+          it 'creates no archive files' do
+            archive_file_paths(date_type.to_sym).each do |_, path|
+              File.exist?(path).must_equal(false)
+            end
+          end
+
+          after { clean_generated_site }
+        end
+      end
+
+      describe 'if category generation is disabled' do
+        before do
+          test_site.config['generation']['categories'] = false
+          test_site.generate
+        end
+
+        it 'creates none of the category files' do
+          test_site.categories.keys.each do |slug|
+            categories_path = test_site.output_paths[:categories]
+            file_path = File.join(categories_path, slug, 'index.html')
+
+            File.exist?(file_path).must_equal(false)
+          end
+        end
 
         after { clean_generated_site }
       end
 
-      describe "with #{date_type} generation disabled" do
+      describe 'if category feed generation is disabled' do
         before do
-          test_site.config['generation']["#{date_type}_archives"] = false
-          test_site.generate_archives
+          test_site.config['generation']['category_feeds'] = false
+          test_site.generate
         end
 
-        it 'creates no archive index files' do
-          archive_file_paths(date_type.to_sym).each do |_, path|
-            File.exist?(path).must_equal(false)
+        it 'creates no category feeds' do
+          test_site.categories.keys.each do |slug|
+            categories_path = test_site.output_paths[:categories]
+
+            site_feed_template_types.each do |feed_type|
+              file_path = File.join(categories_path, slug, "feed.#{feed_type}")
+              File.exist?(file_path).must_equal(false)
+            end
           end
+        end
+
+        after { clean_generated_site }
+      end
+
+      describe 'with custom category names' do
+        before do
+          test_site.config['category_names']['green'] = 'G R E E N'
+          test_site.generate
+        end
+
+        it 'uses the name correctly' do
+          expected_output = read_fixture('pages/categories/custom_green')
+          categories_path = test_site.output_paths[:categories]
+          file_path = File.join(categories_path, 'green', 'index.html')
+
+          File.read(file_path).must_equal(expected_output)
         end
 
         after { clean_generated_site }
