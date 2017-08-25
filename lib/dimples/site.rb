@@ -144,7 +144,7 @@ module Dimples
       end
 
       @posts.each do |post|
-        generate_post(post)
+        post.write(post.output_path(@output_paths[:posts]))
       end
 
       paginate(
@@ -157,22 +157,14 @@ module Dimples
       generate_posts_feeds if @config['generation']['feeds']
     end
 
-    def generate_post(post)
-      post.write(post.output_path(@output_paths[:posts]))
-    end
-
     def generate_pages
       if @config['verbose_logging']
         Dimples.logger.debug_generation('pages', @pages.length)
       end
 
       @pages.each do |page|
-        generate_page(page)
+        page.write(page.output_path(@output_paths[:site]))
       end
-    end
-
-    def generate_page(page)
-      page.write(page.output_path(@output_paths[:site]))
     end
 
     def generate_categories
@@ -181,59 +173,51 @@ module Dimples
       end
 
       @categories.each_value do |category|
-        generate_category(category)
+        path = File.join(@output_paths[:categories], category.slug)
+
+        options = {
+          context: { category: category.slug },
+          title: category.name
+        }
+
+        paginate(
+          self,
+          category.posts,
+          path,
+          @config['layouts']['category'],
+          options
+        )
       end
 
       generate_category_feeds if @config['generation']['category_feeds']
     end
 
-    def generate_category(category)
-      path = File.join(@output_paths[:categories], category.slug)
-
-      options = {
-        context: { category: category.slug },
-        title: category.name
-      }
-
-      paginate(
-        self,
-        category.posts,
-        path,
-        @config['layouts']['category'],
-        options
-      )
-    end
-
     def generate_archives
       %w[year month day].each do |date_type|
         if @config['generation']["#{date_type}_archives"]
-          generate_archive_posts(date_type)
+          @archives[date_type.to_sym].each do |date, posts|
+            year, month, day = date.split('/')
+
+            dates = { year: year }
+            dates[:month] = month if month
+            dates[:day] = day if day
+
+            path = File.join(@output_paths[:archives], dates.values)
+
+            options = {
+              context: dates,
+              title: posts[0].date.strftime(@config['date_formats'][date_type])
+            }
+
+            paginate(
+              self,
+              posts,
+              path,
+              @config['layouts']["#{date_type}_archives"],
+              options
+            )
+          end
         end
-      end
-    end
-
-    def generate_archive_posts(date_type)
-      @archives[date_type.to_sym].each do |date, posts|
-        year, month, day = date.split('/')
-
-        dates = { year: year }
-        dates[:month] = month if month
-        dates[:day] = day if day
-
-        path = File.join(@output_paths[:archives], dates.values)
-
-        options = {
-          context: dates,
-          title: posts[0].date.strftime(@config['date_formats'][date_type])
-        }
-
-        paginate(
-          self,
-          posts,
-          path,
-          @config['layouts']["#{date_type}_archives"],
-          options
-        )
       end
     end
 
