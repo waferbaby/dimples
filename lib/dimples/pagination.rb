@@ -56,7 +56,7 @@ module Dimples
       def step_to(page)
         @current_page = (1..@page_count).cover?(page) ? page : 1
         @previous_page = (@current_page - 1).positive? ? @current_page - 1 : nil
-        @next_page = (@current_page + 1) <= @page_count ? @current_page + 1 : nil
+        @next_page = @current_page + 1 <= @page_count ? @current_page + 1 : nil
 
         @current_page
       end
