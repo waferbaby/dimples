@@ -5,7 +5,11 @@ $LOAD_PATH.unshift(__dir__)
 require 'helper'
 
 describe 'Post' do
-  before { test_site.scan_files }
+  before do
+    test_site.scan_templates
+    test_site.scan_pages
+    test_site.scan_posts
+  end
 
   subject do
     filename = '2015-01-01-a-post.markdown'

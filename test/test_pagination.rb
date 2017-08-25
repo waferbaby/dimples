@@ -7,7 +7,10 @@ require 'helper'
 describe 'Pagination' do
   before do
     test_site.config['pagination']['per_page'] = 2
-    test_site.scan_files
+
+    test_site.scan_templates
+    test_site.scan_pages
+    test_site.scan_posts
   end
 
   include Dimples::Pagination

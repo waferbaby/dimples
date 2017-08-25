@@ -5,7 +5,11 @@ $LOAD_PATH.unshift(__dir__)
 require 'helper'
 
 describe 'Page' do
-  before { test_site.scan_files }
+  before do
+    test_site.scan_templates
+    test_site.scan_pages
+    test_site.scan_posts
+  end
 
   subject do
     path = File.join(test_site.source_paths[:pages], 'about', 'index.markdown')
