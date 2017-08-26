@@ -28,7 +28,7 @@ describe 'Page' do
 
       it 'creates the generated file' do
         File.exist?(file_path).must_equal(true)
-        compare_file_to_fixture(file_path, 'pages/general/about')
+        compare_file_to_fixture(file_path, 'pages/general/about/index')
       end
     end
   end

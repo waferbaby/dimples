@@ -19,7 +19,7 @@ describe 'Renderer' do
       end
 
       it 'renders the expected output' do
-        expected_output = read_fixture('pages/general/contact_with_html')
+        expected_output = read_fixture('pages/general/about/contact')
         subject.render.must_equal(expected_output)
       end
 
@@ -31,8 +31,7 @@ describe 'Renderer' do
         end
 
         it 'passes them on to the Tilt engine' do
-          file_path = 'pages/general/contact_with_html_encoded'
-          expected_output = read_fixture(file_path)
+          expected_output = read_fixture('pages/general/about/contact_encoded')
           subject.render.must_equal(expected_output)
         end
       end
