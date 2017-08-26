@@ -33,9 +33,9 @@ def read_fixture(filename)
   File.read(File.join(__dir__, 'fixtures', filename))
 end
 
-def match_expected_output(fixture_name, test_file_path)
+def compare_file_to_fixture(file_path, fixture_name)
   expected_output = read_fixture(fixture_name)
-  File.read(test_file_path).must_equal(expected_output)
+  File.read(file_path).must_equal(expected_output)
 end
 
 def clean_generated_site
@@ -46,8 +46,8 @@ end
 def archive_file_paths(date_type)
   test_site.archives[date_type].each_key.map do |date|
     dates = date.split('/')
-    path = File.join(test_site.output_paths[:archives], dates, 'index.html')
+    file_path = File.join(test_site.output_paths[:archives], dates, 'index.html')
 
-    [dates.join('-'), path]
+    [dates.join('-'), file_path]
   end
 end
