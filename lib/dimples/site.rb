@@ -194,29 +194,24 @@ module Dimples
 
     def generate_archives
       %w[year month day].each do |date_type|
-        if @config['generation']["#{date_type}_archives"]
-          @archives[date_type.to_sym].each do |date, posts|
-            year, month, day = date.split('/')
+        next unless @config['generation']["#{date_type}_archives"]
 
-            dates = { year: year }
-            dates[:month] = month if month
-            dates[:day] = day if day
+        @archives[date_type.to_sym].each do |date, posts|
+          year, month, day = date.split('/')
 
-            path = File.join(@output_paths[:archives], dates.values)
+          dates = { year: year }
+          dates[:month] = month if month
+          dates[:day] = day if day
 
-            options = {
-              context: dates,
-              title: posts[0].date.strftime(@config['date_formats'][date_type])
-            }
+          path = File.join(@output_paths[:archives], dates.values)
+          layout = @config['layouts']["#{date_type}_archives"]
 
-            paginate(
-              self,
-              posts,
-              path,
-              @config['layouts']["#{date_type}_archives"],
-              options
-            )
-          end
+          options = {
+            context: dates,
+            title: posts[0].date.strftime(@config['date_formats'][date_type])
+          }
+
+          paginate(self, posts, path, layout, options)
         end
       end
     end

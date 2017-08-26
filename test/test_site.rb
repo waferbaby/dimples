@@ -18,8 +18,15 @@ describe Dimples::Site do
         it "finds all the #{file_type} files" do
           file_type_sym = file_type.to_sym
 
-          glob_path = File.join(test_site.source_paths[file_type_sym], '**', '*.*')
-          test_site.send(file_type_sym).length.must_equal(Dir.glob(glob_path).length)
+          glob_path = File.join(
+            test_site.source_paths[file_type_sym],
+            '**',
+            '*.*'
+          )
+
+          length = Dir.glob(glob_path).length
+
+          test_site.send(file_type_sym).length.must_equal(length)
         end
       end
 
@@ -44,35 +51,44 @@ describe Dimples::Site do
         File.directory?(test_site.output_paths[:site]).must_equal(true)
       end
 
-      it "creates all the posts" do
+      it 'creates all the posts' do
         test_site.posts.each do |post|
-          fixture = "#{post.year}-#{post.month}-#{post.day}-#{post.slug}"
+          fixture = "posts/#{post.year}-#{post.month}-#{post.day}-#{post.slug}"
 
           file_path = post.output_path(test_site.output_paths[:posts])
           File.exist?(file_path).must_equal(true)
-          compare_file_to_fixture(file_path, "posts/#{fixture}")
+          compare_file_to_fixture(file_path, fixture)
         end
       end
 
-      it "creates all the posts feeds" do
+      it 'creates all the posts feeds' do
         site_feed_template_types.each do |feed_type|
           expected_output = read_fixture("pages/feeds/#{feed_type}_posts")
-          file_path = File.join(test_site.output_paths[:site], "feed.#{feed_type}")
+
+          file_path = File.join(
+            test_site.output_paths[:site],
+            "feed.#{feed_type}"
+          )
 
           File.exist?(file_path).must_equal(true)
           File.read(file_path).must_equal(expected_output)
         end
       end
 
-      it "creates all the main pages" do
+      it 'creates all the main pages' do
         test_site.pages.each do |page|
           file_path = page.output_path(test_site.output_paths[:site])
 
-          directory = File.dirname(file_path).gsub(test_site.output_paths[:site], '')
+          directory = File.dirname(file_path).gsub(
+            test_site.output_paths[:site],
+            ''
+          )
+
           filename = File.basename(file_path, '.html')
+          fixture = "pages/general#{directory}/#{filename}"
 
           File.exist?(file_path).must_equal(true)
-          compare_file_to_fixture(file_path, "pages/general#{directory}/#{filename}")
+          compare_file_to_fixture(file_path, fixture)
         end
       end
 
@@ -99,13 +115,13 @@ describe Dimples::Site do
         end
       end
 
-      it "creates all the category feeds" do
+      it 'creates all the category feeds' do
         categories_path = test_site.output_paths[:categories]
 
         test_site.categories.keys.each do |slug|
           site_feed_template_types.each do |feed_type|
-            fixture = "#{slug}_#{feed_type}_posts"
-            expected_output = read_fixture("pages/feeds/#{fixture}")
+            fixture = "pages/feeds/#{slug}_#{feed_type}_posts"
+            expected_output = read_fixture(fixture)
             file_path = File.join(categories_path, slug, "feed.#{feed_type}")
 
             File.exist?(file_path).must_equal(true)
@@ -137,9 +153,13 @@ describe Dimples::Site do
           test_site.generate
         end
 
-        it "creates none of the feeds" do
+        it 'creates none of the feeds' do
           site_feed_template_types.each do |feed_type|
-            file_path = File.join(test_site.output_paths[:site], "feed.#{feed_type}")
+            file_path = File.join(
+              test_site.output_paths[:site],
+              "feed.#{feed_type}"
+            )
+
             File.exist?(file_path).must_equal(false)
           end
         end

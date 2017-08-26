@@ -46,7 +46,12 @@ end
 def archive_file_paths(date_type)
   test_site.archives[date_type].each_key.map do |date|
     dates = date.split('/')
-    file_path = File.join(test_site.output_paths[:archives], dates, 'index.html')
+
+    file_path = File.join(
+      test_site.output_paths[:archives],
+      dates,
+      'index.html'
+    )
 
     [dates.join('-'), file_path]
   end

@@ -13,7 +13,12 @@ describe 'Page' do
 
   describe 'with a file path' do
     subject do
-      file_path = File.join(test_site.source_paths[:pages], 'about', 'index.markdown')
+      file_path = File.join(
+        test_site.source_paths[:pages],
+        'about',
+        'index.markdown'
+      )
+
       Dimples::Page.new(test_site, file_path)
     end
 
@@ -51,7 +56,7 @@ describe 'Page' do
 
         it 'creates an empty file' do
           File.exist?(file_path).must_equal(true)
-          File.read(file_path).must_equal("")
+          File.read(file_path).must_equal('')
         end
       end
 

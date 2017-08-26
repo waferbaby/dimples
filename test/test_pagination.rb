@@ -63,7 +63,8 @@ describe 'Pagination' do
         (2..3).each do |index|
           file_path = File.join(paginated_path, "page#{index}", 'index.htm')
           File.exist?(file_path).must_equal(true)
-          compare_file_to_fixture(file_path, "pages/pagination/custom_page_#{index}")
+          fixture = "pages/pagination/custom_page_#{index}"
+          compare_file_to_fixture(file_path, fixture)
         end
       end
     end

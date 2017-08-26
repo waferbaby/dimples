@@ -15,7 +15,10 @@ describe 'Renderer' do
         base_path = test_site.source_paths[:pages]
         file_path = File.join(base_path, 'about', 'contact.markdown')
 
-        Dimples::Renderer.new(test_site, Dimples::Page.new(test_site, file_path))
+        Dimples::Renderer.new(
+          test_site,
+          Dimples::Page.new(test_site, file_path)
+        )
       end
 
       it 'renders the expected output' do
