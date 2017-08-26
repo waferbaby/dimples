@@ -54,10 +54,26 @@ describe Dimples::Site do
         end
       end
 
-      it "creates all the post feeds" do
+      it "creates all the posts feeds" do
+        site_feed_template_types.each do |feed_type|
+          expected_output = read_fixture("pages/feeds/#{feed_type}_posts")
+          file_path = File.join(test_site.output_paths[:site], "feed.#{feed_type}")
+
+          File.exist?(file_path).must_equal(true)
+          File.read(file_path).must_equal(expected_output)
+        end
       end
 
-      it "creates all the pages" do
+      it "creates all the main pages" do
+        test_site.pages.each do |page|
+          file_path = page.output_path(test_site.output_paths[:site])
+
+          directory = File.dirname(file_path).gsub(test_site.output_paths[:site], '')
+          filename = File.basename(file_path, '.html')
+
+          File.exist?(file_path).must_equal(true)
+          compare_file_to_fixture(file_path, "pages/general#{directory}/#{filename}")
+        end
       end
 
       %w[year month day].each do |date_type|
@@ -71,7 +87,7 @@ describe Dimples::Site do
         end
       end
 
-      it 'creates all the category files' do
+      it 'creates all the category pages' do
         categories_path = test_site.output_paths[:categories]
 
         test_site.categories.keys.each do |slug|
@@ -115,6 +131,22 @@ describe Dimples::Site do
     end
 
     describe 'with custom settings' do
+      describe 'if the main feeds are disabled' do
+        before do
+          test_site.config['generation']['feeds'] = false
+          test_site.generate
+        end
+
+        it "creates none of the feeds" do
+          site_feed_template_types.each do |feed_type|
+            file_path = File.join(test_site.output_paths[:site], "feed.#{feed_type}")
+            File.exist?(file_path).must_equal(false)
+          end
+        end
+
+        after { clean_generated_site }
+      end
+
       %w[year month day].each do |date_type|
         describe "if #{date_type} generation is disabled" do
           before do
