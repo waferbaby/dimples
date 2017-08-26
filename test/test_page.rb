@@ -11,25 +11,61 @@ describe 'Page' do
     test_site.scan_posts
   end
 
-  subject do
-    path = File.join(test_site.source_paths[:pages], 'about', 'index.markdown')
-    Dimples::Page.new(test_site, path)
+  describe 'with a file path' do
+    subject do
+      file_path = File.join(test_site.source_paths[:pages], 'about', 'index.markdown')
+      Dimples::Page.new(test_site, file_path)
+    end
+
+    it 'parses its YAML front matter' do
+      subject.title.must_equal('About')
+      subject.layout.must_equal('default')
+    end
+
+    describe 'when publishing' do
+      let(:file_path) { subject.output_path(test_site.output_paths[:site]) }
+      before { subject.write(file_path) }
+
+      it 'creates the generated file' do
+        File.exist?(file_path).must_equal(true)
+        compare_file_to_fixture(file_path, 'pages/general/about')
+      end
+    end
   end
 
-  it 'parses its YAML frontmatter' do
-    subject.title.must_equal('About')
-    subject.layout.must_equal('default')
-  end
+  describe 'without a file path' do
+    subject do
+      Dimples::Page.new(test_site)
+    end
 
-  it 'renders its contents' do
-    expected_output = read_fixture('pages/general/about')
-    subject.render.must_equal(expected_output)
-  end
+    it 'has no YAML front matter' do
+      subject.title.must_be_nil
+      subject.layout.must_be_nil
+    end
 
-  it 'publishes to a file' do
-    path = subject.output_path(test_site.output_paths[:site])
+    describe 'when publishing' do
+      let(:file_path) { subject.output_path(test_site.output_paths[:site]) }
 
-    subject.write(path)
-    File.exist?(path).must_equal(true)
+      describe 'with no set contents' do
+        before { subject.write(file_path) }
+
+        it 'creates an empty file' do
+          File.exist?(file_path).must_equal(true)
+          File.read(file_path).must_equal("")
+        end
+      end
+
+      describe 'with customised contents' do
+        before do
+          subject.contents = 'Plain text file'
+          subject.write(file_path)
+        end
+
+        it 'creates a basic file without a template' do
+          File.exist?(file_path).must_equal(true)
+          File.read(file_path).must_equal('Plain text file')
+        end
+      end
+    end
   end
 end

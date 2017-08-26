@@ -24,17 +24,15 @@ describe 'Pagination' do
       end
 
       it 'creates the main index file' do
-        path = File.join(paginated_path, 'index.html')
-        File.exist?(path).must_equal(true)
-
-        match_expected_output('pages/pagination/index', path)
+        file_path = File.join(paginated_path, 'index.html')
+        File.exist?(file_path).must_equal(true)
+        compare_file_to_fixture(file_path, 'pages/pagination/index')
       end
 
       it 'creates paged directories with index files' do
-        path = File.join(paginated_path, 'page2', 'index.html')
-        File.exist?(path).must_equal(true)
-
-        match_expected_output('pages/pagination/page_2', path)
+        file_path = File.join(paginated_path, 'page2', 'index.html')
+        File.exist?(file_path).must_equal(true)
+        compare_file_to_fixture(file_path, 'pages/pagination/page_2')
       end
     end
 
@@ -56,18 +54,16 @@ describe 'Pagination' do
       end
 
       it 'creates the main custom index file' do
-        path = File.join(paginated_path, 'index.htm')
-        File.exist?(path).must_equal(true)
-
-        match_expected_output('pages/pagination/custom_index', path)
+        file_path = File.join(paginated_path, 'index.htm')
+        File.exist?(file_path).must_equal(true)
+        compare_file_to_fixture(file_path, 'pages/pagination/custom_index')
       end
 
       it 'creates paged directories with index files' do
         (2..3).each do |index|
-          path = File.join(paginated_path, "page#{index}", 'index.htm')
-          File.exist?(path).must_equal(true)
-
-          match_expected_output("pages/pagination/custom_page_#{index}", path)
+          file_path = File.join(paginated_path, "page#{index}", 'index.htm')
+          File.exist?(file_path).must_equal(true)
+          compare_file_to_fixture(file_path, "pages/pagination/custom_page_#{index}")
         end
       end
     end

@@ -18,8 +18,8 @@ describe Dimples::Site do
         it "finds all the #{file_type} files" do
           file_type_sym = file_type.to_sym
 
-          path = File.join(test_site.source_paths[file_type_sym], '**', '*.*')
-          test_site.send(file_type_sym).length.must_equal(Dir.glob(path).length)
+          glob_path = File.join(test_site.source_paths[file_type_sym], '**', '*.*')
+          test_site.send(file_type_sym).length.must_equal(Dir.glob(glob_path).length)
         end
       end
 
@@ -44,47 +44,70 @@ describe Dimples::Site do
         File.directory?(test_site.output_paths[:site]).must_equal(true)
       end
 
+      it "creates all the posts" do
+        test_site.posts.each do |post|
+          fixture = "#{post.year}-#{post.month}-#{post.day}-#{post.slug}"
+
+          file_path = post.output_path(test_site.output_paths[:posts])
+          File.exist?(file_path).must_equal(true)
+          compare_file_to_fixture(file_path, "posts/#{fixture}")
+        end
+      end
+
+      it "creates all the post feeds" do
+      end
+
+      it "creates all the pages" do
+      end
+
       %w[year month day].each do |date_type|
         it "creates the #{date_type} archives" do
-          archive_file_paths(date_type.to_sym).each do |date, path|
+          archive_file_paths(date_type.to_sym).each do |date, file_path|
             expected_output = read_fixture("pages/archives/#{date}")
 
-            File.exist?(path).must_equal(true)
-            File.read(path).must_equal(expected_output)
+            File.exist?(file_path).must_equal(true)
+            File.read(file_path).must_equal(expected_output)
           end
         end
       end
 
       it 'creates all the category files' do
+        categories_path = test_site.output_paths[:categories]
+
         test_site.categories.keys.each do |slug|
           expected_output = read_fixture("pages/categories/#{slug}")
-          categories_path = test_site.output_paths[:categories]
           file_path = File.join(categories_path, slug, 'index.html')
 
           File.exist?(file_path).must_equal(true)
           File.read(file_path).must_equal(expected_output)
+        end
+      end
 
+      it "creates all the category feeds" do
+        categories_path = test_site.output_paths[:categories]
+
+        test_site.categories.keys.each do |slug|
           site_feed_template_types.each do |feed_type|
-            fixture = "pages/feeds/#{slug}_#{feed_type}_posts"
-            expected_output = read_fixture(fixture)
-            feed_path = File.join(categories_path, slug, "feed.#{feed_type}")
+            fixture = "#{slug}_#{feed_type}_posts"
+            expected_output = read_fixture("pages/feeds/#{fixture}")
+            file_path = File.join(categories_path, slug, "feed.#{feed_type}")
 
-            File.exist?(feed_path).must_equal(true)
-            File.read(feed_path).must_equal(expected_output)
+            File.exist?(file_path).must_equal(true)
+            File.read(file_path).must_equal(expected_output)
           end
         end
       end
 
       it 'copies all the asset files' do
-        path = File.join(test_site.source_paths[:public], '**', '*')
+        glob_path = File.join(test_site.source_paths[:public], '**', '*')
 
-        Dir.glob(path).each do |asset_path|
-          output_path = asset_path.gsub(
+        Dir.glob(glob_path).each do |asset_path|
+          file_path = asset_path.gsub(
             test_site.source_paths[:public],
             test_site.output_paths[:site]
           )
 
-          File.exist?(output_path).must_equal(true)
+          File.exist?(file_path).must_equal(true)
         end
       end
 

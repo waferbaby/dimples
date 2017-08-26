@@ -12,12 +12,11 @@ describe 'Template' do
   end
 
   subject do
-    path = File.join(test_site.source_paths[:templates], 'default.erb')
-    Dimples::Template.new(test_site, path)
+    file_path = File.join(test_site.source_paths[:templates], 'post.erb')
+    Dimples::Template.new(test_site, file_path)
   end
 
-  it 'renders its contents' do
-    expected_output = read_fixture('templates/default')
-    subject.render({}, 'Welcome').must_equal(expected_output)
+  it 'parses its YAML front matter' do
+    subject.layout.must_equal('default')
   end
 end

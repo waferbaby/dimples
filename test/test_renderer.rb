@@ -9,33 +9,57 @@ describe 'Renderer' do
     test_site.scan_templates
   end
 
-  subject do
-    base_path = test_site.source_paths[:pages]
-    path = File.join(base_path, 'about', 'contact.markdown')
-    Dimples::Page.new(test_site, path)
-  end
-
-  let(:renderer) do
-    Dimples::Renderer.new(test_site, subject)
-  end
-
   describe 'when rendering' do
-    it 'allows raw HTML in Markdown by default' do
-      expected_output = read_fixture('pages/general/contact_with_html')
-      renderer.render.must_equal(expected_output)
-    end
+    describe 'using a source with a file path' do
+      subject do
+        base_path = test_site.source_paths[:pages]
+        file_path = File.join(base_path, 'about', 'contact.markdown')
 
-    describe 'with custom rendering options set' do
-      before do
-        test_site.config['rendering']['markdown'] = {
-          escape_html: true
-        }
+        Dimples::Renderer.new(test_site, Dimples::Page.new(test_site, file_path))
       end
 
-      it 'passes them on to the Tilt engine' do
-        path = 'pages/general/contact_with_html_encoded'
-        expected_output = read_fixture(path)
-        renderer.render.must_equal(expected_output)
+      it 'renders the expected output' do
+        expected_output = read_fixture('pages/general/contact_with_html')
+        subject.render.must_equal(expected_output)
+      end
+
+      describe 'with custom rendering options set' do
+        before do
+          test_site.config['rendering']['markdown'] = {
+            escape_html: true
+          }
+        end
+
+        it 'passes them on to the Tilt engine' do
+          file_path = 'pages/general/contact_with_html_encoded'
+          expected_output = read_fixture(file_path)
+          subject.render.must_equal(expected_output)
+        end
+      end
+    end
+
+    describe 'using a source without a file path' do
+      let(:page) do
+        Dimples::Page.new(test_site).tap do |page|
+          page.contents = 'Welcome!'
+        end
+      end
+
+      subject { Dimples::Renderer.new(test_site, page) }
+
+      describe 'and no layout' do
+        it 'renders the contents as is' do
+          subject.render.must_equal('Welcome!')
+        end
+      end
+
+      describe 'with a layout' do
+        before { page.layout = 'default' }
+
+        it 'renders the contents with the template' do
+          expected_output = read_fixture('pages/general/welcome')
+          subject.render.must_equal(expected_output)
+        end
       end
     end
   end
