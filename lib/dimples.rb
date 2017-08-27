@@ -8,10 +8,12 @@ require 'logger'
 require 'tilt'
 require 'yaml'
 
+require 'dimples/frontable'
+require 'dimples/renderable'
+
 require 'dimples/category'
 require 'dimples/configuration'
 require 'dimples/errors'
-require 'dimples/frontable'
 require 'dimples/logger'
 require 'dimples/page'
 require 'dimples/pagination'
