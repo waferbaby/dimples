@@ -20,7 +20,7 @@ module Dimples
 
       if @path
         @filename = File.basename(@path, File.extname(@path))
-        @contents = read_with_front_matter(@path)
+        read_with_front_matter
       else
         @filename = 'index'
         @contents = ''

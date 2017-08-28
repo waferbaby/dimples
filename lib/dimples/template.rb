@@ -17,7 +17,7 @@ module Dimples
       @slug = File.basename(path, File.extname(path))
       @path = path
 
-      @contents = read_with_front_matter(path)
+      read_with_front_matter
     end
   end
 end
