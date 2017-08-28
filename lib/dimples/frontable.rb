@@ -3,28 +3,23 @@
 module Dimples
   # A mixin class that handles reading and parsing front matter from a file.
   module Frontable
-    def read_with_front_matter(path)
-      contents = File.read(path)
+    METADATA_KEYS = %w[title layout extension summary categories].freeze
+
+    def read_with_front_matter
+      @contents = File.read(@path)
+
       matches = contents.match(/^(-{3}\n.*?\n?)^(-{3}*$\n?)/m)
+      return if matches.nil?
 
-      if matches
-        metadata = YAML.safe_load(matches[1])
-        contents = matches.post_match.strip
+      metadata = YAML.safe_load(matches[1])
 
-        apply_metadata(metadata) if metadata
-      end
-
-      contents
-    end
-
-    def apply_metadata(metadata)
       metadata.each_pair do |key, value|
-        unless respond_to?(key.to_sym)
-          self.class.send(:attr_accessor, key.to_sym)
+        if METADATA_KEYS.include?(key) && respond_to?("#{key}=")
+          send("#{key}=", value)
         end
-
-        send("#{key}=", value)
       end
+
+      @contents = matches.post_match.strip
     end
   end
 end
