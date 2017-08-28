@@ -3,8 +3,9 @@
 module Dimples
   # A class that models a single site post.
   class Post < Page
-    attr_accessor :categories
     attr_accessor :slug
+    attr_accessor :summary
+    attr_accessor :categories
     attr_accessor :year
     attr_accessor :month
     attr_accessor :day
