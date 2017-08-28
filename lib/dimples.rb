@@ -18,7 +18,6 @@ require 'dimples/logger'
 require 'dimples/page'
 require 'dimples/pagination'
 require 'dimples/post'
-require 'dimples/renderer'
 require 'dimples/site'
 require 'dimples/template'
 
