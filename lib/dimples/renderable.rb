@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Dimples
-  # A mixin class that allows a document to render.
+  # A mixin class that allows a document to render via Tilt.
   module Renderable
     attr_accessor :rendered_contents
 
@@ -10,14 +10,14 @@ module Dimples
       context[:this] ||= self
       context[:type] ||= self.class.name.split('::').last.downcase.to_sym
 
-      scope = Object.new.tap do |scope|
+      scope = Object.new.tap do |s|
         context.each_pair do |key, value|
-          scope.instance_variable_set("@#{key}".to_sym, value)
+          s.instance_variable_set("@#{key}".to_sym, value)
         end
       end
 
       output = rendering_engine.render(scope) { body }.strip
-      rendered_contents = output
+      @rendered_contents = output
 
       if @site.templates[layout]
         @site.templates[layout].render(context, output)
