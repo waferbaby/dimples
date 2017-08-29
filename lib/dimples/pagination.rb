@@ -12,19 +12,21 @@ module Dimples
 
       pager.each do |index, page_items|
         page = Dimples::Page.new(site)
-        page.layout = layout
 
+        page.output_directory = if index == 1
+                                  path
+                                else
+                                  File.join(path, "page#{index}")
+                                end
+
+        page.layout = layout
         page.title = options[:title] || site.templates[layout].title
         page.extension = options[:extension] if options[:extension]
-
-        output_path = page.output_path(
-          index != 1 ? File.join(path, "page#{index}") : path
-        )
 
         context[:items] = page_items
         context[:pagination] = pager.to_h
 
-        page.write(output_path, context)
+        page.write(context)
       end
     end
 
@@ -76,7 +78,7 @@ module Dimples
 
       def to_h
         output = {
-          page: @current_page,
+          current_page: @current_page,
           page_count: @page_count,
           item_count: @items.count,
           url: @url
