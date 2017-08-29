@@ -6,6 +6,14 @@ require 'helper'
 require 'timecop'
 
 describe Dimples::Site do
+  it 'returns the correct value when inspected' do
+    test_site.inspect.must_equal(
+      "#<Dimples::Site " \
+      "@source_paths=#{test_site.source_paths} " \
+      "@output_paths=#{test_site.output_paths}>"
+    )
+  end
+
   describe 'when generating' do
     describe 'with default settings' do
       before do
@@ -55,9 +63,8 @@ describe Dimples::Site do
         test_site.posts.each do |post|
           fixture = "posts/#{post.year}-#{post.month}-#{post.day}-#{post.slug}"
 
-          file_path = post.output_path(test_site.output_paths[:posts])
-          File.exist?(file_path).must_equal(true)
-          compare_file_to_fixture(file_path, fixture)
+          File.exist?(post.output_path).must_equal(true)
+          compare_file_to_fixture(post.output_path, fixture)
         end
       end
 
@@ -77,18 +84,16 @@ describe Dimples::Site do
 
       it 'creates all the main pages' do
         test_site.pages.each do |page|
-          file_path = page.output_path(test_site.output_paths[:site])
-
-          directory = File.dirname(file_path).gsub(
+          directory = File.dirname(page.output_path).gsub(
             test_site.output_paths[:site],
             ''
           )
 
-          filename = File.basename(file_path, '.html')
+          filename = File.basename(page.output_path, '.html')
           fixture = "pages/general#{directory}/#{filename}"
 
-          File.exist?(file_path).must_equal(true)
-          compare_file_to_fixture(file_path, fixture)
+          File.exist?(page.output_path).must_equal(true)
+          compare_file_to_fixture(page.output_path, fixture)
         end
       end
 
