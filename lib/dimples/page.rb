@@ -12,6 +12,7 @@ module Dimples
     attr_accessor :extension
     attr_accessor :layout
     attr_accessor :contents
+    attr_accessor :output_directory
 
     def initialize(site, path = nil)
       @site = site
@@ -20,37 +21,36 @@ module Dimples
 
       if @path
         @filename = File.basename(@path, File.extname(@path))
+        @output_directory = File.dirname(@path).gsub(
+          @site.source_paths[:pages],
+          @site.output_paths[:site]
+        )
+
         read_with_front_matter
       else
         @filename = 'index'
         @contents = ''
+        @output_directory = @site.output_paths[:site]
       end
     end
 
-    def output_path(parent_path)
-      parts = [parent_path]
-
-      unless @path.nil?
-        parts << File.dirname(@path).gsub(@site.source_paths[:pages], '')
-      end
-
-      parts << "#{@filename}.#{@extension}"
-
-      File.join(parts)
+    def output_path
+      File.join(@output_directory, "#{@filename}.#{@extension}")
     end
 
-    def write(path, context = {})
-      output = context ? render(context) : contents
-      parent_path = File.dirname(path)
+    def write(context = {})
+      FileUtils.mkdir_p(@output_directory) unless Dir.exist?(@output_directory)
 
-      FileUtils.mkdir_p(parent_path) unless Dir.exist?(parent_path)
-
-      File.open(path, 'w+') do |file|
-        file.write(output)
+      File.open(output_path, 'w+') do |file|
+        file.write(context ? render(context) : contents)
       end
     rescue SystemCallError => e
       error_message = "Failed to write #{path} (#{e.message})"
       raise Errors::PublishingError, error_message
+    end
+
+    def inspect
+      "#<Dimples::Page @output_path=#{output_path}>"
     end
   end
 end
