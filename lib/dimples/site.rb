@@ -143,9 +143,7 @@ module Dimples
         Dimples.logger.debug_generation('posts', @posts.length)
       end
 
-      @posts.each do |post|
-        post.write(post.output_path(@output_paths[:posts]))
-      end
+      @posts.each(&:write)
 
       paginate(
         self,
@@ -162,9 +160,7 @@ module Dimples
         Dimples.logger.debug_generation('pages', @pages.length)
       end
 
-      @pages.each do |page|
-        page.write(page.output_path(@output_paths[:site]))
-      end
+      @pages.each(&:write)
     end
 
     def generate_categories
@@ -216,17 +212,18 @@ module Dimples
       end
     end
 
-    def generate_feeds(path, options)
+    def generate_feeds(path, context)
       feed_templates.each do |format|
         next unless @templates[format]
 
         feed = Dimples::Page.new(self)
 
+        feed.output_directory = path
         feed.filename = 'feed'
         feed.extension = @templates[format].slug
         feed.layout = format
 
-        feed.write(feed.output_path(path), options)
+        feed.write(context)
       end
     end
 
@@ -257,6 +254,12 @@ module Dimples
       end
     rescue => e
       raise Errors::GenerationError, "Site assets failed to copy (#{e.message})"
+    end
+
+    def inspect
+      "#<Dimples::Site " \
+      "@source_paths=#{@source_paths} " \
+      "@output_paths=#{@output_paths}>"
     end
 
     private
