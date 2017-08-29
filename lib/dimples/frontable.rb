@@ -8,7 +8,7 @@ module Dimples
     def read_with_front_matter
       @contents = File.read(@path)
 
-      matches = contents.match(/^(-{3}\n.*?\n?)^(-{3}*$\n?)/m)
+      matches = @contents.match(/^(-{3}\n.*?\n?)^(-{3}*$\n?)/m)
       return if matches.nil?
 
       metadata = YAML.safe_load(matches[1])
