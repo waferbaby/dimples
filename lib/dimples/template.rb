@@ -19,5 +19,9 @@ module Dimples
 
       read_with_front_matter
     end
+
+    def inspect
+      "#<Dimples::Template @slug=#{@slug} @path=#{@path}>"
+    end
   end
 end
