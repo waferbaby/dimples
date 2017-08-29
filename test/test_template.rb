@@ -19,4 +19,8 @@ describe 'Template' do
   it 'parses its YAML front matter' do
     subject.layout.must_equal('default')
   end
+
+  it 'returns the correct value when inspected' do
+    subject.inspect.must_equal "#<Dimples::Template @slug=#{subject.slug} @path=#{subject.path}>"
+  end
 end
