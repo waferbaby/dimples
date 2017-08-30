@@ -257,7 +257,7 @@ module Dimples
     end
 
     def inspect
-      "#<Dimples::Site " \
+      "#<#{self.class.to_s} " \
       "@source_paths=#{@source_paths} " \
       "@output_paths=#{@output_paths}>"
     end

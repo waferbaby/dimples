@@ -15,7 +15,7 @@ module Dimples
     end
 
     def inspect
-      "#<Dimples::Category @slug=#{@slug} @name=#{@name}>"
+      "#<#{self.class.to_s} @slug=#{@slug} @name=#{@name}>"
     end
   end
 end

@@ -50,7 +50,7 @@ module Dimples
     end
 
     def inspect
-      "#<Dimples::Page @output_path=#{output_path}>"
+      "#<#{self.class.to_s} @output_path=#{output_path}>"
     end
   end
 end
