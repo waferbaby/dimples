@@ -20,7 +20,7 @@ module Dimples
                                 end
 
         page.layout = layout
-        page.title = options[:title] || site.templates[layout].title
+        page.title = options[:title] || site.templates[layout]&.title
         page.extension = options[:extension] if options[:extension]
 
         context[:items] = page_items
