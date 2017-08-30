@@ -13,5 +13,9 @@ module Dimples
       @name = @site.config['category_names'][slug] || slug.capitalize
       @posts = []
     end
+
+    def inspect
+      "#<Dimples::Category @slug=#{@slug} @name=#{@name}>"
+    end
   end
 end
