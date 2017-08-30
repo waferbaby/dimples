@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(__dir__)
 
 require 'helper'
 
-describe 'Renderable' do
+describe Dimples::Renderable do
   before do
     test_site.scan_templates
   end

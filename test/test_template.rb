@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(__dir__)
 
 require 'helper'
 
-describe 'Template' do
+describe Dimples::Template do
   before do
     test_site.scan_templates
     test_site.scan_pages

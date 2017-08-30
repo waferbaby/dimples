@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(__dir__)
 
 require 'helper'
 
-describe 'Configuration' do
+describe Dimples::Configuration do
   describe 'with passed-in values' do
     subject do
       custom_settings = {

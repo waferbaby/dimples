@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(__dir__)
 
 require 'helper'
 
-describe 'Pagination' do
+describe Dimples::Pagination do
   before do
     test_site.config['pagination']['per_page'] = 2
 
