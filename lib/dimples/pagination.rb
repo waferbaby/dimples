@@ -4,11 +4,11 @@ module Dimples
   # A module that supports pagination.
   module Pagination
     def paginate(site, items, path, layout, options = {})
-      context = options[:context] || {}
+      context = options.delete(:context) || {}
       url = path.gsub(site.output_paths[:site], '') + '/'
-      per_page = options[:per_page] || site.config['pagination']['per_page']
+      per_page = options.delete(:per_page) || site.config['pagination']['per_page']
 
-      pager = Pager.new(url, items, per_page)
+      pager = Pager.new(url, items, per_page, options)
 
       pager.each do |index, page_items|
         page = Dimples::Page.new(site)
@@ -40,11 +40,12 @@ module Dimples
       attr_reader :page_count
       attr_reader :item_count
 
-      def initialize(url, items, per_page)
+      def initialize(url, items, per_page, options = {})
         @url = url
         @items = items
         @per_page = per_page
         @page_count = (items.length.to_f / per_page.to_i).ceil
+        @page_prefix = options[:page_prefix] || 'page'
 
         step_to(1)
       end
@@ -69,11 +70,11 @@ module Dimples
 
       def previous_page_url
         return unless @previous_page
-        @previous_page != 1 ? "#{@url}page#{@previous_page}" : @url
+        @previous_page != 1 ? "#{@url}#{@page_prefix}#{@previous_page}" : @url
       end
 
       def next_page_url
-        "#{@url}page#{@next_page}" if @next_page
+        "#{@url}#{@page_prefix}#{@next_page}" if @next_page
       end
 
       def to_h

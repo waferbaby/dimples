@@ -71,82 +71,133 @@ describe Dimples::Pagination do
   end
 
   describe 'Pager' do
-    subject do
-      Dimples::Pagination::Pager.new('/archives/', test_site.posts, 1)
+    describe 'with the default options' do
+      subject do
+        Dimples::Pagination::Pager.new('/archives/', test_site.posts, 1)
+      end
+
+      describe 'starting from the first page' do
+        it 'is on the correct page' do
+          subject.current_page.must_equal(1)
+        end
+
+        it 'has no previous page' do
+          subject.previous_page.must_be_nil
+        end
+
+        it 'has no previous page url' do
+          subject.previous_page_url.must_be_nil
+        end
+
+        it 'has the correct next page' do
+          subject.next_page.must_equal(2)
+        end
+
+        it 'has the correct next page url' do
+          subject.next_page_url.must_equal('/archives/page2')
+        end
+      end
+
+      describe 'stepping forwards one page' do
+        before do
+          subject.step_to(2)
+        end
+
+        it 'is on the correct page' do
+          subject.current_page.must_equal(2)
+        end
+
+        it 'has the correct previous page' do
+          subject.previous_page.must_equal(1)
+        end
+
+        it 'has the correct previous page url' do
+          subject.previous_page_url.must_equal('/archives/')
+        end
+
+        it 'has the correct next page' do
+          subject.next_page.must_equal(3)
+        end
+
+        it 'has the correct next page url' do
+          subject.next_page_url.must_equal('/archives/page3')
+        end
+      end
+
+      describe 'stepping to the last page' do
+        before do
+          subject.step_to(subject.page_count)
+        end
+
+        it 'is on the correct page' do
+          subject.current_page.must_equal(subject.page_count)
+        end
+
+        it 'has the correct previous page' do
+          subject.previous_page.must_equal(subject.page_count - 1)
+        end
+
+        it 'has the correct previous page url' do
+          url = "/archives/page#{subject.page_count - 1}"
+          subject.previous_page_url.must_equal(url)
+        end
+
+        it 'has no next page' do
+          subject.next_page.must_be_nil
+        end
+
+        it 'has no next page url' do
+          subject.next_page_url.must_be_nil
+        end
+      end
     end
 
-    describe 'starting from the first page' do
-      it 'is on the correct page' do
-        subject.current_page.must_equal(1)
+    describe 'with custom options' do
+      subject do
+        options = {
+          'page_prefix': '?page='
+        }
+
+        Dimples::Pagination::Pager.new('/archives/', test_site.posts, 1, options)
       end
 
-      it 'has no previous page' do
-        subject.previous_page.must_be_nil
+      describe 'starting from the first page' do
+        it 'has no previous page url' do
+          subject.previous_page_url.must_be_nil
+        end
+
+        it 'has the correct next page url' do
+          subject.next_page_url.must_equal('/archives/?page=2')
+        end
       end
 
-      it 'has no previous page url' do
-        subject.previous_page_url.must_be_nil
+      describe 'stepping forwards one page' do
+        before do
+          subject.step_to(2)
+        end
+
+        it 'has the correct previous page url' do
+          subject.previous_page_url.must_equal('/archives/')
+        end
+
+        it 'has the correct next page url' do
+          subject.next_page_url.must_equal('/archives/?page=3')
+        end
       end
 
-      it 'has the correct next page' do
-        subject.next_page.must_equal(2)
-      end
+      describe 'stepping to the last page' do
+        before do
+          subject.step_to(subject.page_count)
+        end
 
-      it 'has the correct next page url' do
-        subject.next_page_url.must_equal('/archives/page2')
-      end
-    end
+        it 'has the correct previous page url' do
+          url = "/archives/?page=#{subject.page_count - 1}"
+          subject.previous_page_url.must_equal(url)
+        end
 
-    describe 'stepping forwards one page' do
-      before do
-        subject.step_to(2)
-      end
-
-      it 'is on the correct page' do
-        subject.current_page.must_equal(2)
-      end
-
-      it 'has the correct previous page' do
-        subject.previous_page.must_equal(1)
-      end
-
-      it 'has the correct previous page url' do
-        subject.previous_page_url.must_equal('/archives/')
-      end
-
-      it 'has the correct next page' do
-        subject.next_page.must_equal(3)
-      end
-
-      it 'has the correct next page url' do
-        subject.next_page_url.must_equal('/archives/page3')
-      end
-    end
-
-    describe 'stepping to the last page' do
-      before do
-        subject.step_to(subject.page_count)
-      end
-
-      it 'is on the correct page' do
-        subject.current_page.must_equal(subject.page_count)
-      end
-
-      it 'has the correct previous page' do
-        subject.previous_page.must_equal(subject.page_count - 1)
-      end
-
-      it 'has the correct previous page url' do
-        url = "/archives/page#{subject.page_count - 1}"
-        subject.previous_page_url.must_equal(url)
-      end
-
-      it 'has no next page' do
-        subject.next_page.must_be_nil
-      end
-
-      it 'has no next page url' do
-        subject.next_page_url.must_be_nil
+        it 'has no next page url' do
+          subject.next_page_url.must_be_nil
+        end
       end
     end
   end
