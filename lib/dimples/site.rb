@@ -45,10 +45,7 @@ module Dimples
     end
 
     def generate
-      scan_templates
-      scan_pages
-      scan_posts
-
+      scan_files
       prepare_output_directory
 
       generate_pages unless @pages.count.zero?
@@ -68,6 +65,14 @@ module Dimples
 
     def generated?
       @errors.count.zero?
+    end
+
+    def scan_files
+      Dimples.logger.debug('Scanning files...') if @config['verbose_logging']
+
+      scan_templates
+      scan_pages
+      scan_posts
     end
 
     def scan_templates
