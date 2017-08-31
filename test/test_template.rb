@@ -5,11 +5,7 @@ $LOAD_PATH.unshift(__dir__)
 require 'helper'
 
 describe Dimples::Template do
-  before do
-    test_site.scan_templates
-    test_site.scan_pages
-    test_site.scan_posts
-  end
+  before { test_site.scan_files }
 
   subject do
     file_path = File.join(test_site.source_paths[:templates], 'post.erb')

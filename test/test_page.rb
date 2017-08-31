@@ -5,11 +5,7 @@ $LOAD_PATH.unshift(__dir__)
 require 'helper'
 
 describe Dimples::Page do
-  before do
-    test_site.scan_templates
-    test_site.scan_pages
-    test_site.scan_posts
-  end
+  before { test_site.scan_files }
 
   describe 'with a file path' do
     subject do

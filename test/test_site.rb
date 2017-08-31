@@ -176,11 +176,7 @@ describe Dimples::Site do
         describe "if #{date_type} generation is disabled" do
           before do
             test_site.config['generation']["#{date_type}_archives"] = false
-
-            test_site.scan_templates
-            test_site.scan_pages
-            test_site.scan_posts
-
+            test_site.scan_files
             test_site.generate_archives
           end
 
