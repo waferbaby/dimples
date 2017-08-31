@@ -16,6 +16,10 @@ module Dimples
         end
       end
 
+      scope.class.send(:define_method, :render_template) do |template, context = {}|
+        @site.templates[template].render(context) if @site.templates[template]
+      end
+
       output = rendering_engine.render(scope) { body }.strip
       @rendered_contents = output
 
