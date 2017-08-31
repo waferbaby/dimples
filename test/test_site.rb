@@ -8,7 +8,7 @@ require 'timecop'
 describe Dimples::Site do
   it 'returns the correct value when inspected' do
     test_site.inspect.must_equal(
-      "#<Dimples::Site " \
+      '#<Dimples::Site ' \
       "@source_paths=#{test_site.source_paths} " \
       "@output_paths=#{test_site.output_paths}>"
     )

@@ -158,7 +158,12 @@ describe Dimples::Pagination do
           'page_prefix': '?page='
         }
 
-        Dimples::Pagination::Pager.new('/archives/', test_site.posts, 1, options)
+        Dimples::Pagination::Pager.new(
+          '/archives/',
+          test_site.posts,
+          1,
+          options
+        )
       end
 
       describe 'starting from the first page' do

@@ -257,7 +257,7 @@ module Dimples
     end
 
     def inspect
-      "#<#{self.class.to_s} " \
+      "#<#{self.class} " \
       "@source_paths=#{@source_paths} " \
       "@output_paths=#{@output_paths}>"
     end

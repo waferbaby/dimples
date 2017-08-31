@@ -41,7 +41,7 @@ module Dimples
     end
 
     def inspect
-      "#<#{self.class.to_s} @slug=#{@slug} @output_path=#{output_path}>"
+      "#<#{self.class} @slug=#{@slug} @output_path=#{output_path}>"
     end
   end
 end

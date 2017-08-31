@@ -21,6 +21,8 @@ describe Dimples::Template do
   end
 
   it 'returns the correct value when inspected' do
-    subject.inspect.must_equal "#<Dimples::Template @slug=#{subject.slug} @path=#{subject.path}>"
+    subject.inspect.must_equal(
+      "#<Dimples::Template @slug=#{subject.slug} @path=#{subject.path}>"
+    )
   end
 end

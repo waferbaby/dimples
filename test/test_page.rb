@@ -28,7 +28,9 @@ describe Dimples::Page do
     end
 
     it 'returns the correct value when inspected' do
-      subject.inspect.must_equal "#<Dimples::Page @output_path=#{subject.output_path}>"
+      subject.inspect.must_equal(
+        "#<Dimples::Page @output_path=#{subject.output_path}>"
+      )
     end
 
     describe 'when publishing' do
@@ -36,7 +38,8 @@ describe Dimples::Page do
 
       it 'creates the generated file' do
         File.exist?(subject.output_path).must_equal(true)
-        compare_file_to_fixture(subject.output_path, 'pages/general/about/index')
+        fixture = 'pages/general/about/index'
+        compare_file_to_fixture(subject.output_path, fixture)
       end
     end
   end

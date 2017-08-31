@@ -15,7 +15,7 @@ module Dimples
     end
 
     def inspect
-      "#<#{self.class.to_s} @slug=#{@slug} @name=#{@name}>"
+      "#<#{self.class} @slug=#{@slug} @name=#{@name}>"
     end
   end
 end

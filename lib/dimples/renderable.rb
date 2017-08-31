@@ -10,23 +10,26 @@ module Dimples
       context[:this] ||= self
       context[:type] ||= self.class.name.split('::').last.downcase.to_sym
 
-      scope = Object.new.tap do |s|
-        context.each_pair do |key, value|
-          s.instance_variable_set("@#{key}".to_sym, value)
-        end
-      end
-
-      scope.class.send(:define_method, :render_template) do |template, context = {}|
-        @site.templates[template].render(context) if @site.templates[template]
-      end
-
-      output = rendering_engine.render(scope) { body }.strip
+      output = rendering_engine.render(scope(context)) { body }.strip
       @rendered_contents = output
 
       if @site.templates[layout]
         @site.templates[layout].render(context, output)
       else
         output
+      end
+    end
+
+    def scope(context)
+      Object.new.tap do |scope|
+        context.each_pair do |key, value|
+          scope.instance_variable_set("@#{key}".to_sym, value)
+        end
+
+        method_name = :render_template
+        scope.class.send(:define_method, method_name) do |template, locals = {}|
+          @site.templates[template]&.render(locals)
+        end
       end
     end
 

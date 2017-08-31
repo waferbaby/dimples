@@ -39,14 +39,18 @@ describe Dimples::Post do
   end
 
   it 'returns the correct value when inspected' do
-    subject.inspect.must_equal "#<Dimples::Post @slug=#{subject.slug} @output_path=#{subject.output_path}>"
+    subject.inspect.must_equal(
+      "#<Dimples::Post @slug=#{subject.slug} " \
+      "@output_path=#{subject.output_path}>"
+    )
   end
 
   describe 'when publishing' do
     before { subject.write }
 
     it 'creates the generated file' do
-      compare_file_to_fixture(subject.output_path, 'posts/2015-02-01-another-post')
+      fixture = 'posts/2015-02-01-another-post'
+      compare_file_to_fixture(subject.output_path, fixture)
     end
   end
 end
