@@ -83,8 +83,8 @@ module Dimples
         if parent_path == @source_paths[:templates]
           slug = template.slug
         else
-          relative_path = parent_path.gsub(@source_paths[:templates], '')[1..-1]
-          slug = relative_path.gsub(File::SEPARATOR, '.') + ".#{template.slug}"
+          relative_path = parent_path.sub(@source_paths[:templates], '')[1..-1]
+          slug = relative_path.sub(File::SEPARATOR, '.') + ".#{template.slug}"
         end
 
         @templates[slug] = template
@@ -198,7 +198,7 @@ module Dimples
         next unless @config['generation']["#{date_type}_archives"]
 
         @archives[date_type.to_sym].each do |date, posts|
-          year, month, day = date.split('/')
+          year, month, day = date.split('-')
 
           dates = { year: year }
           dates[:month] = month if month
@@ -274,11 +274,11 @@ module Dimples
     end
 
     def archive_month(year, month)
-      @archives[:month]["#{year}/#{month}"] ||= []
+      @archives[:month]["#{year}-#{month}"] ||= []
     end
 
     def archive_day(year, month, day)
-      @archives[:day]["#{year}/#{month}/#{day}"] ||= []
+      @archives[:day]["#{year}-#{month}-#{day}"] ||= []
     end
   end
 end
