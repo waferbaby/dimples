@@ -21,7 +21,7 @@ module Dimples
 
       if @path
         @filename = File.basename(@path, File.extname(@path))
-        @output_directory = File.dirname(@path).gsub(
+        @output_directory = File.dirname(@path).sub(
           @site.source_paths[:pages],
           @site.output_paths[:site]
         )
