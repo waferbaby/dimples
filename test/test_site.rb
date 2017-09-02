@@ -6,11 +6,13 @@ require 'helper'
 require 'timecop'
 
 describe Dimples::Site do
+  before { @site = Dimples::Site.new(test_configuration) }
+
   it 'returns the correct value when inspected' do
-    test_site.inspect.must_equal(
+    @site.inspect.must_equal(
       '#<Dimples::Site ' \
-      "@source_paths=#{test_site.source_paths} " \
-      "@output_paths=#{test_site.output_paths}>"
+      "@source_paths=#{@site.source_paths} " \
+      "@output_paths=#{@site.output_paths}>"
     )
   end
 
@@ -18,7 +20,7 @@ describe Dimples::Site do
     describe 'with default settings' do
       before do
         Timecop.freeze(Time.local(2017, 1, 1, 0, 0, 0))
-        test_site.generate
+        @site.generate
         Timecop.return
       end
 
@@ -27,222 +29,244 @@ describe Dimples::Site do
           file_type_sym = file_type.to_sym
 
           glob_path = File.join(
-            test_site.source_paths[file_type_sym],
+            @site.source_paths[file_type_sym],
             '**',
             '*.*'
           )
 
           length = Dir.glob(glob_path).length
-
-          test_site.send(file_type_sym).length.must_equal(length)
+          @site.send(file_type_sym).length.must_equal(length)
         end
       end
 
       it 'prepares the archive data' do
-        years = test_site.posts.map(&:year).uniq.sort
-        test_site.archives[:year].keys.sort.must_equal(years)
+        years = @site.posts.map(&:year).uniq.sort
+        @site.archives[:year].keys.sort.must_equal(years)
 
-        months = test_site.posts.map do |post|
-          "#{post.year}/#{post.month}"
+        months = @site.posts.map do |post|
+          "#{post.year}-#{post.month}"
         end.uniq.sort
 
-        test_site.archives[:month].keys.sort.must_equal(months)
+        @site.archives[:month].keys.sort.must_equal(months)
 
-        days = test_site.posts.map do |post|
-          "#{post.year}/#{post.month}/#{post.day}"
+        days = @site.posts.map do |post|
+          "#{post.year}-#{post.month}-#{post.day}"
         end.uniq.sort
 
-        test_site.archives[:day].keys.sort.must_equal(days)
+        @site.archives[:day].keys.sort.must_equal(days)
       end
 
       it 'prepares the output directory' do
-        File.directory?(test_site.output_paths[:site]).must_equal(true)
+        File.directory?(@site.output_paths[:site]).must_equal(true)
       end
 
       it 'creates all the posts' do
-        test_site.posts.each do |post|
-          fixture = "posts/#{post.year}-#{post.month}-#{post.day}-#{post.slug}"
+        @site.posts.each do |post|
+          date = "#{post.year}-#{post.month}-#{post.day}-#{post.slug}"
+          expected_output = fixtures["posts.#{date}"]
 
           File.exist?(post.output_path).must_equal(true)
-          compare_file_to_fixture(post.output_path, fixture)
+          File.read(post.output_path).must_equal(expected_output)
         end
       end
 
       it 'creates all the posts feeds' do
-        site_feed_template_types.each do |feed_type|
-          expected_output = read_fixture("pages/feeds/#{feed_type}_posts")
+        @site.feed_templates.each do |template|
+          feed_type = template.split('.')[1]
 
-          file_path = File.join(
-            test_site.output_paths[:site],
+          path = File.join(
+            @site.output_paths[:site],
             "feed.#{feed_type}"
           )
 
-          File.exist?(file_path).must_equal(true)
-          File.read(file_path).must_equal(expected_output)
+          expected_output = fixtures["pages.feeds.#{feed_type}_posts"]
+
+          File.exist?(path).must_equal(true)
+          File.read(path).must_equal(expected_output)
         end
       end
 
       it 'creates all the main pages' do
-        test_site.pages.each do |page|
-          directory = File.dirname(page.output_path).gsub(
-            test_site.output_paths[:site],
-            ''
-          )
-
+        @site.pages.each do |page|
           filename = File.basename(page.output_path, '.html')
-          fixture = "pages/general#{directory}/#{filename}"
+          directory = File.dirname(page.output_path).sub(
+            @site.output_paths[:site],
+            ''
+          )[1..-1]
+
+          expected_output = fixtures["pages.#{directory}.#{filename}"]
 
           File.exist?(page.output_path).must_equal(true)
-          compare_file_to_fixture(page.output_path, fixture)
+          File.read(page.output_path).must_equal(expected_output)
         end
       end
 
       %w[year month day].each do |date_type|
         it "creates the #{date_type} archives" do
-          archive_file_paths(date_type.to_sym).each do |date, file_path|
-            expected_output = read_fixture("pages/archives/#{date}")
+          @site.archives[date_type.to_sym].each_key do |date|
 
-            File.exist?(file_path).must_equal(true)
-            File.read(file_path).must_equal(expected_output)
+            path = File.join(
+              @site.output_paths[:archives],
+              date.split('-'),
+              'index.html'
+            )
+
+            expected_output = fixtures["pages.archives.#{date}"]
+
+            File.exist?(path).must_equal(true)
+            File.read(path).must_equal(expected_output)
           end
         end
       end
 
       it 'creates all the category pages' do
-        categories_path = test_site.output_paths[:categories]
+        categories_path = @site.output_paths[:categories]
 
-        test_site.categories.keys.each do |slug|
-          expected_output = read_fixture("pages/categories/#{slug}")
-          file_path = File.join(categories_path, slug, 'index.html')
+        @site.categories.keys.each do |slug|
+          path = File.join(categories_path, slug, 'index.html')
+          expected_output = fixtures["pages.categories.#{slug}"]
 
-          File.exist?(file_path).must_equal(true)
-          File.read(file_path).must_equal(expected_output)
+          File.exist?(path).must_equal(true)
+          File.read(path).must_equal(expected_output)
         end
       end
 
       it 'creates all the category feeds' do
-        categories_path = test_site.output_paths[:categories]
+        categories_path = @site.output_paths[:categories]
 
-        test_site.categories.keys.each do |slug|
-          site_feed_template_types.each do |feed_type|
-            fixture = "pages/feeds/#{slug}_#{feed_type}_posts"
-            expected_output = read_fixture(fixture)
-            file_path = File.join(categories_path, slug, "feed.#{feed_type}")
+        @site.categories.keys.each do |slug|
+          @site.feed_templates.each do |template|
+            feed_type = template.split('.')[1]
 
-            File.exist?(file_path).must_equal(true)
-            File.read(file_path).must_equal(expected_output)
+            path = File.join(categories_path, slug, "feed.#{feed_type}")
+            expected_output = fixtures["pages.feeds.#{slug}_#{feed_type}_posts"]
+
+            File.exist?(path).must_equal(true)
+            File.read(path).must_equal(expected_output)
           end
         end
       end
 
       it 'copies all the asset files' do
-        glob_path = File.join(test_site.source_paths[:public], '**', '*')
+        glob_path = File.join(@site.source_paths[:public], '**', '*')
 
         Dir.glob(glob_path).each do |asset_path|
-          file_path = asset_path.gsub(
-            test_site.source_paths[:public],
-            test_site.output_paths[:site]
+          path = asset_path.sub(
+            @site.source_paths[:public],
+            @site.output_paths[:site]
           )
 
-          File.exist?(file_path).must_equal(true)
+          File.exist?(path).must_equal(true)
         end
       end
 
-      after { clean_generated_site }
+      after { clean_generated_site(@site) }
     end
 
     describe 'with custom settings' do
       describe 'if the main feeds are disabled' do
         before do
-          test_site.config['generation']['feeds'] = false
-          test_site.generate
+          @site.config['generation']['feeds'] = false
+          @site.generate
         end
 
         it 'creates none of the feeds' do
-          site_feed_template_types.each do |feed_type|
-            file_path = File.join(
-              test_site.output_paths[:site],
-              "feed.#{feed_type}"
+          @site.feed_templates.each do |template|
+            path = File.join(
+              @site.output_paths[:site],
+              "feed.#{template.split('.')[1]}"
             )
 
-            File.exist?(file_path).must_equal(false)
+            File.exist?(path).must_equal(false)
           end
         end
 
-        after { clean_generated_site }
+        after { clean_generated_site(@site) }
       end
 
       %w[year month day].each do |date_type|
         describe "if #{date_type} generation is disabled" do
           before do
-            test_site.config['generation']["#{date_type}_archives"] = false
-            test_site.scan_files
-            test_site.generate_archives
+            @site.config['generation']["#{date_type}_archives"] = false
+            @site.scan_files
+            @site.generate_archives
           end
 
           it 'creates no archive files' do
-            archive_file_paths(date_type.to_sym).each do |_, path|
+            @site.archives[date_type.to_sym].each_key do |date|
+              path = File.join(
+                @site.output_paths[:archives],
+                date.split('-'),
+                'index.html'
+              )
+
               File.exist?(path).must_equal(false)
             end
           end
 
-          after { clean_generated_site }
+          after { clean_generated_site(@site) }
         end
       end
 
       describe 'if category generation is disabled' do
         before do
-          test_site.config['generation']['categories'] = false
-          test_site.generate
+          @site.config['generation']['categories'] = false
+          @site.generate
         end
 
         it 'creates none of the category files' do
-          test_site.categories.keys.each do |slug|
-            categories_path = test_site.output_paths[:categories]
-            file_path = File.join(categories_path, slug, 'index.html')
+          @site.categories.keys.each do |slug|
+            categories_path = @site.output_paths[:categories]
+            path = File.join(categories_path, slug, 'index.html')
 
-            File.exist?(file_path).must_equal(false)
+            File.exist?(path).must_equal(false)
           end
         end
 
-        after { clean_generated_site }
+        after { clean_generated_site(@site) }
       end
 
       describe 'if category feed generation is disabled' do
         before do
-          test_site.config['generation']['category_feeds'] = false
-          test_site.generate
+          @site.config['generation']['category_feeds'] = false
+          @site.generate
         end
 
         it 'creates no category feeds' do
-          test_site.categories.keys.each do |slug|
-            categories_path = test_site.output_paths[:categories]
+          @site.categories.keys.each do |slug|
+            categories_path = @site.output_paths[:categories]
 
-            site_feed_template_types.each do |feed_type|
-              file_path = File.join(categories_path, slug, "feed.#{feed_type}")
-              File.exist?(file_path).must_equal(false)
+            @site.feed_templates.each do |template|
+              path = File.join(
+                categories_path,
+                slug,
+                "feed.#{template.split('.')[1]}"
+              )
+
+              File.exist?(path).must_equal(false)
             end
           end
         end
 
-        after { clean_generated_site }
+        after { clean_generated_site(@site) }
       end
 
       describe 'with custom category names' do
         before do
-          test_site.config['category_names']['green'] = 'G R E E N'
-          test_site.generate
+          @site.config['category_names']['green'] = 'G R E E N'
+          @site.generate
         end
 
         it 'uses the name correctly' do
-          expected_output = read_fixture('pages/categories/custom_green')
-          categories_path = test_site.output_paths[:categories]
-          file_path = File.join(categories_path, 'green', 'index.html')
+          categories_path = @site.output_paths[:categories]
+          path = File.join(categories_path, 'green', 'index.html')
+          expected_output = fixtures['pages.categories.custom_green']
 
-          File.read(file_path).must_equal(expected_output)
+          File.exist?(path).must_equal(true)
+          File.read(path).must_equal(expected_output)
         end
 
-        after { clean_generated_site }
+        after { clean_generated_site(@site) }
       end
     end
   end

@@ -6,30 +6,35 @@ require 'helper'
 
 describe Dimples::Pagination do
   before do
-    test_site.config['pagination']['per_page'] = 2
-    test_site.scan_files
+    @site = Dimples::Site.new(test_configuration)
+    @site.config['pagination']['per_page'] = 2
+    @site.scan_files
+
+    @paginated_path = File.join(@site.output_paths[:site], 'archives')
   end
 
   include Dimples::Pagination
 
-  let(:paginated_path) { File.join(test_site.output_paths[:site], 'archives') }
-
   describe 'when paginating' do
     describe 'without options' do
       before do
-        paginate(test_site, test_site.posts, paginated_path, 'paginated')
+        paginate(@site, @site.posts, @paginated_path, 'paginated')
       end
 
       it 'creates the main index file' do
-        file_path = File.join(paginated_path, 'index.html')
-        File.exist?(file_path).must_equal(true)
-        compare_file_to_fixture(file_path, 'pages/pagination/index')
+        path = File.join(@paginated_path, 'index.html')
+        expected_output = fixtures['pages.pagination.index']
+
+        File.exist?(path).must_equal(true)
+        File.read(path).must_equal(expected_output)
       end
 
       it 'creates paged directories with index files' do
-        file_path = File.join(paginated_path, 'page2', 'index.html')
-        File.exist?(file_path).must_equal(true)
-        compare_file_to_fixture(file_path, 'pages/pagination/page_2')
+        path = File.join(@paginated_path, 'page2', 'index.html')
+        expected_output = fixtures['pages.pagination.page_2']
+
+        File.exist?(path).must_equal(true)
+        File.read(path).must_equal(expected_output)
       end
     end
 
@@ -42,26 +47,29 @@ describe Dimples::Pagination do
         }
 
         paginate(
-          test_site,
-          test_site.posts,
-          paginated_path,
+          @site,
+          @site.posts,
+          @paginated_path,
           'paginated',
           options
         )
       end
 
       it 'creates the main custom index file' do
-        file_path = File.join(paginated_path, 'index.htm')
-        File.exist?(file_path).must_equal(true)
-        compare_file_to_fixture(file_path, 'pages/pagination/custom_index')
+        path = File.join(@paginated_path, 'index.htm')
+        expected_output = fixtures['pages.pagination.custom_index']
+
+        File.exist?(path).must_equal(true)
+        File.read(path).must_equal(expected_output)
       end
 
       it 'creates paged directories with index files' do
         (2..3).each do |index|
-          file_path = File.join(paginated_path, "page#{index}", 'index.htm')
-          File.exist?(file_path).must_equal(true)
-          fixture = "pages/pagination/custom_page_#{index}"
-          compare_file_to_fixture(file_path, fixture)
+          path = File.join(@paginated_path, "page#{index}", 'index.htm')
+          expected_output = fixtures["pages.pagination.custom_page_#{index}"]
+
+          File.exist?(path).must_equal(true)
+          File.read(path).must_equal(expected_output)
         end
       end
     end
@@ -69,136 +77,132 @@ describe Dimples::Pagination do
 
   describe 'Pager' do
     describe 'with the default options' do
-      subject do
-        Dimples::Pagination::Pager.new('/archives/', test_site.posts, 1)
+      before do
+        @pager = Dimples::Pagination::Pager.new('/archives/', @site.posts, 1)
       end
 
       describe 'starting from the first page' do
         it 'is on the correct page' do
-          subject.current_page.must_equal(1)
+          @pager.current_page.must_equal(1)
         end
 
         it 'has no previous page' do
-          subject.previous_page.must_be_nil
+          @pager.previous_page.must_be_nil
         end
 
         it 'has no previous page url' do
-          subject.previous_page_url.must_be_nil
+          @pager.previous_page_url.must_be_nil
         end
 
         it 'has the correct next page' do
-          subject.next_page.must_equal(2)
+          @pager.next_page.must_equal(2)
         end
 
         it 'has the correct next page url' do
-          subject.next_page_url.must_equal('/archives/page2')
+          @pager.next_page_url.must_equal('/archives/page2')
         end
       end
 
       describe 'stepping forwards one page' do
         before do
-          subject.step_to(2)
+          @pager.step_to(2)
         end
 
         it 'is on the correct page' do
-          subject.current_page.must_equal(2)
+          @pager.current_page.must_equal(2)
         end
 
         it 'has the correct previous page' do
-          subject.previous_page.must_equal(1)
+          @pager.previous_page.must_equal(1)
         end
 
         it 'has the correct previous page url' do
-          subject.previous_page_url.must_equal('/archives/')
+          @pager.previous_page_url.must_equal('/archives/')
         end
 
         it 'has the correct next page' do
-          subject.next_page.must_equal(3)
+          @pager.next_page.must_equal(3)
         end
 
         it 'has the correct next page url' do
-          subject.next_page_url.must_equal('/archives/page3')
+          @pager.next_page_url.must_equal('/archives/page3')
         end
       end
 
       describe 'stepping to the last page' do
         before do
-          subject.step_to(subject.page_count)
+          @pager.step_to(@pager.page_count)
         end
 
         it 'is on the correct page' do
-          subject.current_page.must_equal(subject.page_count)
+          @pager.current_page.must_equal(@pager.page_count)
         end
 
         it 'has the correct previous page' do
-          subject.previous_page.must_equal(subject.page_count - 1)
+          @pager.previous_page.must_equal(@pager.page_count - 1)
         end
 
         it 'has the correct previous page url' do
-          url = "/archives/page#{subject.page_count - 1}"
-          subject.previous_page_url.must_equal(url)
+          url = "/archives/page#{@pager.page_count - 1}"
+          @pager.previous_page_url.must_equal(url)
         end
 
         it 'has no next page' do
-          subject.next_page.must_be_nil
+          @pager.next_page.must_be_nil
         end
 
         it 'has no next page url' do
-          subject.next_page_url.must_be_nil
+          @pager.next_page_url.must_be_nil
         end
       end
     end
 
     describe 'with custom options' do
-      subject do
-        options = {
-          'page_prefix': '?page='
-        }
-
-        Dimples::Pagination::Pager.new(
+      before do
+        @pager = Dimples::Pagination::Pager.new(
           '/archives/',
-          test_site.posts,
+          @site.posts,
           1,
-          options
+          { 'page_prefix': '?page=' }
         )
       end
 
       describe 'starting from the first page' do
         it 'has no previous page url' do
-          subject.previous_page_url.must_be_nil
+          @pager.previous_page_url.must_be_nil
         end
 
         it 'has the correct next page url' do
-          subject.next_page_url.must_equal('/archives/?page=2')
+          @pager.next_page_url.must_equal('/archives/?page=2')
         end
       end
 
       describe 'stepping forwards one page' do
         before do
-          subject.step_to(2)
+          @pager.step_to(2)
         end
 
         it 'has the correct previous page url' do
-          subject.previous_page_url.must_equal('/archives/')
+          @pager.previous_page_url.must_equal('/archives/')
         end
 
         it 'has the correct next page url' do
-          subject.next_page_url.must_equal('/archives/?page=3')
+          @pager.next_page_url.must_equal('/archives/?page=3')
         end
       end
 
       describe 'stepping to the last page' do
         before do
-          subject.step_to(subject.page_count)
+          @pager.step_to(@pager.page_count)
         end
 
         it 'has the correct previous page url' do
-          url = "/archives/?page=#{subject.page_count - 1}"
-          subject.previous_page_url.must_equal(url)
+          url = "/archives/?page=#{@pager.page_count - 1}"
+          @pager.previous_page_url.must_equal(url)
         end
 
         it 'has no next page url' do
-          subject.next_page_url.must_be_nil
+          @pager.next_page_url.must_be_nil
         end
       end
     end
