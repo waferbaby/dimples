@@ -15,7 +15,7 @@ describe Dimples::Renderable do
       before do
         @page = Dimples::Page.new(
           @site,
-          File.join(@site.source_paths[:pages], 'about', 'contact.markdown')
+          File.join(@site.source_paths[:pages], 'about', 'index.markdown')
         )
       end
 
@@ -24,7 +24,7 @@ describe Dimples::Renderable do
       end
 
       it 'renders the expected output' do
-        expected_output = fixtures['pages.about.contact']
+        expected_output = fixtures['pages.about.index']
         @page.render.must_equal(expected_output)
       end
 
@@ -36,7 +36,7 @@ describe Dimples::Renderable do
         end
 
         it 'passes them on to the Tilt engine' do
-          expected_output = fixtures['pages.about.contact_encoded']
+          expected_output = fixtures['pages.about.escaped_index']
           @page.render.must_equal(expected_output)
         end
       end
