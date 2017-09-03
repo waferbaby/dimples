@@ -163,7 +163,7 @@ describe Dimples::Pagination do
           '/archives/',
           @site.posts,
           1,
-          { 'page_prefix': '?page=' }
+          'page_prefix': '?page='
         )
       end
 

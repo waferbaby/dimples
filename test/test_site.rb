@@ -104,7 +104,6 @@ describe Dimples::Site do
       %w[year month day].each do |date_type|
         it "creates the #{date_type} archives" do
           @site.archives[date_type.to_sym].each_key do |date|
-
             path = File.join(
               @site.output_paths[:archives],
               date.split('-'),
