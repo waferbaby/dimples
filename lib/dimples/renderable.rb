@@ -38,8 +38,8 @@ module Dimples
         callback = proc { contents }
 
         if @path
-          ext = File.extname(@path)[1..-1]
-          options = @site.config['rendering'][ext] || {}
+          extension = File.extname(@path)[1..-1]
+          options = @site.config['rendering'][extension] || {}
           Tilt.new(@path, options, &callback)
         else
           Tilt::StringTemplate.new(&callback)
