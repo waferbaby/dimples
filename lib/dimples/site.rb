@@ -17,8 +17,8 @@ module Dimples
     attr_accessor :post_class
     attr_accessor :errors
 
-    def initialize(config)
-      @config = config
+    def initialize(config = {})
+      @config = Dimples::Configuration.new(config)
 
       @templates = {}
       @categories = {}
@@ -29,18 +29,24 @@ module Dimples
       @archives = { year: {}, month: {}, day: {} }
       @latest_post = false
 
-      @post_class = @config.class_override(:post) || Dimples::Post
+      @post_class = if @config[:class_overrides][:post]
+                      Object.const_get(config[:class_overrides][:post])
+                    else
+                      Dimples::Post
+                    end
 
-      @source_paths = { root: File.expand_path(@config['source_path']) }
-      @output_paths = { site: File.expand_path(@config['destination_path']) }
+      @source_paths = { root: File.expand_path(@config[:source_path]) }
+      @output_paths = { site: File.expand_path(@config[:destination_path]) }
 
       %w[pages posts public templates].each do |path|
         @source_paths[path.to_sym] = File.join(@source_paths[:root], path)
       end
 
       %w[archives posts categories].each do |path|
-        output_path = File.join(@output_paths[:site], @config['paths'][path])
-        @output_paths[path.to_sym] = output_path
+        path_sym = path.to_sym
+        @output_paths[path_sym] = File.join(
+          @output_paths[:site], @config[:paths][path_sym]
+        )
       end
     end
 
@@ -53,7 +59,7 @@ module Dimples
       unless @posts.count.zero?
         generate_posts
         generate_archives
-        generate_categories if @config['generation']['categories']
+        generate_categories if @config[:generation][:categories]
       end
 
       copy_assets
@@ -68,7 +74,7 @@ module Dimples
     end
 
     def scan_files
-      Dimples.logger.debug('Scanning files...') if @config['verbose_logging']
+      Dimples.logger.debug('Scanning files...') if @config[:verbose_logging]
 
       scan_templates
       scan_pages
@@ -144,7 +150,7 @@ module Dimples
     end
 
     def generate_posts
-      if @config['verbose_logging']
+      if @config[:verbose_logging]
         Dimples.logger.debug_generation('posts', @posts.length)
       end
 
@@ -154,14 +160,14 @@ module Dimples
         self,
         @posts,
         @output_paths[:archives],
-        @config['layouts']['posts']
+        @config[:layouts][:posts]
       )
 
-      generate_posts_feeds if @config['generation']['feeds']
+      generate_posts_feeds if @config[:generation][:feeds]
     end
 
     def generate_pages
-      if @config['verbose_logging']
+      if @config[:verbose_logging]
         Dimples.logger.debug_generation('pages', @pages.length)
       end
 
@@ -169,7 +175,7 @@ module Dimples
     end
 
     def generate_categories
-      if @config['verbose_logging']
+      if @config[:verbose_logging]
         Dimples.logger.debug_generation('category pages', @categories.length)
       end
 
@@ -185,17 +191,18 @@ module Dimples
           self,
           category.posts,
           path,
-          @config['layouts']['category'],
+          @config[:layouts][:category],
           options
         )
       end
 
-      generate_category_feeds if @config['generation']['category_feeds']
+      generate_category_feeds if @config[:generation][:category_feeds]
     end
 
     def generate_archives
       %w[year month day].each do |date_type|
-        next unless @config['generation']["#{date_type}_archives"]
+        date_archives_sym = "#{date_type}_archives".to_sym
+        next unless @config[:generation][date_archives_sym]
 
         @archives[date_type.to_sym].each do |date, posts|
           year, month, day = date.split('-')
@@ -205,11 +212,11 @@ module Dimples
           dates[:day] = day if day
 
           path = File.join(@output_paths[:archives], dates.values)
-          layout = @config['layouts']["#{date_type}_archives"]
+          layout = @config[:layouts][date_archives_sym]
 
           options = {
             context: dates,
-            title: posts[0].date.strftime(@config['date_formats'][date_type])
+            title: posts[0].date.strftime(@config[:date_formats][date_type.to_sym])
           }
 
           paginate(self, posts, path, layout, options)
@@ -233,14 +240,14 @@ module Dimples
     end
 
     def generate_posts_feeds
-      posts = @posts[0..@config['pagination']['per_page'] - 1]
+      posts = @posts[0..@config[:pagination][:per_page] - 1]
       generate_feeds(@output_paths[:site], posts: posts)
     end
 
     def generate_category_feeds
       @categories.each_value do |category|
         path = File.join(@output_paths[:categories], category.slug)
-        posts = category.posts[0..@config['pagination']['per_page'] - 1]
+        posts = category.posts[0..@config[:pagination][:per_page] - 1]
 
         generate_feeds(path, posts: posts, category: category.slug)
       end
@@ -252,7 +259,7 @@ module Dimples
 
     def copy_assets
       if Dir.exist?(@source_paths[:public])
-        Dimples.logger.debug('Copying assets...') if @config['verbose_logging']
+        Dimples.logger.debug('Copying assets...') if @config[:verbose_logging]
 
         path = File.join(@source_paths[:public], '.')
         FileUtils.cp_r(path, @output_paths[:site])
