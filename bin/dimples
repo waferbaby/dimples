@@ -43,8 +43,7 @@ config_path = options[:config] || File.join(Dir.pwd, 'config.json')
 if File.exist?(config_path)
   begin
     config = JSON.parse(File.read(config_path), symbolize_names: true)
-  rescue => e
-    puts e.inspect
+  rescue
     Trollop.die "Invalid or malformed config file (#{config_path})"
   end
 else
@@ -60,10 +59,10 @@ if Dir.exist?(lib_path)
 end
 
 site_klass = if config[:class_overrides][:site]
-              Object.const_get(config[:class_overrides][:site])
-            else
-              Dimples::Site
-            end
+               Object.const_get(config[:class_overrides][:site])
+             else
+               Dimples::Site
+             end
 
 site = site_klass.new(config)
 
