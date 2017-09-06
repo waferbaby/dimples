@@ -14,7 +14,6 @@ module Dimples
     attr_accessor :pages
     attr_accessor :posts
     attr_accessor :latest_post
-    attr_accessor :post_class
     attr_accessor :errors
 
     def initialize(config = {})
@@ -29,12 +28,6 @@ module Dimples
       @archives = { year: {}, month: {}, day: {} }
       @latest_post = false
 
-      @post_class = if @config[:class_overrides][:post]
-                      Object.const_get(config[:class_overrides][:post])
-                    else
-                      Dimples::Post
-                    end
-
       @source_paths = { root: File.expand_path(@config[:source_path]) }
       @output_paths = { site: File.expand_path(@config[:destination_path]) }
 
@@ -43,9 +36,8 @@ module Dimples
       end
 
       %w[archives posts categories].each do |path|
-        path_sym = path.to_sym
-        @output_paths[path_sym] = File.join(
-          @output_paths[:site], @config[:paths][path_sym]
+        @output_paths[path.to_sym] = File.join(
+          @output_paths[:site], @config[:paths][path.to_sym]
         )
       end
     end
@@ -126,7 +118,7 @@ module Dimples
     end
 
     def scan_post(path)
-      @post_class.new(self, path).tap do |post|
+      post_class.new(self, path).tap do |post|
         post.categories&.each do |slug|
           @categories[slug] ||= Dimples::Category.new(self, slug)
           @categories[slug].posts << post
@@ -212,11 +204,13 @@ module Dimples
           dates[:day] = day if day
 
           path = File.join(@output_paths[:archives], dates.values)
+
           layout = @config[:layouts][date_archives_sym]
+          date_format = @config[:date_formats][date_type.to_sym]
 
           options = {
             context: dates,
-            title: posts[0].date.strftime(@config[:date_formats][date_type.to_sym])
+            title: posts[0].date.strftime(date_format)
           }
 
           paginate(self, posts, path, layout, options)
@@ -275,6 +269,14 @@ module Dimples
     end
 
     private
+
+    def post_class
+      @post_class ||= if @config[:class_overrides][:post]
+                        Object.const_get(config[:class_overrides][:post])
+                      else
+                        Dimples::Post
+                      end
+    end
 
     def archive_year(year)
       @archives[:year][year] ||= []
