@@ -50,7 +50,7 @@ else
   Trollop.die "Unable to find config file (#{config_path})"
 end
 
-config[:verbose_logging] = options[:verbose] || false
+config[:verbose_logging] = options[:verbose] if options[:verbose]
 
 if Dir.exist?(lib_path)
   Dir.glob(File.join(lib_path, '**', '*.rb')) do |path|
@@ -58,8 +58,10 @@ if Dir.exist?(lib_path)
   end
 end
 
-site_klass = if config[:class_overrides][:site]
-               Object.const_get(config[:class_overrides][:site])
+site_klass_name = config.dig(:class_overrides, :site)
+
+site_klass = if site_klass_name
+               Object.const_get(site_klass_name)
              else
                Dimples::Site
              end
