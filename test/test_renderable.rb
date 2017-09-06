@@ -30,7 +30,7 @@ describe Dimples::Renderable do
 
       describe 'with custom rendering options set' do
         before do
-          @site.config['rendering']['markdown'] = {
+          @site.config[:rendering][:markdown] = {
             escape_html: true
           }
         end

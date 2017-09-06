@@ -165,7 +165,7 @@ describe Dimples::Site do
     describe 'with custom settings' do
       describe 'if the main feeds are disabled' do
         before do
-          @site.config['generation']['feeds'] = false
+          @site.config[:generation][:feeds] = false
           @site.generate
         end
 
@@ -186,7 +186,7 @@ describe Dimples::Site do
       %w[year month day].each do |date_type|
         describe "if #{date_type} generation is disabled" do
           before do
-            @site.config['generation']["#{date_type}_archives"] = false
+            @site.config[:generation]["#{date_type}_archives".to_sym] = false
             @site.scan_files
             @site.generate_archives
           end
@@ -209,7 +209,7 @@ describe Dimples::Site do
 
       describe 'if category generation is disabled' do
         before do
-          @site.config['generation']['categories'] = false
+          @site.config[:generation][:categories] = false
           @site.generate
         end
 
@@ -227,7 +227,7 @@ describe Dimples::Site do
 
       describe 'if category feed generation is disabled' do
         before do
-          @site.config['generation']['category_feeds'] = false
+          @site.config[:generation][:category_feeds] = false
           @site.generate
         end
 
@@ -252,7 +252,7 @@ describe Dimples::Site do
 
       describe 'with custom category names' do
         before do
-          @site.config['category_names']['green'] = 'G R E E N'
+          @site.config[:category_names][:green] = 'G R E E N'
           @site.generate
         end
 

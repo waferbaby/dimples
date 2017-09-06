@@ -7,7 +7,7 @@ require 'helper'
 describe Dimples::Pagination do
   before do
     @site = Dimples::Site.new(test_configuration)
-    @site.config['pagination']['per_page'] = 2
+    @site.config[:pagination][:per_page] = 2
     @site.scan_files
 
     @paginated_path = File.join(@site.output_paths[:site], 'archives')
