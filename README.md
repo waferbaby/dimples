@@ -24,8 +24,7 @@ Dimples includes a very simple command-line tool, imaginatively named `dimples`,
 
 It assumes your directory structure will possibly look something like this:
 
-- `config/`
-  - `site.yml`
+- `config.json` (required: your config file)
 - `lib/` (optional code to extend Dimples)
 - `pages/` (a bunch of awesome pages)
 - `posts/` (a bunch of clever, articulate posts)
@@ -86,11 +85,11 @@ categories:
 I did it, mum.
 ```
 
-Anything you throw into the front matter becomes available to the `@this` item when the site is rendered (so for the above example you'd have access to `@this.title`, `@this.layout` and `@this.categories`.)
+With the above example, you'd have access to `@this.title`, `@this.layout` and `@this.categories` in your file.
 
 Posts are also given `@this.date` and `@this.slug`, which matches what you used for their filenames.
 
-You can override the file extension your page or post will use by supplying an `extension` element:
+You can override the file extension your page or post will end up with by supplying an `extension` element:
 
 ```yaml
 ---
@@ -112,41 +111,48 @@ A template represents the actual file on disk, whereas a layout signals which on
 
 ## Configuration
 
-As a fussy and opinionated gem, Dimples has a lot of feelings about how it should generate a site, but that doesn't mean you don't get to have a say in it. Here's what the default config looks like, in YAML:
+As a fussy and opinionated gem, Dimples has a lot of feelings about how it should generate a site, but that doesn't mean you don't get to have a say in it. Here's what the default config looks like, in JSON:
 
-```yaml
-source_path: (current directory)
-destination_path: (current directory plus "site")
-verbose_logging: false
-class_overrides:
-  :site:
-  :post:
-rendering: {}
-category_names: {}
-paths:
-  archives: archives
-  posts: archives/%Y/%m/%d
-  categories: archives/categories
-layouts:
-  posts: posts
-  post: post
-  category: category
-  year_archives: year_archives
-  month_archives: month_archives
-  day_archives: day_archives
-pagination:
-  per_page: 10
-generation:
-  categories: true
-  year_archives: true
-  month_archives: true
-  day_archives: true
-  feeds: true
-  category_feeds: true
-date_formats:
-  year: "%Y"
-  month: "%Y-%m"
-  day: "%Y-%m-%d"
+```json {
+  "source_path": "(current directory)",
+  "destination_path": "(current directory plus 'site')",
+  "verbose_logging": false,
+  "class_overrides": {
+    "site": "",
+    "post": ""
+  },
+  "rendering": {},
+  "category_names": {},
+  "paths": {
+    "archives": "archives",
+    "posts": "archives/%Y/%m/%d",
+    "categories": "archives/categories"
+  },
+  "layouts": {
+    "posts": "posts",
+    "post": "post",
+    "category": "category",
+    "year_archives": "year_archives",
+    "month_archives": "month_archives",
+    "day_archives": "day_archives"
+  },
+  "pagination": {
+    "per_page": 10
+  },
+  "generation": {
+    "categories": true,
+    "year_archives": true,
+    "month_archives": true,
+    "day_archives": true,
+    "feeds": true,
+    "category_feeds": true
+  },
+  "date_formats": {
+    "year": "%Y",
+    "month": "%Y-%m",
+    "day": "%Y-%m-%d"
+  }
+}
 ```
 
 And here's what it all means:
