@@ -5,6 +5,7 @@ $LOAD_PATH.unshift(File.join(__dir__, '..', 'lib'))
 
 require 'dimples'
 require 'dimples/version'
+require 'json'
 require 'trollop'
 
 trap('SIGINT') do
@@ -37,30 +38,33 @@ unless valid_commands.include?(command)
 end
 
 lib_path = File.join(Dir.pwd, options[:lib])
-config_path = File.join(Dir.pwd, options[:config] || 'config', 'site.yml')
-
-config_hash = {}
+config_path = options[:config] || File.join(Dir.pwd, 'config.json')
 
 if File.exist?(config_path)
   begin
-    config_hash = YAML.load_file(config_path) || {}
-  rescue
-    Trollop.die 'Invalid or malformed YAML config file'
+    config = JSON.parse(File.read(config_path), symbolize_names: true)
+  rescue => e
+    puts e.inspect
+    Trollop.die "Invalid or malformed config file (#{config_path})"
   end
-elsif options[:config]
-  Trollop.die 'Unable to find config file'
+else
+  Trollop.die "Unable to find config file (#{config_path})"
 end
 
-config_hash['verbose_logging'] = true if options[:verbose]
-config = Dimples::Configuration.new(config_hash)
+config[:verbose_logging] = options[:verbose] || false
 
 if Dir.exist?(lib_path)
-  Dir.glob(File.join(lib_path, '**', '*')) do |path|
+  Dir.glob(File.join(lib_path, '**', '*.rb')) do |path|
     require path
   end
 end
 
-site_klass = config.class_override(:site) || Dimples::Site
+site_klass = if config[:class_overrides][:site]
+              Object.const_get(config[:class_overrides][:site])
+            else
+              Dimples::Site
+            end
+
 site = site_klass.new(config)
 
 case command.to_sym
