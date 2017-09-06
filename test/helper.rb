@@ -10,12 +10,12 @@ require 'tilt/erubis'
 require 'little-fixtures'
 
 def test_configuration
-  Dimples::Configuration.new(
-    'source_path' => File.join(__dir__, 'source'),
-    'destination_path' => File.join(
+  {
+    source_path: File.join(__dir__, 'source'),
+    destination_path: File.join(
       File::SEPARATOR, 'tmp', "dimples-#{Time.new.to_i}"
     )
-  )
+  }
 end
 
 def fixtures
