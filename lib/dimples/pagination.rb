@@ -7,7 +7,7 @@ module Dimples
       context = options.delete(:context) || {}
       url = path.sub(site.output_paths[:site], '') + '/'
       per_page = options.delete(:per_page) ||
-                 site.config['pagination']['per_page']
+                 site.config[:pagination][:per_page]
 
       pager = Pager.new(url, items, per_page, options)
 

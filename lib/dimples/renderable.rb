@@ -39,7 +39,7 @@ module Dimples
 
         if @path
           extension = File.extname(@path)[1..-1]
-          options = @site.config['rendering'][extension] || {}
+          options = @site.config[:rendering][extension.to_sym] || {}
           Tilt.new(@path, options, &callback)
         else
           Tilt::StringTemplate.new(&callback)

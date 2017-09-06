@@ -22,7 +22,7 @@ module Dimples
 
       @filename = 'index'
       @slug = parts[4]
-      @layout = @site.config['layouts']['post']
+      @layout = @site.config[:layouts][:post]
 
       self.date = Time.mktime(parts[1], parts[2], parts[3])
 

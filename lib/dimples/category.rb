@@ -10,7 +10,7 @@ module Dimples
     def initialize(site, slug)
       @site = site
       @slug = slug
-      @name = @site.config['category_names'][slug] || slug.capitalize
+      @name = @site.config[:category_names][slug.to_sym] || slug.capitalize
       @posts = []
     end
 
