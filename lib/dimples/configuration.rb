@@ -4,7 +4,16 @@ module Dimples
   # A class that models a site's configuration.
   class Configuration
     def initialize(config = {})
-      @settings = Configuration.default_settings.merge(config)
+      @settings = Dimples::Configuration.default_settings
+
+      config.each_key do |key|
+        case @settings[key]
+        when Hash
+          @settings[key].merge!(config[key])
+        else
+          @settings[key] = config[key]
+        end
+      end
     end
 
     def [](key)
