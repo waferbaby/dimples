@@ -42,7 +42,10 @@ config_path = options[:config] || File.join(Dir.pwd, 'config.json')
 
 if File.exist?(config_path)
   begin
-    config = JSON.parse(File.read(config_path), symbolize_names: true)
+    file_contents = File.read(config_path)
+    Trollop.die "Config file is empty (#{config_path})" if file_contents.empty?
+
+    config = JSON.parse(file_contents, symbolize_names: true)
   rescue
     Trollop.die "Invalid or malformed config file (#{config_path})"
   end
