@@ -100,7 +100,9 @@ module Dimples
     end
 
     def scan_posts
-      Dir.glob(File.join(@source_paths[:posts], '*.*')).reverse_each do |path|
+      paths = Dir.glob(File.join(@source_paths[:posts], '*.*')).sort
+
+      paths.reverse_each do |path|
         @posts << scan_post(path)
       end
 
