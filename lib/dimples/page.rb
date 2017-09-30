@@ -35,7 +35,19 @@ module Dimples
     end
 
     def output_path
-      File.join(@output_directory, "#{@filename}.#{@extension}")
+      File.join(@output_directory, output_filename)
+    end
+
+    def output_filename
+      "#{@filename}.#{@extension}"
+    end
+
+    def url
+      @output_directory.sub(@site.output_paths[:site], '').tap do |url|
+        url[0] = '/' unless url[0] == '/'
+        url.concat('/') unless url[-1] == '/'
+        url.concat(output_filename) if filename != 'index'
+      end
     end
 
     def write(context = {})
