@@ -43,7 +43,9 @@ module Dimples
     end
 
     def url
-      @output_directory.sub(@site.output_paths[:site], '').tap do |url|
+      absolute_output_directory = File.absolute_path(@output_directory)
+
+      absolute_output_directory.sub(@site.output_paths[:site], '').tap do |url|
         url[0] = '/' unless url[0] == '/'
         url.concat('/') unless url[-1] == '/'
         url.concat(output_filename) if filename != 'index'
