@@ -16,6 +16,10 @@ describe Dimples::Post do
     @post.categories.sort.must_equal(['green'])
   end
 
+  it 'has the correct url' do
+    @post.url.must_equal('/archives/2015/02/01/another-post/')
+  end
+
   it 'finds its next post' do
     @post.next_post.slug.must_equal('yet-another-post')
   end

@@ -29,6 +29,10 @@ describe Dimples::Page do
       )
     end
 
+    it 'has the correct url' do
+      @page.url.must_equal('/about/')
+    end
+
     describe 'when publishing' do
       before { @page.write }
 
@@ -44,6 +48,10 @@ describe Dimples::Page do
   describe 'without a file path' do
     before do
       @page = Dimples::Page.new(@site)
+    end
+
+    it 'has the correct url' do
+      @page.url.must_equal('/')
     end
 
     it 'has no YAML front matter' do
