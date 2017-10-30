@@ -14,7 +14,10 @@ def test_configuration
     source_path: File.join(__dir__, 'source'),
     destination_path: File.join(
       File::SEPARATOR, 'tmp', "dimples-#{Time.new.to_i}"
-    )
+    ),
+    category_names: {
+      'mac': 'Macintosh'
+    }
   }
 end
 
