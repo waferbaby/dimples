@@ -10,29 +10,29 @@ describe Dimples::Category do
   end
 
   describe 'with a custom name in the configuration' do
-    before { @category = Dimples::Category.new(@site, 'windows') }
-
-    it 'sets the correct name' do
-      @category.name.must_equal('Windows')
-    end
-
-    it 'returns the correct value when inspected' do
-      @category.inspect.must_equal(
-        '#<Dimples::Category @slug=windows @name=Windows>'
-      )
-    end
-  end
-
-  describe 'without a custom name in the configuration' do
     before { @category = Dimples::Category.new(@site, 'mac') }
 
-    it 'sets the correct name' do
+    it 'uses the custom name' do
       @category.name.must_equal('Macintosh')
     end
 
     it 'returns the correct value when inspected' do
       @category.inspect.must_equal(
         '#<Dimples::Category @slug=mac @name=Macintosh>'
+      )
+    end
+  end
+
+  describe 'without a custom name in the configuration' do
+    before { @category = Dimples::Category.new(@site, 'windows') }
+
+    it 'capitalises the name' do
+      @category.name.must_equal('Windows')
+    end
+
+    it 'returns the correct value when inspected' do
+      @category.inspect.must_equal(
+        '#<Dimples::Category @slug=windows @name=Windows>'
       )
     end
   end
