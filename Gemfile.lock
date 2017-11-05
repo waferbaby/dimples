@@ -2,7 +2,6 @@ PATH
   remote: .
   specs:
     dimples (4.0.4)
-      ruby-progressbar (~> 1.9.0)
       tilt (~> 2.0)
       trollop (~> 2.1)
 
@@ -18,7 +17,6 @@ GEM
     minitest (5.10.3)
     rake (10.5.0)
     redcarpet (3.4.0)
-    ruby-progressbar (1.9.0)
     simplecov (0.15.1)
       docile (~> 1.1.0)
       json (>= 1.8, < 3)
