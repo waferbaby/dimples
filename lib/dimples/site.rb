@@ -138,7 +138,7 @@ module Dimples
       end
 
       Dir.mkdir(@output_paths[:site])
-    rescue => e
+    rescue StandardError => e
       error_message = "Couldn't prepare the output directory (#{e.message})"
       raise Errors::GenerationError, error_message
     end
@@ -260,7 +260,7 @@ module Dimples
         path = File.join(@source_paths[:public], '.')
         FileUtils.cp_r(path, @output_paths[:site])
       end
-    rescue => e
+    rescue StandardError => e
       raise Errors::GenerationError, "Site assets failed to copy (#{e.message})"
     end
 

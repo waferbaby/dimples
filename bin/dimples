@@ -17,14 +17,14 @@ valid_commands = %w[build]
 
 options = Trollop.options do
   version "dimples v#{Dimples::VERSION}"
-  banner <<-EOS
+  banner <<-BANNER
 A very, very simple static site generator.
 
 Usage:
 dimples <#{valid_commands.join('|')}> [options]
 
 Options:
-EOS
+BANNER
   opt :config, 'Config file path', type: :string
   opt :lib, 'Library file path', default: 'lib'
   opt :verbose, 'Verbose mode', default: false
@@ -46,7 +46,7 @@ if File.exist?(config_path)
     Trollop.die "Config file is empty (#{config_path})" if file_contents.empty?
 
     config = JSON.parse(file_contents, symbolize_names: true)
-  rescue
+  rescue JSON::ParserError
     Trollop.die "Invalid or malformed config file (#{config_path})"
   end
 else

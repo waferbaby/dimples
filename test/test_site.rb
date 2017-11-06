@@ -121,7 +121,7 @@ describe Dimples::Site do
       it 'creates all the category pages' do
         categories_path = @site.output_paths[:categories]
 
-        @site.categories.keys.each do |slug|
+        @site.categories.each_key do |slug|
           path = File.join(categories_path, slug, 'index.html')
           expected_output = fixtures["pages.categories.#{slug}"]
 
@@ -133,7 +133,7 @@ describe Dimples::Site do
       it 'creates all the category feeds' do
         categories_path = @site.output_paths[:categories]
 
-        @site.categories.keys.each do |slug|
+        @site.categories.each_key do |slug|
           @site.feed_templates.each do |template|
             feed_type = template.split('.')[1]
 
@@ -214,7 +214,7 @@ describe Dimples::Site do
         end
 
         it 'creates none of the category files' do
-          @site.categories.keys.each do |slug|
+          @site.categories.each_key do |slug|
             categories_path = @site.output_paths[:categories]
             path = File.join(categories_path, slug, 'index.html')
 
@@ -232,7 +232,7 @@ describe Dimples::Site do
         end
 
         it 'creates no category feeds' do
-          @site.categories.keys.each do |slug|
+          @site.categories.each_key do |slug|
             categories_path = @site.output_paths[:categories]
 
             @site.feed_templates.each do |template|
