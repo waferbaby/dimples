@@ -52,11 +52,11 @@ module Dimples
       end
     end
 
-    def write(context = nil)
+    def write(context = {})
       FileUtils.mkdir_p(@output_directory) unless Dir.exist?(@output_directory)
 
       File.open(output_path, 'w+') do |file|
-        file.write(context ? render(context) : contents)
+        file.write(layout ? render(context) : contents)
       end
     rescue SystemCallError => e
       error_message = "Failed to write #{path} (#{e.message})"
