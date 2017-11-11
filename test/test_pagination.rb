@@ -94,6 +94,10 @@ describe Dimples::Pagination do
           @pager.current_page.must_equal(1)
         end
 
+        it 'has the correct page url' do
+          @pager.current_page_url.must_equal('/archives/')
+        end
+
         it 'has no previous page' do
           @pager.previous_page.must_be_nil
         end
@@ -120,6 +124,10 @@ describe Dimples::Pagination do
           @pager.current_page.must_equal(2)
         end
 
+        it 'has the correct page url' do
+          @pager.current_page_url.must_equal('/archives/page2')
+        end
+
         it 'has the correct previous page' do
           @pager.previous_page.must_equal(1)
         end
@@ -139,20 +147,23 @@ describe Dimples::Pagination do
 
       describe 'stepping to the last page' do
         before do
-          @pager.step_to(@pager.page_count)
+          @pager.step_to(3)
         end
 
         it 'is on the correct page' do
-          @pager.current_page.must_equal(@pager.page_count)
+          @pager.current_page.must_equal(3)
+        end
+
+        it 'has the correct page url' do
+          @pager.current_page_url.must_equal('/archives/page3')
         end
 
         it 'has the correct previous page' do
-          @pager.previous_page.must_equal(@pager.page_count - 1)
+          @pager.previous_page.must_equal(2)
         end
 
         it 'has the correct previous page url' do
-          url = "/archives/page#{@pager.page_count - 1}"
-          @pager.previous_page_url.must_equal(url)
+          @pager.previous_page_url.must_equal('/archives/page2')
         end
 
         it 'has no next page' do
@@ -184,6 +195,10 @@ describe Dimples::Pagination do
       end
 
       describe 'starting from the first page' do
+        it 'has the correct page url' do
+          @pager.current_page_url.must_equal('/archives/')
+        end
+
         it 'has no previous page url' do
           @pager.previous_page_url.must_be_nil
         end
@@ -198,6 +213,10 @@ describe Dimples::Pagination do
           @pager.step_to(2)
         end
 
+        it 'has the correct page url' do
+          @pager.current_page_url.must_equal('/archives/?page=2')
+        end
+
         it 'has the correct previous page url' do
           @pager.previous_page_url.must_equal('/archives/')
         end
@@ -209,12 +228,15 @@ describe Dimples::Pagination do
 
       describe 'stepping to the last page' do
         before do
-          @pager.step_to(@pager.page_count)
+          @pager.step_to(3)
+        end
+
+        it 'has the correct page url' do
+          @pager.current_page_url.must_equal('/archives/?page=3')
         end
 
         it 'has the correct previous page url' do
-          url = "/archives/?page=#{@pager.page_count - 1}"
-          @pager.previous_page_url.must_equal(url)
+          @pager.previous_page_url.must_equal('/archives/?page=2')
         end
 
         it 'has no next page url' do
