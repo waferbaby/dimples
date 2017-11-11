@@ -54,10 +54,7 @@ module Dimples
 
     def write(context = {})
       FileUtils.mkdir_p(@output_directory) unless Dir.exist?(@output_directory)
-
-      File.open(output_path, 'w+') do |file|
-        file.write(render(context))
-      end
+      File.write(output_path, render(context))
     rescue SystemCallError => e
       error_message = "Failed to write #{path} (#{e.message})"
       raise Errors::PublishingError, error_message
