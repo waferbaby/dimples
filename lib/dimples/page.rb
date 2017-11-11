@@ -52,7 +52,7 @@ module Dimples
       end
     end
 
-    def write(context = {})
+    def write(context = nil)
       FileUtils.mkdir_p(@output_directory) unless Dir.exist?(@output_directory)
 
       File.open(output_path, 'w+') do |file|
