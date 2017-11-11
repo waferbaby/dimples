@@ -81,6 +81,14 @@ describe Dimples::Pagination do
         @pager = Dimples::Pagination::Pager.new('/archives/', @site.posts, 1)
       end
 
+      it 'has the correct first page url' do
+        @pager.first_page_url.must_equal('/archives/')
+      end
+
+      it 'has the correct last page url' do
+        @pager.last_page_url.must_equal('/archives/page3')
+      end
+
       describe 'starting from the first page' do
         it 'is on the correct page' do
           @pager.current_page.must_equal(1)
@@ -165,6 +173,14 @@ describe Dimples::Pagination do
           1,
           'page_prefix': '?page='
         )
+      end
+
+      it 'has the correct first page url' do
+        @pager.first_page_url.must_equal('/archives/')
+      end
+
+      it 'has the correct last page url' do
+        @pager.last_page_url.must_equal('/archives/?page=3')
       end
 
       describe 'starting from the first page' do
