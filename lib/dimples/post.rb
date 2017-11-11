@@ -24,7 +24,7 @@ module Dimples
       @slug = parts[4]
       @layout = @site.config[:layouts][:post]
 
-      self.date = Time.mktime(parts[1], parts[2], parts[3])
+      self.date = DateTime.new(parts[1].to_i, parts[2].to_i, parts[3].to_i)
 
       @output_directory = File.join(
         @date.strftime(@site.output_paths[:posts]),
