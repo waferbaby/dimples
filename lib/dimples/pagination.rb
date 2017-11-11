@@ -87,24 +87,20 @@ module Dimples
       end
 
       def to_h
-        output = {
+        {
+          url: @url,
           current_page: @current_page,
           page_count: @page_count,
           item_count: @items.count,
-          url: @url
+          previous_page: @previous_page,
+          next_page: @next_page,
+          links: {
+            first_page: first_page_url,
+            last_page: last_page_url,
+            previous_page: previous_page_url,
+            next_page: next_page_url
+          }
         }
-
-        if @previous_page
-          output[:previous_page] = @previous_page
-          output[:previous_page_url] = previous_page_url
-        end
-
-        if @next_page
-          output[:next_page] = @next_page
-          output[:next_page_url] = next_page_url
-        end
-
-        output
       end
     end
   end
