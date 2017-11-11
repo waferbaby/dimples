@@ -56,7 +56,7 @@ module Dimples
       FileUtils.mkdir_p(@output_directory) unless Dir.exist?(@output_directory)
 
       File.open(output_path, 'w+') do |file|
-        file.write(layout ? render(context) : contents)
+        file.write(render(context))
       end
     rescue SystemCallError => e
       error_message = "Failed to write #{path} (#{e.message})"
