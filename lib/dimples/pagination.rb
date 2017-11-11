@@ -69,6 +69,14 @@ module Dimples
         @items.slice((page - 1) * @per_page, @per_page)
       end
 
+      def first_page_url
+        @url
+      end
+
+      def last_page_url
+        "#{@url}#{@page_prefix}#{@page_count}"
+      end
+
       def previous_page_url
         return unless @previous_page
         @previous_page != 1 ? "#{@url}#{@page_prefix}#{@previous_page}" : @url
