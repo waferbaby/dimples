@@ -78,7 +78,7 @@ module Dimples
       end
 
       def last_page_url
-        "#{@url}#{@page_prefix}#{@page_count}"
+        @page_count != 1 ? "#{@url}#{@page_prefix}#{@page_count}" : @url
       end
 
       def previous_page_url
