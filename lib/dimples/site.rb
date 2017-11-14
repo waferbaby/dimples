@@ -45,20 +45,22 @@ module Dimples
     def generate
       scan_files
       prepare_output_directory
-
-      generate_pages unless @pages.count.zero?
-
-      unless @posts.count.zero?
-        generate_posts
-        generate_archives
-        generate_categories if @config[:generation][:categories]
-      end
-
+      publish_files
       copy_assets
     rescue Errors::RenderingError,
            Errors::PublishingError,
            Errors::GenerationError => e
       @errors << e.message
+    end
+
+    def publish_files
+      publish_pages unless @pages.count.zero?
+
+      unless @posts.count.zero?
+        publish_posts
+        publish_archives
+        publish_categories if @config[:generation][:categories]
+      end
     end
 
     def generated?
@@ -143,7 +145,7 @@ module Dimples
       raise Errors::GenerationError, error_message
     end
 
-    def generate_posts
+    def publish_posts
       if @config[:verbose_logging]
         Dimples.logger.debug_generation('posts', @posts.length)
       end
@@ -157,10 +159,10 @@ module Dimples
         @config[:layouts][:posts]
       )
 
-      generate_posts_feeds if @config[:generation][:feeds]
+      publish_posts_feeds if @config[:generation][:feeds]
     end
 
-    def generate_pages
+    def publish_pages
       if @config[:verbose_logging]
         Dimples.logger.debug_generation('pages', @pages.length)
       end
@@ -168,7 +170,7 @@ module Dimples
       @pages.each(&:write)
     end
 
-    def generate_categories
+    def publish_categories
       if @config[:verbose_logging]
         Dimples.logger.debug_generation('category pages', @categories.length)
       end
@@ -190,10 +192,10 @@ module Dimples
         )
       end
 
-      generate_category_feeds if @config[:generation][:category_feeds]
+      publish_category_feeds if @config[:generation][:category_feeds]
     end
 
-    def generate_archives
+    def publish_archives
       %w[year month day].each do |date_type|
         date_archives_sym = "#{date_type}_archives".to_sym
         next unless @config[:generation][date_archives_sym]
@@ -220,7 +222,7 @@ module Dimples
       end
     end
 
-    def generate_feeds(path, context)
+    def publish_feeds(path, context)
       feed_templates.each do |format|
         next unless @templates[format]
 
@@ -235,17 +237,17 @@ module Dimples
       end
     end
 
-    def generate_posts_feeds
+    def publish_posts_feeds
       posts = @posts[0..@config[:pagination][:per_page] - 1]
-      generate_feeds(@output_paths[:site], posts: posts)
+      publish_feeds(@output_paths[:site], posts: posts)
     end
 
-    def generate_category_feeds
+    def publish_category_feeds
       @categories.each_value do |category|
         path = File.join(@output_paths[:categories], category.slug)
         posts = category.posts[0..@config[:pagination][:per_page] - 1]
 
-        generate_feeds(path, posts: posts, category: category.slug)
+        publish_feeds(path, posts: posts, category: category.slug)
       end
     end
 
