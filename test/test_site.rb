@@ -187,8 +187,7 @@ describe Dimples::Site do
         describe "if #{date_type} generation is disabled" do
           before do
             @site.config[:generation]["#{date_type}_archives".to_sym] = false
-            @site.scan_files
-            @site.generate_archives
+            @site.generate
           end
 
           it 'creates no archive files' do
