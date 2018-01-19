@@ -2,7 +2,7 @@
 layout: default
 ---
 
-<h2>Posts in <%= @archive_date.strftime('%B, %Y') %></h2>
+<h2>Posts from this <%= @archive_type %> (<%= @archive_date.strftime('%B, %Y') %>)</h2>
 
 <ul>
 <% @items.each do |post| %>
