@@ -63,6 +63,8 @@ For example, a very basic template for a post might look something like:
 </article>
 ```
 
+Archive pages are assigned an `@archive_date` Date object, which is set to the current date for the given page.
+
 Any templates stored in a `feeds` subdirectory will be used as a feed format, mapping its filename to the generated feed's extension - `templates/feeds/atom.erb` becomes `feed.atom`, and so on.
 
 ### Lib
@@ -236,7 +238,7 @@ Key | Default | Description
 
 ## Date formats
 
-These are currently used to define the auto-generated title for each type of archive page, and are also passed to Ruby's `strftime` [Time method](http://ruby-doc.org/core-2.4.0/Time.html#method-i-strftime "The strftime method of the Time class.").
+These are currently used to define the auto-generated title for each type of archive page, and are also passed to Ruby's `strftime` [method](https://ruby-doc.org/stdlib-2.3.1/libdoc/date/rdoc/Date.html#method-i-strftime "The strftime method of the Date class.").
 
 Key | Default | Description
 ----|---------|-------------
