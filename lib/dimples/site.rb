@@ -203,19 +203,17 @@ module Dimples
         @archives[date_type.to_sym].each do |date, posts|
           year, month, day = date.split('-')
 
-          context = { archive_year: year }
-          context[:archive_month] = month if month
-          context[:archive_day] = day if day
+          dates = { year: year }
+          dates[:month] = month if month
+          dates[:day] = day if day
 
-          path = File.join(@output_paths[:archives], context.values)
+          path = File.join(@output_paths[:archives], dates.values)
 
           layout = @config[:layouts][date_archives_sym]
           date_format = @config[:date_formats][date_type.to_sym]
 
-          context[:archive_date] = posts[0].date
-
           options = {
-            context: context,
+            context: { archive_date: posts[0].date },
             title: posts[0].date.strftime(date_format)
           }
 
