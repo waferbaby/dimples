@@ -213,7 +213,7 @@ module Dimples
           date_format = @config[:date_formats][date_type.to_sym]
 
           options = {
-            context: { archive_date: posts[0].date },
+            context: { archive_date: posts[0].date, archive_type: date_type },
             title: posts[0].date.strftime(date_format)
           }
 
