@@ -45,15 +45,7 @@ module Dimples
     def generate
       scan_files
       prepare_output_directory
-      publish_files
-      copy_assets
-    rescue Errors::RenderingError,
-           Errors::PublishingError,
-           Errors::GenerationError => e
-      @errors << e.message
-    end
 
-    def publish_files
       publish_pages unless @pages.count.zero?
 
       unless @posts.count.zero?
@@ -61,6 +53,12 @@ module Dimples
         publish_archives
         publish_categories if @config[:generation][:categories]
       end
+
+      copy_assets
+    rescue Errors::RenderingError,
+           Errors::PublishingError,
+           Errors::GenerationError => e
+      @errors << e.message
     end
 
     def generated?
