@@ -238,7 +238,7 @@ Key | Default | Description
 
 ## Date formats
 
-These are currently used to define the auto-generated title for each type of archive page, and are also passed to Ruby's `strftime` [method for the Date class](https://ruby-doc.org/stdlib-2.3.1/libdoc/date/rdoc/Date.html#method-i-strftime "The strftime method of the Date class.").
+These are currently used to define the auto-generated title for each type of archive page, and are also passed to Ruby's [method for formatting dates](https://ruby-doc.org/stdlib-2.3.1/libdoc/date/rdoc/Date.html#method-i-strftime "The strftime method of the Date class.").
 
 Key | Default | Description
 ----|---------|-------------
