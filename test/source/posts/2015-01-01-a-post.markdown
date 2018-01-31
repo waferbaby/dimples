@@ -1,8 +1,0 @@
----
-title: My first post
-categories:
-- red
-- green
----
-
-Welcome to my first post. This is *awesome*.
