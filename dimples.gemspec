@@ -2,8 +2,6 @@
 
 $LOAD_PATH.unshift File.expand_path('./lib')
 
-require 'dimples/version'
-
 Gem::Specification.new do |s|
   s.name        = 'dimples'
   s.version     = File.read(File.expand_path('./.gem_version'))
