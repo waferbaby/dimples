@@ -6,7 +6,7 @@ require 'dimples/version'
 
 Gem::Specification.new do |s|
   s.name        = 'dimples'
-  s.version     = Dimples::VERSION
+  s.version     = File.read(File.expand_path('./.gem_version'))
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Daniel Bogan']
   s.email       = ['d+dimples@waferbaby.com']
