@@ -1,5 +1,5 @@
 module Dimples
-  class Plugin
+  class Filter
     def self.process(action, item, &block)
       puts "I am before #{action} with #{item}"
 
