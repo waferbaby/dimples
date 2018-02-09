@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Dimples
   module Frontable
     def read_with_front_matter(path)
