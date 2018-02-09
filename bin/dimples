@@ -18,7 +18,7 @@ valid_commands = %w[build]
 options = Trollop.options do
   version "dimples v#{Dimples::VERSION}"
   banner <<-BANNER
-A very, very simple static site generator.
+A simple static site generator.
 
 Usage:
 dimples <#{valid_commands.join('|')}> [options]
@@ -26,7 +26,6 @@ dimples <#{valid_commands.join('|')}> [options]
 Options:
 BANNER
   opt :config, 'Config file path', type: :string
-  opt :lib, 'Library file path', default: 'lib'
   opt :verbose, 'Verbose mode', default: false
 end
 
@@ -37,7 +36,7 @@ unless valid_commands.include?(command)
   Trollop.die "Command must be '#{valid_commands.join('\', \'')}'"
 end
 
-lib_path = File.join(Dir.pwd, options[:lib])
+lib_path = File.join(Dir.pwd, 'lib')
 config_path = options[:config] || File.join(Dir.pwd, 'config.json')
 
 if File.exist?(config_path)
@@ -53,43 +52,24 @@ else
   Trollop.die "Unable to find config file (#{config_path})"
 end
 
-config[:verbose_logging] = options[:verbose] if options[:verbose]
-
 if Dir.exist?(lib_path)
   Dir.glob(File.join(lib_path, '**', '*.rb')) do |path|
     require path
   end
 end
 
-site_klass_name = config.dig(:class_overrides, :site)
-
-site_klass = if site_klass_name
-               Object.const_get(site_klass_name)
-             else
-               Dimples::Site
-             end
-
-site = site_klass.new(config)
+site = Dimples::Site.new(config)
 
 case command.to_sym
 when :build
-  Dimples.logger.info("Building site at #{site.output_paths[:site]}...")
+  puts 'Building site...'
 
-  result = Benchmark.measure do
-    site.generate
-  end
+  site.generate
 
-  if site.generated?
-    generation_time = result.real.round(2)
-
-    message = "\033[92mDone!\033[0m Site built in #{generation_time} second"
-    message += 's' if generation_time != 1
-    message += '.'
-
-    Dimples.logger.info(message)
+  if site.errors.empty?
+    puts 'Done! Your site has been built.'
   else
-    site.errors.each do |error|
-      Dimples.logger.error(error)
-    end
+    puts 'Generation failed:'
+    site.errors.each { |error| puts error }
   end
 end
