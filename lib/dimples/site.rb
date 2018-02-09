@@ -3,11 +3,13 @@
 module Dimples
   class Site
     attr_accessor :config
+    attr_accessor :categories
     attr_accessor :errors
     attr_accessor :paths
 
     def initialize(config = {})
       @config = Hashie::Mash.new(Configuration.defaults).deep_merge(config)
+      @categories = {}
       @errors = []
 
       @paths = {}.tap do |paths|
@@ -21,21 +23,17 @@ module Dimples
     end
 
     def generate
-      begin
-        prepare_output_directory
+      prepare_output_directory
 
-        posts.each do |post|
-          Plugin.process(self, :post_write, post) { post.write }
-        end
-
-        pages.each do |page|
-          Plugin.process(self, :page_write, page) { page.write }
-        end
-
-        # copy_assets
-      rescue PublishingError, RenderingError, GenerationError => error
-        @errors << error
+      posts.each do |post|
+        Plugin.process(self, :post_write, post) { post.write }
       end
+
+      pages.each do |page|
+        Plugin.process(self, :page_write, page) { page.write }
+      end
+    rescue PublishingError, RenderingError, GenerationError => error
+      @errors << error
     end
 
     def templates
