@@ -3,6 +3,7 @@
 module Dimples
   class Page
     include Frontable
+    include Renderable
 
     attr_accessor :contents
     attr_accessor :metadata
@@ -19,6 +20,14 @@ module Dimples
         @contents = ''
         @metadata = {}
       end
+    end
+
+    def filename
+      @metadata[:filename] || 'index'
+    end
+
+    def extension
+      @metadata[:extension] || 'html'
     end
 
     def write(context: {})
@@ -49,25 +58,12 @@ module Dimples
       @output_path ||= File.join(output_directory, "#{filename}.#{extension}")
     end
 
-    def filename
-      @metadata[:filename] || 'index'
+    def method_missing(method_name, *args, &block)
+      @metadata.key?(method_name) ? @metadata[method_name] : super
     end
 
-    def extension
-      @metadata[:extension] || 'html'
-    end
-
-    def template
-      @template ||= @site.templates[@metadata[:layout]]
-    end
-
-    def render(context = {})
-      return @contents unless template
-      template.render(page: self, context: context)
-    end
-
-    def method_missing(name, *args, &block)
-      @metadata.key?(name) ? @metadata[name] : super
+    def respond_to_missing?(method_name, include_private = false)
+      @metadata.key?(method_name) || super
     end
   end
 end
