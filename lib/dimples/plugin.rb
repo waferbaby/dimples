@@ -1,5 +1,12 @@
+# frozen_string_literal: true
+
 module Dimples
   class Plugin
+    EVENTS = %i[
+      post_write
+      page_write
+    ].freeze
+
     def self.inherited(subclass)
       (@subclasses ||= []) << subclass
     end
@@ -20,8 +27,7 @@ module Dimples
       @site = site
     end
 
-    def process(event, item, &block)
-    end
+    def process(event, item, &block); end
 
     def supported_events
       []
