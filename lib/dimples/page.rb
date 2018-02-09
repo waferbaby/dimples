@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Dimples
   class Page
     include Frontable
@@ -5,6 +7,7 @@ module Dimples
     attr_accessor :contents
     attr_accessor :metadata
     attr_accessor :path
+    attr_writer :output_directory
 
     def initialize(site, path = nil)
       @site = site
@@ -18,15 +21,32 @@ module Dimples
       end
     end
 
+    def write(context: {})
+      FileUtils.mkdir_p(output_directory) unless Dir.exist?(output_directory)
+      File.write(output_path, render(context))
+    rescue SystemCallError => e
+      raise PublishingError, "Failed to publish file at #{output_path} (#{e})"
+    end
+
+    def inspect
+      "#<#{self.class} @slug=#{slug} @output_directory=#{output_directory}>"
+    end
+
+    private
+
     def output_directory
-      @output_path ||= if @path
-        File.dirname(@path).sub(
-          @site.paths[:pages],
-          @site.paths[:output]
-        )
-      else
-        @site.paths[:output]
-      end
+      @output_directory ||= if @path
+                              File.dirname(@path).sub(
+                                @site.paths[:pages],
+                                @site.paths[:output]
+                              )
+                            else
+                              @site.paths[:output]
+                            end
+    end
+
+    def output_path
+      @output_path ||= File.join(output_directory, "#{filename}.#{extension}")
     end
 
     def filename
@@ -38,23 +58,16 @@ module Dimples
     end
 
     def template
-      @template ||= @metadata[:layout] ? @site.templates[@metadata[:layout]] : nil
+      @template ||= @site.templates[@metadata[:layout]]
     end
 
     def render(context = {})
       return @contents unless template
-      template.render(self, context)
-    end
-
-    def write(context = {})
-      output = render(context)
-      path = File.join(output_directory, "#{filename}.#{extension}")
-
-      puts "Writing to #{path}"
+      template.render(page: self, context: context)
     end
 
     def method_missing(name, *args, &block)
-      @metadata.has_key?(name.to_s) ? @metadata[name] : super
+      @metadata.key?(name) ? @metadata[name] : super
     end
   end
 end
