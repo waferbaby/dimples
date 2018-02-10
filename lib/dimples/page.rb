@@ -20,6 +20,8 @@ module Dimples
         @contents = ''
         @metadata = {}
       end
+
+      @metadata[:title] ||= ''
     end
 
     def filename
