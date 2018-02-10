@@ -2,7 +2,7 @@ module Dimples
   module Renderable
     def render(context = {}, body = nil)
       context[:site] ||= @site
-      context.merge!(type => Hashie::Mash.new(@metadata))
+      context[type] = Hashie::Mash.new(@metadata)
 
       output = engine.render(scope, context) { body }
 
