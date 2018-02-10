@@ -1,25 +1,17 @@
 module Dimples
   module Renderable
-    def render(context)
+    def render(contents, context = {})
       context[:site] ||= @site
-      context[:page] ||= Hashie::Mash.new(@metadata)
+      context.merge!(type => Hashie::Mash.new(@metadata))
 
-      output = rendering_engine.render(Object.new, context) {
-        context[:page]&.contents
-      }
+      output = rendering_engine.render(Object.new, context) { contents }
 
-      if (template = @site.templates[@metadata[:layout]])
-        context[:page].contents ||= output
-        output = template.render(context)
-      end
-
-      output
+      return output unless (template = @site.templates[@metadata[:layout]])
+      template.render(output, context)
     end
 
-    private
-
     def rendering_engine
-      @engine ||= begin
+      @rendering_engine ||= begin
         callback = proc { @contents }
 
         if @path
