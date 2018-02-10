@@ -79,13 +79,22 @@ module Dimples
 
     def read_posts
       @posts = globbed_files(@paths[:posts]).sort.map do |path|
-        Post.new(self, path)
+        Post.new(self, path).tap { |post| categorise_post(post) }
       end.reverse
     end
 
     def read_pages
       @pages = globbed_files(@paths[:pages]).sort.map do |path|
         Page.new(self, path)
+      end
+    end
+
+    def categorise_post(post)
+      post.categories.each do |slug|
+        slug_sym = slug.to_sym
+
+        @categories[slug_sym] ||= Category.new(self, slug)
+        @categories[slug_sym].posts << post
       end
     end
 
