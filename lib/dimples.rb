@@ -9,6 +9,7 @@ require 'yaml'
 require 'dimples/frontable'
 require 'dimples/renderable'
 
+require 'dimples/category'
 require 'dimples/configuration'
 require 'dimples/errors'
 require 'dimples/page'
