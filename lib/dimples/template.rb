@@ -14,5 +14,9 @@ module Dimples
       @path = path
       @contents, @metadata = read_with_front_matter(path)
     end
+
+    def type
+      :template
+    end
   end
 end
