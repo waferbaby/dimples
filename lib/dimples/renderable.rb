@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Dimples
   module Renderable
     def render(context = {}, body = nil)
@@ -37,4 +39,3 @@ module Dimples
     end
   end
 end
-
