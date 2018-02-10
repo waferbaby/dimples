@@ -2,15 +2,16 @@
 
 module Dimples
   class Site
-    attr_accessor :config
-    attr_accessor :categories
-    attr_accessor :errors
-    attr_accessor :paths
+    attr_reader :config
+    attr_reader :categories
+    attr_reader :errors
+    attr_reader :paths
+    attr_reader :posts
+    attr_reader :pages
+    attr_reader :templates
 
     def initialize(config = {})
       @config = Hashie::Mash.new(Configuration.defaults).deep_merge(config)
-      @categories = {}
-      @errors = []
 
       @paths = {}.tap do |paths|
         paths[:source] = Dir.pwd
@@ -20,47 +21,22 @@ module Dimples
           paths[type.to_sym] = File.join(paths[:source], type)
         end
       end
+
+      prepare
     end
 
     def generate
-      prepare_output_directory
+      prepare
 
-      posts.each do |post|
-        Plugin.process(self, :post_write, post) { post.write }
-      end
+      read_templates
+      read_posts
+      read_pages
 
-      pages.each do |page|
-        Plugin.process(self, :page_write, page) { page.write }
-      end
+      create_output_directory
+
+      publish
     rescue PublishingError, RenderingError, GenerationError => error
       @errors << error
-    end
-
-    def templates
-      @templates ||= {}.tap do |templates|
-        globbed_files(@paths[:templates]).each do |path|
-          basename = File.basename(path, File.extname(path))
-          dir_name = File.dirname(path)
-
-          unless dir_name == @paths[:templates]
-            basename = dir_name.split(File::SEPARATOR)[-1] + '.' + basename
-          end
-
-          templates[basename] = Template.new(self, path)
-        end
-      end
-    end
-
-    def posts
-      @posts ||= globbed_files(@paths[:posts]).sort.map do |path|
-        Post.new(self, path)
-      end
-    end
-
-    def pages
-      @pages ||= globbed_files(@paths[:pages]).sort.map do |path|
-        Page.new(self, path)
-      end
     end
 
     def inspect
@@ -69,12 +45,58 @@ module Dimples
 
     private
 
-    def prepare_output_directory
+    def prepare
+      @categories = {}
+      @templates = {}
+
+      @pages = []
+      @posts = []
+      @errors = []
+    end
+
+    def create_output_directory
       FileUtils.remove_dir(@paths[:output]) if Dir.exist?(@paths[:output])
       Dir.mkdir(@paths[:output])
     rescue StandardError => e
       message = "Couldn't prepare the output directory (#{e.message})"
       raise GenerationError, message
+    end
+
+    def read_templates
+      @templates = {}
+
+      globbed_files(@paths[:templates]).each do |path|
+        basename = File.basename(path, File.extname(path))
+        dir_name = File.dirname(path)
+
+        unless dir_name == @paths[:templates]
+          basename = dir_name.split(File::SEPARATOR)[-1] + '.' + basename
+        end
+
+        @templates[basename] = Template.new(self, path)
+      end
+    end
+
+    def read_posts
+      @posts = globbed_files(@paths[:posts]).sort.map do |path|
+        Post.new(self, path)
+      end.reverse
+    end
+
+    def read_pages
+      @pages = globbed_files(@paths[:pages]).sort.map do |path|
+        Page.new(self, path)
+      end
+    end
+
+    def publish
+      @posts.each do |post|
+        Plugin.process(self, :post_write, post) { post.write }
+      end
+
+      @pages.each do |page|
+        Plugin.process(self, :page_write, page) { page.write }
+      end
     end
 
     def globbed_files(path)
