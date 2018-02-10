@@ -1,17 +1,28 @@
 module Dimples
   module Renderable
-    def render(contents, context = {})
+    def render(context = {}, body = nil)
       context[:site] ||= @site
       context.merge!(type => Hashie::Mash.new(@metadata))
 
-      output = rendering_engine.render(Object.new, context) { contents }
+      output = engine.render(scope, context) { body }
 
       return output unless (template = @site.templates[@metadata[:layout]])
-      template.render(output, context)
+      template.render(context, output)
     end
 
-    def rendering_engine
-      @rendering_engine ||= begin
+    def scope
+      @scope ||= Object.new.tap do |scope|
+        scope.instance_variable_set(:@site, @site)
+        scope.instance_variable_set(:@metadata, {})
+
+        scope.class.send(:define_method, :render) do |layout, locals = {}|
+          @site.templates[layout]&.render(locals)
+        end
+      end
+    end
+
+    def engine
+      @engine ||= begin
         callback = proc { @contents }
 
         if @path
@@ -27,11 +38,3 @@ module Dimples
   end
 end
 
-#     def self.render_scope
-#       @render_scope ||= Object.new.tap do |scope|
-#         method_name = :render_template
-#         scope.class.send(:define_method, method_name) do |site, template, locals = {}|
-#           site.templates[template]&.render(context: locals)
-#         end
-#       end
-#     end
