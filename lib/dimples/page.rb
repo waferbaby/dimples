@@ -30,9 +30,13 @@ module Dimples
       @metadata[:extension] || 'html'
     end
 
-    def write(context: {})
+    def type
+      :page
+    end
+
+    def write(context = {})
       FileUtils.mkdir_p(output_directory) unless Dir.exist?(output_directory)
-      File.write(output_path, render(context))
+      File.write(output_path, render(contents, context))
     rescue SystemCallError => e
       raise PublishingError, "Failed to publish file at #{output_path} (#{e})"
     end
