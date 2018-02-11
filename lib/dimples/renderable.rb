@@ -15,7 +15,6 @@ module Dimples
     def scope
       @scope ||= Object.new.tap do |scope|
         scope.instance_variable_set(:@site, @site)
-        scope.instance_variable_set(:@metadata, {})
 
         scope.class.send(:define_method, :render) do |layout, locals = {}|
           @site.templates[layout]&.render(locals)
