@@ -52,7 +52,7 @@ module Dimples
     def output_directory
       @output_directory ||= if @path
                               File.dirname(@path).sub(
-                                @site.paths[:pages],
+                                @site.paths[:sources][:pages],
                                 @site.paths[:output]
                               )
                             else
