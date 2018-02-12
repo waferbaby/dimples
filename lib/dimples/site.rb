@@ -14,11 +14,12 @@ module Dimples
       @config = Hashie::Mash.new(Configuration.defaults).deep_merge(config)
 
       @paths = {}.tap do |paths|
-        paths[:source] = Dir.pwd
-        paths[:output] = File.join(paths[:source], 'site')
+        paths[:base] = Dir.pwd
+        paths[:output] = File.join(paths[:base], 'site')
+        paths[:sources] = {}
 
-        %w[posts pages templates].each do |type|
-          paths[type.to_sym] = File.join(paths[:source], type)
+        %w[pages posts public templates].each do |type|
+          paths[:sources][type.to_sym] = File.join(paths[:base], type)
         end
       end
 
@@ -33,6 +34,7 @@ module Dimples
       read_pages
 
       create_output_directory
+      copy_assets
 
       publish
     rescue PublishingError, RenderingError, GenerationError => error
@@ -54,22 +56,14 @@ module Dimples
       @errors = []
     end
 
-    def create_output_directory
-      FileUtils.remove_dir(@paths[:output]) if Dir.exist?(@paths[:output])
-      Dir.mkdir(@paths[:output])
-    rescue StandardError => e
-      message = "Couldn't prepare the output directory (#{e.message})"
-      raise GenerationError, message
-    end
-
     def read_templates
       @templates = {}
 
-      globbed_files(@paths[:templates]).each do |path|
+      globbed_files(@paths[:sources][:templates]).each do |path|
         basename = File.basename(path, File.extname(path))
         dir_name = File.dirname(path)
 
-        unless dir_name == @paths[:templates]
+        unless dir_name == @paths[:sources][:templates]
           basename = dir_name.split(File::SEPARATOR)[-1] + '.' + basename
         end
 
@@ -78,13 +72,13 @@ module Dimples
     end
 
     def read_posts
-      @posts = globbed_files(@paths[:posts]).sort.map do |path|
+      @posts = globbed_files(@paths[:sources][:posts]).sort.map do |path|
         Post.new(self, path).tap { |post| categorise_post(post) }
       end.reverse
     end
 
     def read_pages
-      @pages = globbed_files(@paths[:pages]).sort.map do |path|
+      @pages = globbed_files(@paths[:sources][:pages]).sort.map do |path|
         Page.new(self, path)
       end
     end
@@ -96,6 +90,21 @@ module Dimples
         @categories[slug_sym] ||= Category.new(self, slug)
         @categories[slug_sym].posts << post
       end
+    end
+
+    def create_output_directory
+      FileUtils.remove_dir(@paths[:output]) if Dir.exist?(@paths[:output])
+      Dir.mkdir(@paths[:output])
+    rescue StandardError => e
+      message = "Couldn't prepare the output directory (#{e.message})"
+      raise GenerationError, message
+    end
+
+    def copy_assets
+      return unless Dir.exist?(@paths[:sources][:public])
+      FileUtils.cp_r(File.join(@paths[:sources][:public], '.'), @paths[:output])
+    rescue StandardError => e
+      raise GenerationError, "Failed to copy site assets (#{e.message})"
     end
 
     def publish
