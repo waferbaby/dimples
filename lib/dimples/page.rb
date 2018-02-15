@@ -36,8 +36,10 @@ module Dimples
       :page
     end
 
-    def write(context = {})
+    def write(output_directory, context = {})
       FileUtils.mkdir_p(output_directory) unless Dir.exist?(output_directory)
+      output_path = File.join(output_directory, "#{filename}.#{extension}")
+
       File.write(output_path, render(context))
     rescue SystemCallError => e
       raise PublishingError, "Failed to publish file at #{output_path} (#{e})"
@@ -49,27 +51,18 @@ module Dimples
 
     private
 
-    def output_directory
-      @output_directory ||= if @path
-                              File.dirname(@path).sub(
-                                @site.paths[:sources][:pages],
-                                @site.paths[:output]
-                              )
-                            else
-                              @site.paths[:output]
-                            end
-    end
-
-    def output_path
-      @output_path ||= File.join(output_directory, "#{filename}.#{extension}")
-    end
-
     def method_missing(method_name, *args, &block)
-      @metadata.key?(method_name) ? @metadata[method_name] : super
+      if @metadata.key?(method_name)
+        @metadata[method_name]
+      elsif (matches = method_name.match(/([a-z]+)=/))
+        @metadata[matches[1].to_sym] = args[0]
+      else
+        super
+      end
     end
 
     def respond_to_missing?(method_name, include_private = false)
-      @metadata.key?(method_name) || super
+      @metadata.key?(method_name) || method_name.match?(/([a-z]+)=/) || super
     end
   end
 end
