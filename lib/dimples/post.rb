@@ -16,14 +16,16 @@ module Dimples
       @metadata[:categories] ||= []
     end
 
-    private
+    def year
+      @year ||= @metadata[:date].strftime(@site.config.date_formats.year)
+    end
 
-    def output_directory
-      @output_directory ||= File.join(
-        @site.paths[:output],
-        date.strftime(@site.config.urls.posts),
-        slug
-      )
+    def month
+      @month ||= @metadata[:date].strftime(@site.config.date_formats.month)
+    end
+
+    def day
+      @day ||= @metadata[:date].strftime(@site.config.date_formats.day)
     end
   end
 end
