@@ -18,13 +18,13 @@ module Dimples
 
     def self.default_generation
       {
-        paginated_posts: true,
         categories: true,
 
         post_feeds: true,
         category_feeds: true,
         archive_feeds: true,
 
+        archives: true,
         year_archives: true,
         month_archives: true,
         day_archives: true
@@ -41,12 +41,10 @@ module Dimples
 
     def self.default_layouts
       {
-        posts: 'posts',
         post: 'post',
         category: 'category',
-        year_archives: 'year_archives',
-        month_archives: 'month_archives',
-        day_archives: 'day_archives'
+        archives: 'archives',
+        date_archives: 'archives'
       }
     end
 
@@ -60,6 +58,7 @@ module Dimples
 
     def self.default_pagination
       {
+        page_prefix: 'page',
         per_page: 10
       }
     end
