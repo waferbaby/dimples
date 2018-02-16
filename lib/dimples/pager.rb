@@ -8,19 +8,19 @@ module Dimples
     attr_reader :page_count
     attr_reader :item_count
 
-    def initialize(url, items, options = {})
+    def initialize(url, posts, options = {})
       @url = url
-      @items = items
+      @posts = posts
       @per_page = options[:per_page] || 10
       @page_prefix = options[:page_prefix] || 'page'
-      @page_count = (items.length.to_f / @per_page.to_i).ceil
+      @page_count = (posts.length.to_f / @per_page.to_i).ceil
 
       step_to(1)
     end
 
     def each(&block)
       (1..@page_count).each do |index|
-        block.yield step_to(index), items_at(index)
+        block.yield step_to(index)
       end
     end
 
@@ -32,8 +32,8 @@ module Dimples
       @current_page
     end
 
-    def items_at(page)
-      @items.slice((page - 1) * @per_page, @per_page)
+    def posts_at(page)
+      @posts.slice((page - 1) * @per_page, @per_page)
     end
 
     def current_page_url
@@ -60,9 +60,10 @@ module Dimples
     def to_context
       Hashie::Mash.new(
         url: @url,
+        posts: posts_at(current_page),
         current_page: @current_page,
         page_count: @page_count,
-        item_count: @items.count,
+        post_count: @posts.count,
         previous_page: @previous_page,
         next_page: @next_page,
         links: {
