@@ -8,7 +8,6 @@ module Dimples
     attr_accessor :contents
     attr_accessor :metadata
     attr_accessor :path
-    attr_writer :output_directory
 
     def initialize(site, path = nil)
       @site = site
@@ -20,8 +19,6 @@ module Dimples
         @contents = ''
         @metadata = {}
       end
-
-      @metadata[:title] ||= ''
     end
 
     def filename
@@ -46,7 +43,7 @@ module Dimples
     end
 
     def inspect
-      "#<#{self.class} @slug=#{slug} @output_directory=#{output_directory}>"
+      "#<#{self.class} @path=#{path}>"
     end
 
     private
