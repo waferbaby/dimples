@@ -36,18 +36,22 @@ module Dimples
       create_output_directory
       copy_assets
 
-      publish
+      publish_posts
+      publish_pages
+      publish_archives
     rescue PublishingError, RenderingError, GenerationError => error
       @errors << error
     end
 
     def inspect
-      "#<#{self.class} @paths=#{@paths}>"
+      "#<#{self.class} @paths=#{paths}>"
     end
 
     private
 
     def prepare
+      @archives = { years: {}, months: {}, days: {} }
+
       @categories = {}
       @templates = {}
 
@@ -73,7 +77,10 @@ module Dimples
 
     def read_posts
       @posts = globbed_files(@paths[:sources][:posts]).sort.map do |path|
-        Post.new(self, path).tap { |post| categorise_post(post) }
+        Post.new(self, path).tap do |post|
+          add_archive_post(post)
+          categorise_post(post)
+        end
       end.reverse
     end
 
@@ -81,6 +88,12 @@ module Dimples
       @pages = globbed_files(@paths[:sources][:pages]).sort.map do |path|
         Page.new(self, path)
       end
+    end
+
+    def add_archive_post(post)
+      archive_year(post.year) << post
+      archive_month(post.year, post.month) << post
+      archive_day(post.year, post.month, post.day) << post
     end
 
     def categorise_post(post)
@@ -107,18 +120,82 @@ module Dimples
       raise GenerationError, "Failed to copy site assets (#{e.message})"
     end
 
-    def publish
+    def publish_posts
       @posts.each do |post|
-        Plugin.process(self, :post_write, post) { post.write }
-      end
+        Plugin.process(self, :post_write, post) do
+          output_directory = File.join(
+            @paths[:output],
+            post.date.strftime(@config.paths.posts),
+            post.slug
+          )
 
+          post.write(output_directory)
+        end
+      end
+    end
+
+    def publish_pages
       @pages.each do |page|
-        Plugin.process(self, :page_write, page) { page.write }
+        Plugin.process(self, :page_write, page) do
+          output_directory = if page.path
+                              File.dirname(page.path).sub(
+                                @paths[:sources][:pages],
+                                @paths[:output]
+                              )
+                            else
+                              @paths[:output]
+                            end
+
+          page.write(output_directory)
+        end
+      end
+    end
+
+    def publish_archives
+      if @config.generation.archives
+        paginate_posts(
+          @posts,
+          File.join(@paths[:output], @config.paths.archives),
+          @config.layouts.archives
+        )
+      end
+    end
+
+    def paginate_posts(posts, path, layout, context = {})
+      pager = Pager.new(
+        path.sub(@paths[:output], '') + '/',
+        posts,
+        @config.pagination
+      )
+
+      pager.each do |index|
+        page = Page.new(self)
+        page.layout = layout
+
+        output_directory = if index == 1
+                            path
+                           else
+                            File.join(path, "#{@config.pagination.page_prefix}#{index}")
+                           end
+
+        page.write(output_directory, context.merge!(pagination: pager.to_context))
       end
     end
 
     def globbed_files(path)
       Dir.glob(File.join(path, '**', '*.*'))
+    end
+
+    def archive_year(year)
+      @archives[:years][year] ||= []
+    end
+
+    def archive_month(year, month)
+      @archives[:months]["#{year}-#{month}"] ||= []
+    end
+
+    def archive_day(year, month, day)
+      @archives[:days]["#{year}-#{month}-#{day}"] ||= []
     end
   end
 end
