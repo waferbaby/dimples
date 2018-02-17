@@ -10,8 +10,8 @@ module Dimples
         pagination: default_pagination,
         date_formats: default_date_formats,
         feed_formats: default_feed_formats,
-        rendering: {},
         category_names: {},
+        rendering: {},
       }
     end
 
