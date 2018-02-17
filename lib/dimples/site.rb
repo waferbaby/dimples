@@ -50,7 +50,7 @@ module Dimples
     private
 
     def prepare
-      @archives = { years: {}, months: {}, days: {} }
+      @archives = { year: {}, month: {}, day: {} }
 
       @categories = {}
       @templates = {}
@@ -138,13 +138,13 @@ module Dimples
       @pages.each do |page|
         Plugin.process(self, :page_write, page) do
           output_directory = if page.path
-                              File.dirname(page.path).sub(
-                                @paths[:sources][:pages],
-                                @paths[:output]
-                              )
-                            else
-                              @paths[:output]
-                            end
+                               File.dirname(page.path).sub(
+                                 @paths[:sources][:pages],
+                                 @paths[:output]
+                               )
+                             else
+                               @paths[:output]
+                             end
 
           page.write(output_directory)
         end
@@ -159,6 +159,21 @@ module Dimples
           @config.layouts.archives
         )
       end
+
+      %w[year month day].each do |date_type|
+        next unless @config.generation["#{date_type}_archives"]
+
+        @archives[date_type.to_sym].each do |date, posts|
+          date_parts = date.split('-')
+          path = File.join(@paths[:output], @config.paths.archives, date_parts)
+
+          paginate_posts(
+            posts,
+            path,
+            @config.layouts.archives
+          )
+        end
+      end
     end
 
     def paginate_posts(posts, path, layout, context = {})
@@ -172,13 +187,18 @@ module Dimples
         page = Page.new(self)
         page.layout = layout
 
+        page_prefix = @config.pagination.page_prefix
+
         output_directory = if index == 1
-                            path
+                             path
                            else
-                            File.join(path, "#{@config.pagination.page_prefix}#{index}")
+                             File.join(path, "#{page_prefix}#{index}")
                            end
 
-        page.write(output_directory, context.merge!(pagination: pager.to_context))
+        page.write(
+          output_directory,
+          context.merge(pagination: pager.to_context)
+        )
       end
     end
 
@@ -187,15 +207,15 @@ module Dimples
     end
 
     def archive_year(year)
-      @archives[:years][year] ||= []
+      @archives[:year][year] ||= []
     end
 
     def archive_month(year, month)
-      @archives[:months]["#{year}-#{month}"] ||= []
+      @archives[:month]["#{year}-#{month}"] ||= []
     end
 
     def archive_day(year, month, day)
-      @archives[:days]["#{year}-#{month}-#{day}"] ||= []
+      @archives[:day]["#{year}-#{month}-#{day}"] ||= []
     end
   end
 end
