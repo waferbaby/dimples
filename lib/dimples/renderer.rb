@@ -11,7 +11,9 @@ module Dimples
       context[:site] ||= @site
       output = engine.render(scope, context) { body }
 
-      return output unless (template = @site.templates[@source.metadata[:layout]])
+      template = @site.templates[@source.metadata[:layout]]
+      return output if template.nil?
+
       template.render(context, output)
     end
 
