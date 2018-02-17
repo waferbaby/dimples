@@ -36,7 +36,7 @@ unless valid_commands.include?(command)
   Trollop.die "Command must be '#{valid_commands.join('\', \'')}'"
 end
 
-lib_path = File.join(Dir.pwd, 'lib')
+plugins_path = File.join(Dir.pwd, 'plugins')
 config_path = options[:config] || File.join(Dir.pwd, 'config.json')
 
 if File.exist?(config_path)
@@ -52,8 +52,8 @@ else
   Trollop.die "Unable to find config file (#{config_path})"
 end
 
-if Dir.exist?(lib_path)
-  Dir.glob(File.join(lib_path, '**', '*.rb')) do |path|
+if Dir.exist?(plugins_path)
+  Dir.glob(File.join(plugins_path, '**', '*.rb')) do |path|
     require path
   end
 end
