@@ -9,6 +9,8 @@ module Dimples
 
     def render(context = {}, body = nil)
       context[:site] ||= @site
+      context[:pagination] ||= nil
+
       output = engine.render(scope, context) { body }
 
       template = @site.templates[@source.metadata[:layout]]
