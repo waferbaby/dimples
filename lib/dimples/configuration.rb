@@ -4,39 +4,35 @@ module Dimples
   module Configuration
     def self.defaults
       {
-        source_path: Dir.pwd,
-        destination_path: File.join(Dir.pwd, 'site'),
-        rendering: {},
-        category_names: {},
-        generation: default_generation,
         paths: default_paths,
+        generation: default_generation,
         layouts: default_layouts,
         pagination: default_pagination,
         date_formats: default_date_formats,
-        feed_formats: default_feed_formats
-      }
-    end
-
-    def self.default_generation
-      {
-        categories: true,
-
-        main_feed: true,
-        category_feeds: true,
-        archive_feeds: true,
-
-        archives: true,
-        year_archives: true,
-        month_archives: true,
-        day_archives: true
+        feed_formats: default_feed_formats,
+        rendering: {},
+        category_names: {},
       }
     end
 
     def self.default_paths
       {
+        output: 'site',
         archives: 'archives',
         posts: 'archives/%Y/%m/%d',
         categories: 'archives/categories'
+      }
+    end
+
+    def self.default_generation
+      {
+        archives: true,
+        year_archives: true,
+        month_archives: true,
+        day_archives: true,
+        categories: true,
+        main_feed: true,
+        category_feeds: true,
       }
     end
 
