@@ -29,8 +29,13 @@ module Dimples
       @metadata[:extension] || 'html'
     end
 
-    def type
-      :page
+    def render(context = {})
+      metadata = @metadata.dup
+      metadata.merge!(context[:page]) if context[:page]
+
+      context[:page] = Hashie::Mash.new(metadata)
+
+      renderer.render(context)
     end
 
     def write(output_directory, context = {})
