@@ -61,14 +61,13 @@ module Dimples
 
     def to_context
       Hashie::Mash.new(
-        url: @url,
         posts: posts_at(current_page),
         current_page: @current_page,
         page_count: @page_count,
         post_count: @posts.count,
         previous_page: @previous_page,
         next_page: @next_page,
-        links: {
+        urls: {
           current_page: current_page_url,
           first_page: first_page_url,
           last_page: last_page_url,
