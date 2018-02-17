@@ -178,7 +178,7 @@ module Dimples
         path = File.join(@paths[:output], @config.paths.archives, date_parts)
 
         paginate_posts(
-          posts,
+          posts.reverse,
           path,
           @config.layouts.date_archive,
           page: {
@@ -195,7 +195,7 @@ module Dimples
         path = File.join(@paths[:output], @config.paths.categories, category.slug)
 
         paginate_posts(
-          category.posts,
+          category.posts.reverse,
           path,
           @config.layouts.category,
           page: {
