@@ -43,8 +43,8 @@ module Dimples
       {
         post: 'post',
         category: 'category',
-        archives: 'archives',
-        date_archives: 'archives'
+        archive: 'archive',
+        date_archive: 'archive'
       }
     end
 
