@@ -12,6 +12,7 @@ module Dimples
         paths: default_paths,
         layouts: default_layouts,
         date_formats: default_date_formats,
+        feed_formats: default_feed_formats,
         pagination: default_pagination
       }
     end
@@ -54,6 +55,10 @@ module Dimples
         month: '%Y-%m',
         day: '%Y-%m-%d'
       }
+    end
+
+    def self.default_feed_formats
+      ['atom', 'json']
     end
 
     def self.default_pagination

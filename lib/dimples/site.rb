@@ -24,6 +24,8 @@ module Dimples
         end
       end
 
+      puts @config.inspect
+
       prepare
     end
 
@@ -193,16 +195,22 @@ module Dimples
     def publish_categories
       @categories.each_value do |category|
         path = File.join(@paths[:output], @config.paths.categories, category.slug)
-
-        paginate_posts(
-          category.posts.reverse,
-          path,
-          @config.layouts.category,
+        category_posts = category.posts.reverse
+        context = {
           page: {
             title: category.name,
             category: category
           }
+        }
+
+        paginate_posts(
+          category_posts,
+          path,
+          @config.layouts.category,
+          context
         )
+
+        publish_feeds(category_posts, path, context)
       end
     end
 
@@ -229,6 +237,18 @@ module Dimples
           output_directory,
           context.merge(pagination: pager.to_context)
         )
+      end
+    end
+
+    def publish_feeds(posts, path, context = {})
+      @config.feed_formats.each do |format|
+        feed_layout = "feeds.#{format}"
+        next unless @templates.key?(feed_layout)
+
+        page = Page.new(self)
+        page.layout = feed_layout
+
+        puts "I AM FEED #{page.inspect} at #{path}"
       end
     end
 
