@@ -3,7 +3,6 @@
 module Dimples
   class Template
     include Frontable
-    include Renderable
 
     attr_accessor :path
     attr_accessor :contents
@@ -15,8 +14,15 @@ module Dimples
       @contents, @metadata = read_with_front_matter(path)
     end
 
-    def type
-      :template
+    def render(context = {}, body = nil)
+      context[:template] ||= Hashie::Mash.new(@metadata)
+      renderer.render(context, body)
+    end
+
+    private
+
+    def renderer
+      @renderer ||= Renderer.new(@site, self)
     end
   end
 end
