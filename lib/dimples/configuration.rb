@@ -20,7 +20,7 @@ module Dimples
       {
         categories: true,
 
-        post_feeds: true,
+        post_feed: true,
         category_feeds: true,
         archive_feeds: true,
 
