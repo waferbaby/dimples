@@ -16,11 +16,11 @@ module Dimples
 
       @paths = {}.tap do |paths|
         paths[:base] = Dir.pwd
-        paths[:output] = File.join(paths[:base], 'site')
-        paths[:sources] = {}
-
-        %w[pages posts public templates].each do |type|
-          paths[:sources][type.to_sym] = File.join(paths[:base], type)
+        paths[:output] = File.join(paths[:base], @config.paths.output)
+        paths[:sources] = {}.tap do |sources|
+          %w[pages posts public templates].each do |type|
+            sources[type.to_sym] = File.join(paths[:base], type)
+          end
         end
       end
 
@@ -40,7 +40,8 @@ module Dimples
       publish_posts
       publish_pages
       publish_archives
-      publish_categories
+
+      publish_categories if @config.generation.categories
     rescue PublishingError, RenderingError, GenerationError => error
       @errors << error
     end
