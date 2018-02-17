@@ -24,8 +24,6 @@ module Dimples
         end
       end
 
-      puts @config.inspect
-
       prepare
     end
 
@@ -131,13 +129,13 @@ module Dimples
     def publish_posts
       @posts.each do |post|
         Plugin.process(self, :post_write, post) do
-          output_directory = File.join(
+          path = File.join(
             @paths[:output],
             post.date.strftime(@config.paths.posts),
             post.slug
           )
 
-          post.write(output_directory)
+          post.write(path)
         end
       end
     end
@@ -145,16 +143,16 @@ module Dimples
     def publish_pages
       @pages.each do |page|
         Plugin.process(self, :page_write, page) do
-          output_directory = if page.path
-                               File.dirname(page.path).sub(
-                                 @paths[:sources][:pages],
-                                 @paths[:output]
-                               )
-                             else
-                               @paths[:output]
-                             end
+          path = if page.path
+                   File.dirname(page.path).sub(
+                     @paths[:sources][:pages],
+                     @paths[:output]
+                   )
+                 else
+                   @paths[:output]
+                 end
 
-          page.write(output_directory)
+          page.write(path)
         end
       end
     end
@@ -194,14 +192,14 @@ module Dimples
 
     def publish_categories
       @categories.each_value do |category|
-        path = File.join(@paths[:output], @config.paths.categories, category.slug)
+        path = File.join(
+          @paths[:output],
+          @config.paths.categories,
+          category.slug
+        )
+
         category_posts = category.posts.reverse
-        context = {
-          page: {
-            title: category.name,
-            category: category
-          }
-        }
+        context = { page: { title: category.name, category: category } }
 
         paginate_posts(
           category_posts,
@@ -226,29 +224,34 @@ module Dimples
         page.layout = layout
 
         page_prefix = @config.pagination.page_prefix
-
-        output_directory = if index == 1
-                             path
-                           else
-                             File.join(path, "#{page_prefix}#{index}")
-                           end
+        page_path = if index == 1
+                      path
+                    else
+                      File.join(path, "#{page_prefix}#{index}")
+                    end
 
         page.write(
-          output_directory,
+          page_path,
           context.merge(pagination: pager.to_context)
         )
       end
     end
 
     def publish_feeds(posts, path, context = {})
-      @config.feed_formats.each do |format|
-        feed_layout = "feeds.#{format}"
+      @config.feed_formats.each do |feed_format|
+        feed_layout = "feeds.#{feed_format}"
         next unless @templates.key?(feed_layout)
 
         page = Page.new(self)
-        page.layout = feed_layout
 
-        puts "I AM FEED #{page.inspect} at #{path}"
+        page.layout = feed_layout
+        page.feed_posts = posts.slice(0, 10)
+        page.filename = 'feed'
+        page.extension = feed_format
+
+        puts page.metadata
+
+        page.write(path, context)
       end
     end
 

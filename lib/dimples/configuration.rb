@@ -58,7 +58,7 @@ module Dimples
     end
 
     def self.default_feed_formats
-      ['atom', 'json']
+      %w[atom json]
     end
 
     def self.default_pagination

@@ -59,7 +59,7 @@ module Dimples
     def method_missing(method_name, *args, &block)
       if @metadata.key?(method_name)
         @metadata[method_name]
-      elsif (matches = method_name.match(/([a-z]+)=/))
+      elsif (matches = method_name.match(/([a-z_]+)=/))
         @metadata[matches[1].to_sym] = args[0]
       else
         super
@@ -67,7 +67,7 @@ module Dimples
     end
 
     def respond_to_missing?(method_name, include_private = false)
-      @metadata.key?(method_name) || method_name.match?(/([a-z]+)=/) || super
+      @metadata.key?(method_name) || method_name.match?(/([a-z_]+)=/) || super
     end
   end
 end
