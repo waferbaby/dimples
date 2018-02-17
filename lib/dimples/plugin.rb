@@ -12,11 +12,11 @@ module Dimples
     end
 
     def self.plugins(site)
-      @plugins ||= @subclasses.map { |subclass| subclass.new(site) }
+      @plugins ||= @subclasses&.map { |subclass| subclass.new(site) }
     end
 
     def self.process(site, event, item, &block)
-      plugins(site).each do |plugin|
+      plugins(site)&.each do |plugin|
         plugin.process(event, item, &block) if plugin.supports_event?(event)
       end
 
