@@ -3,7 +3,6 @@
 module Dimples
   class Page
     include Frontable
-    include Renderable
 
     attr_accessor :contents
     attr_accessor :metadata
@@ -52,6 +51,10 @@ module Dimples
     end
 
     private
+
+    def renderer
+      @renderer ||= Renderer.new(@site, self)
+    end
 
     def method_missing(method_name, *args, &block)
       if @metadata.key?(method_name)
