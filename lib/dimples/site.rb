@@ -249,8 +249,6 @@ module Dimples
         page.filename = 'feed'
         page.extension = feed_format
 
-        puts page.metadata
-
         page.write(path, context)
       end
     end
