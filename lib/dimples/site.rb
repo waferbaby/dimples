@@ -40,7 +40,6 @@ module Dimples
       publish_posts
       publish_pages
       publish_archives
-
       publish_categories if @config.generation.categories
     rescue PublishingError, RenderingError, GenerationError => error
       @errors << error
@@ -139,6 +138,8 @@ module Dimples
           post.write(path)
         end
       end
+
+      publish_feeds(@posts, @paths[:output]) if @config.generation.main_feed
     end
 
     def publish_pages
@@ -246,7 +247,7 @@ module Dimples
         page = Page.new(self)
 
         page.layout = feed_layout
-        page.feed_posts = posts.slice(0, 10)
+        page.feed_posts = posts.slice(0, @config.pagination.per_page)
         page.filename = 'feed'
         page.extension = feed_format
 
