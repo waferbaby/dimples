@@ -11,7 +11,7 @@ module Dimples
       context[:site] ||= @site
       context[:pagination] ||= nil
 
-      output = engine.render(scope, context) { body }
+      output = engine.render(scope, context) { body }.strip
       @source.metadata[:rendered_contents] = output
 
       template = @site.templates[@source.metadata[:layout]]
