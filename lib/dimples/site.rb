@@ -9,6 +9,7 @@ module Dimples
     attr_reader :posts
     attr_reader :pages
     attr_reader :templates
+    attr_reader :latest_post
 
     def initialize(config = {})
       @config = Hashie::Mash.new(Configuration.defaults).deep_merge(config)
@@ -39,6 +40,7 @@ module Dimples
       publish_posts
       publish_pages
       publish_archives
+      publish_categories
     rescue PublishingError, RenderingError, GenerationError => error
       @errors << error
     end
@@ -58,6 +60,8 @@ module Dimples
       @pages = []
       @posts = []
       @errors = []
+
+      @latest_post = nil
     end
 
     def read_templates
@@ -82,6 +86,8 @@ module Dimples
           categorise_post(post)
         end
       end.reverse
+
+      @latest_post = @posts[0]
     end
 
     def read_pages
@@ -156,23 +162,47 @@ module Dimples
         paginate_posts(
           @posts,
           File.join(@paths[:output], @config.paths.archives),
-          @config.layouts.archives
+          @config.layouts.archive
         )
       end
 
       %w[year month day].each do |date_type|
         next unless @config.generation["#{date_type}_archives"]
+        publish_date_archive(date_type.to_sym)
+      end
+    end
 
-        @archives[date_type.to_sym].each do |date, posts|
-          date_parts = date.split('-')
-          path = File.join(@paths[:output], @config.paths.archives, date_parts)
+    def publish_date_archive(date_type)
+      @archives[date_type].each do |date, posts|
+        date_parts = date.split('-')
+        path = File.join(@paths[:output], @config.paths.archives, date_parts)
 
-          paginate_posts(
-            posts,
-            path,
-            @config.layouts.archives
-          )
-        end
+        paginate_posts(
+          posts,
+          path,
+          @config.layouts.date_archive,
+          page: {
+            title: posts[0].date.strftime(@config.date_formats[date_type]),
+            archive_date: posts[0].date,
+            archive_type: date_type
+          }
+        )
+      end
+    end
+
+    def publish_categories
+      @categories.each_value do |category|
+        path = File.join(@paths[:output], @config.paths.categories, category.slug)
+
+        paginate_posts(
+          category.posts,
+          path,
+          @config.layouts.category,
+          page: {
+            title: category.name,
+            category: category
+          }
+        )
       end
     end
 
