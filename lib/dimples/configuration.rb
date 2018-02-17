@@ -11,9 +11,9 @@ module Dimples
         generation: default_generation,
         paths: default_paths,
         layouts: default_layouts,
+        pagination: default_pagination,
         date_formats: default_date_formats,
-        feed_formats: default_feed_formats,
-        pagination: default_pagination
+        feed_formats: default_feed_formats
       }
     end
 
@@ -21,7 +21,7 @@ module Dimples
       {
         categories: true,
 
-        post_feed: true,
+        main_feed: true,
         category_feeds: true,
         archive_feeds: true,
 
@@ -58,7 +58,7 @@ module Dimples
     end
 
     def self.default_feed_formats
-      %w[atom json]
+      ['atom']
     end
 
     def self.default_pagination
