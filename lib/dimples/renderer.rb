@@ -12,6 +12,7 @@ module Dimples
       context[:pagination] ||= nil
 
       output = engine.render(scope, context) { body }
+      @source.metadata[:rendered_contents] = output
 
       template = @site.templates[@source.metadata[:layout]]
       return output if template.nil?
