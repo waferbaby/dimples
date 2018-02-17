@@ -17,15 +17,15 @@ module Dimples
     end
 
     def year
-      @year ||= @metadata[:date].strftime(@site.config.date_formats.year)
+      @year ||= @metadata[:date].strftime('%Y')
     end
 
     def month
-      @month ||= @metadata[:date].strftime(@site.config.date_formats.month)
+      @month ||= @metadata[:date].strftime('%m')
     end
 
     def day
-      @day ||= @metadata[:date].strftime(@site.config.date_formats.day)
+      @day ||= @metadata[:date].strftime('%d')
     end
   end
 end
