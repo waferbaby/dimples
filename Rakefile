@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
-require 'rake/testtask'
+require 'rspec/core/rake_task'
 
-Rake::TestTask.new(:test) do |t|
-  t.test_files = FileList['test/test_*.rb']
-  t.warning = false
+RSpec::Core::RakeTask.new(:spec) do |task|
+  task.pattern = Dir.glob('spec/**/*_spec.rb')
 end
+
+task default: :spec
 
 task :build do
   Rake::Task['cleanup'].invoke
