@@ -3,6 +3,8 @@ A simple, opinionated static site generator.
 
 [![Build Status](https://travis-ci.org/waferbaby/dimples.svg?branch=master)](https://travis-ci.org/waferbaby/dimples) [![Test Coverage](https://codeclimate.com/github/waferbaby/dimples/badges/coverage.svg)](https://codeclimate.com/github/waferbaby/dimples) [![Gem Version](https://badge.fury.io/rb/dimples.svg)](http://badge.fury.io/rb/dimples)
 
+**Note:** This is v5 of Dimples, and it's a _complete_ rewrite. [Version 4 is still around](https://github.com/waferbaby/dimples/tree/v4 "Version 4 of the gem.") if you need it.
+
 ## Requirements
 
 - [Tilt](https://github.com/rtomayko/tilt "The Tilt gem.") - for the templates.
@@ -256,9 +258,9 @@ By default, Dimples will capitalise your category's slug as its title, but you c
 
 ```json
 {
-  category_names: {
-    bsd: 'BSD',
-    mac: 'Macintosh'
+  "category_names": {
+    "bsd": "BSD",
+    "mac": "Macintosh"
   }
 }
 ```
