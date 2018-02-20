@@ -3,7 +3,7 @@ A simple, opinionated static site generator.
 
 [![Build Status](https://travis-ci.org/waferbaby/dimples.svg?branch=master)](https://travis-ci.org/waferbaby/dimples) [![Test Coverage](https://codeclimate.com/github/waferbaby/dimples/badges/coverage.svg)](https://codeclimate.com/github/waferbaby/dimples) [![Gem Version](https://badge.fury.io/rb/dimples.svg)](http://badge.fury.io/rb/dimples)
 
-**Note:** This is v5 of Dimples, and it's a _complete_ rewrite. [Version 4 is still around](https://github.com/waferbaby/dimples/tree/v4 "Version 4 of the gem.") if you need it.
+**Note:** This is version 5 of Dimples, and it's a _complete_ rewrite. You can still find [version 4 here](https://github.com/waferbaby/dimples/tree/v4 "Version 4 of the gem.").
 
 ## Requirements
 
@@ -193,7 +193,7 @@ Dimples has a number of options for customising how it works - here are the defa
 }
 ```
 
-## Paths
+### Paths
 
 The source and destination paths for the output.
 
@@ -203,7 +203,7 @@ Key | Default | Description
 `archives` | `archives` | The name of the directory, appended to the `output` path, where the main paginated archives are generated.
 `posts` | `archives/%Y/%m/%d` | The name of the directory where individual posts end up (suffixed with the post slug). This string is passed to Ruby's `strftime` [Time method](http://ruby-doc.org/core-2.4.0/Time.html#method-i-strftime "The strftime method of the Time class."), so you can use any of its options here.
 
-## Generation
+### Generation
 
 Choose what gets built when Dimples runs.
 
@@ -217,7 +217,7 @@ Key | Default | Description
 `main_feed` | true | If we should build the main feeds based on your posts.
 `category_feeds` | true | If we should build feeds of the posts in each site category.
 
-## Layouts
+### Layouts
 
 The default templates for various page types.
 
@@ -228,7 +228,7 @@ Key | Default | Description
 `archive` | `archive` | The main archive pages.
 `date_archive` | `date_archive` | The year, month and day archive pages.
 
-## Pagination
+### Pagination
 
 Settings for all paginated pages.
 
@@ -237,7 +237,7 @@ Key | Default | Description
 `page_prefix` | `page` | The prefix used when generating page URL slugs ("page2").
 `per_page` | 10 | The number of posts to show per page. This applies to your feeds, too.
 
-## Date formats
+### Date formats
 
 These are used to define the auto-generated title for each type of archive page, and they're passed to Ruby's [method for formatting dates](https://ruby-doc.org/stdlib-2.3.1/libdoc/date/rdoc/Date.html#method-i-strftime "The strftime method of the Date class.").
 
@@ -247,12 +247,12 @@ Key | Default | Description
 `month` | `%Y-%m` | The month format.
 `day` | `%Y-%m-%d` | The day format.
 
-## Feed formats
+### Feed formats
 
 An array of feed formats your site supports - these will be matched by name to the templates within the `templates/feeds/` directory, so `atom` will use
 `templates/feeds/atom.(extension)`.
 
-## Category names
+### Category names
 
 By default, Dimples will capitalise your category's slug as its title, but you can override that here:
 
@@ -265,6 +265,6 @@ By default, Dimples will capitalise your category's slug as its title, but you c
 }
 ```
 
-## Rendering
+### Rendering
 
 These options will be passed directly to the renderer Tilt picks for your posts, pages and templates based on the file extension.
