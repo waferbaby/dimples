@@ -1,9 +1,12 @@
+# frozen_string_literal: true
+
 describe 'Page' do
   let(:site) { double }
 
   describe '#initialize' do
     context 'when a path is provided' do
-      let(:page) { Dimples::Page.new(site, './pages/about.erb') }
+      let(:path) { './pages/about.erb' }
+      let(:page) { Dimples::Page.new(site, path) }
 
       before do
         page_data = <<PAGE_DATA
@@ -15,12 +18,12 @@ layout: default
 Hello.
 PAGE_DATA
 
-        allow(File).to receive(:read).with('./pages/about.erb').and_return(page_data)
+        allow(File).to receive(:read).with(path).and_return(page_data)
       end
 
       it 'parses the metadata and contents' do
         expect(page.contents).to eq('Hello.')
-        expect(page.metadata).to eq({ title: 'About', layout: 'default' })
+        expect(page.metadata).to eq(title: 'About', layout: 'default')
       end
     end
 

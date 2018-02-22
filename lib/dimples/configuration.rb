@@ -11,7 +11,7 @@ module Dimples
         date_formats: default_date_formats,
         feed_formats: default_feed_formats,
         category_names: {},
-        rendering: {},
+        rendering: {}
       }
     end
 
@@ -32,7 +32,7 @@ module Dimples
         day_archives: true,
         categories: true,
         main_feed: true,
-        category_feeds: true,
+        category_feeds: true
       }
     end
 
