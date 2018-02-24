@@ -6,6 +6,14 @@ SimpleCov.start
 require 'dimples'
 
 RSpec.configure do |config|
+  config.before(:example) do
+    @site_output = File.join(__dir__, 'tmp')
+  end
+
+  config.after(:example) do
+    FileUtils.rm_rf(@site_output) if Dir.exist?(@site_output)
+  end
+
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
   end
