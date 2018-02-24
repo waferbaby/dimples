@@ -2,33 +2,21 @@
 
 describe 'Page' do
   let(:site) { double }
-  let(:page) { Dimples::Page.new(site) }
+  let(:page) { Dimples::Page.new(site, source_path) }
+  let(:html) { '<p><em>Hey!</em></p>' }
+  let(:source_path) { path = File.join(__dir__, 'sources', 'pages', 'index.markdown') }
 
   describe '#initialize' do
     context 'when a path is provided' do
-      let(:path) { './pages/about.erb' }
-      let(:page) { Dimples::Page.new(site, path) }
-
-      before do
-        page_data = <<PAGE_DATA
----
-title: About
-layout: default
----
-
-Hello.
-PAGE_DATA
-
-        allow(File).to receive(:read).with(path).and_return(page_data)
-      end
-
       it 'parses the metadata and contents' do
-        expect(page.contents).to eq('Hello.')
-        expect(page.metadata).to eq(title: 'About', layout: 'default')
+        expect(page.contents).to eq('*Hey!*')
+        expect(page.metadata).to eq(title: 'About', layout: false)
       end
     end
 
     context 'when no path is provided' do
+      let(:page) { Dimples::Page.new(site) }
+
       it 'sets the default metadata and contents' do
         expect(page.contents).to eq('')
         expect(page.metadata).to eq({})
@@ -73,8 +61,39 @@ PAGE_DATA
   end
 
   describe '#render' do
+    context 'when the page has a path' do
+      before do
+        config = Hashie::Mash.new({ rendering: {} })
+        allow(site).to receive(:config).and_return(config)
+      end
+
+      it 'renders the contents' do
+        expect(page.render).to eq(html)
+      end
+    end
+
+    context 'when the page has no path' do
+      let(:page) { Dimples::Page.new(site) }
+
+      it 'renders an empty string' do
+        expect(page.render).to eq('')
+      end
+    end
   end
 
   describe '#write' do
+    let(:output_directory) { File.join(@site_output, 'pages') }
+    let(:output_path) { File.join(output_directory, "#{page.filename}.#{page.extension}") }
+
+    before do
+      allow(page).to receive(:render).and_return(html)
+    end
+
+    it 'writes out the file' do
+      page.write(output_directory)
+
+      expect(File.exist?(output_path)).to eq(true)
+      expect(File.read(output_path)).to eq(html)
+    end
   end
 end
