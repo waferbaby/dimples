@@ -14,7 +14,10 @@ module Dimples
       output = engine.render(scope, context) { body }.strip
       @source.metadata[:rendered_contents] = output
 
-      template = @site.templates[@source.metadata[:layout]]
+      if @source.metadata[:layout]
+        template = @site.templates[@source.metadata[:layout]]
+      end
+
       return output if template.nil?
 
       template.render(context, output)
