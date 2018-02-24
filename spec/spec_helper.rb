@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'dimples'
 require 'simplecov'
-
 SimpleCov.start
+
+require 'dimples'
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
