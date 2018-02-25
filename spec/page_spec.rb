@@ -4,7 +4,7 @@ describe 'Page' do
   let(:site) { double }
   let(:page) { Dimples::Page.new(site, source_path) }
   let(:html) { '<p><em>Hey!</em></p>' }
-  let(:source_path) { path = File.join(__dir__, 'sources', 'pages', 'index.markdown') }
+  let(:source_path) { File.join(__dir__, 'sources', 'pages', 'index.markdown') }
 
   describe '#initialize' do
     context 'when a path is provided' do
@@ -63,7 +63,7 @@ describe 'Page' do
   describe '#render' do
     context 'when the page has a path' do
       before do
-        config = Hashie::Mash.new({ rendering: {} })
+        config = Hashie::Mash.new(rendering: {})
         allow(site).to receive(:config).and_return(config)
       end
 
@@ -82,18 +82,33 @@ describe 'Page' do
   end
 
   describe '#write' do
-    let(:output_directory) { File.join(@site_output, 'pages') }
-    let(:output_path) { File.join(output_directory, "#{page.filename}.#{page.extension}") }
+    let(:page_directory) { File.join(@site_output, 'pages') }
 
     before do
       allow(page).to receive(:render).and_return(html)
     end
 
-    it 'writes out the file' do
-      page.write(output_directory)
+    context 'when we have correct permissions' do
+      it 'writes out the file' do
+        page.write(page_directory)
 
-      expect(File.exist?(output_path)).to eq(true)
-      expect(File.read(output_path)).to eq(html)
+        path = File.join(page_directory, "#{page.filename}.#{page.extension}")
+
+        expect(File.exist?(path)).to eq(true)
+        expect(File.read(path)).to eq(html)
+      end
+    end
+
+    context 'when we have incorrect permissions' do
+      before do
+        Dir.mkdir(@site_output, 0o400)
+      end
+
+      it 'raises an exception' do
+        expect { page.write(page_directory) }.to raise_error(
+          Dimples::PublishingError
+        )
+      end
     end
   end
 end
