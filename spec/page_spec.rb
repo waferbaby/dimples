@@ -111,4 +111,20 @@ describe 'Page' do
       end
     end
   end
+
+  describe '#inspect' do
+    context 'when a path is provided' do
+      it 'shows the correct string' do
+        expect(page.inspect).to eq("#<Dimples::Page @path=#{page.path}>")
+      end
+    end
+
+    context 'when no path is provided' do
+      let(:page) { Dimples::Page.new(site) }
+
+      it 'shows the correct string' do
+        expect(page.inspect).to eq("#<Dimples::Page @path=>")
+      end
+    end
+  end
 end
