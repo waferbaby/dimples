@@ -123,7 +123,7 @@ describe 'Page' do
       let(:page) { Dimples::Page.new(site) }
 
       it 'shows the correct string' do
-        expect(page.inspect).to eq("#<Dimples::Page @path=>")
+        expect(page.inspect).to eq('#<Dimples::Page @path=>')
       end
     end
   end
