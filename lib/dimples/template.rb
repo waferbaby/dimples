@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Dimples
+  # A single template used when rendering pages, posts and other templates.
   class Template
     include Frontable
 

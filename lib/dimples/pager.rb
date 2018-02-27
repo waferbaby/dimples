@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Dimples
+  # A paginated collection of posts that can be walked forward or backwards.
   class Pager
     include Enumerable
 

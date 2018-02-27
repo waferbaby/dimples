@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Dimples
+  # Default configuration options for a site.
   module Configuration
     def self.defaults
       {

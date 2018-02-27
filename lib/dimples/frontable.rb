@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Dimples
+  # Adds the ability to read frontmatter from a file.
   module Frontable
     def read_with_front_matter(path)
       contents = File.read(path)

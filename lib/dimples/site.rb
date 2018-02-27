@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Dimples
+  # A collection of pages, posts and templates that can generate a website.
   class Site
     attr_reader :config
     attr_reader :categories

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Dimples
+  # A single page on a site.
   class Page
     include Frontable
 

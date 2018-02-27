@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Dimples
+  # A single post category for a site.
   class Category
     attr_accessor :name
     attr_accessor :slug

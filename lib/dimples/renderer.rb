@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Dimples
+  # A wrapper around Tilt, tied to a single post, page or template.
   class Renderer
     def initialize(site, source)
       @site = site

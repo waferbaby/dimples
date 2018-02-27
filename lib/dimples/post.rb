@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Dimples
+  # A single dated post on a site.
   class Post < Page
     POST_FILENAME = /(\d{4})-(\d{2})-(\d{2})-(.+)/
 

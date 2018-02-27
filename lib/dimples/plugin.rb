@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Dimples
+  # A Ruby class that can receive events from Dimples as a site is processed.
   class Plugin
     EVENTS = %i[
       post_write
