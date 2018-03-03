@@ -4,8 +4,12 @@ module Dimples
   # A Ruby class that can receive events from Dimples as a site is processed.
   class Plugin
     EVENTS = %i[
-      post_write
-      page_write
+      before_site_generation
+      after_site_generation
+      before_post_write
+      before_page_write
+      after_post_write
+      after_page_write
     ].freeze
 
     def self.inherited(subclass)
@@ -16,12 +20,10 @@ module Dimples
       @plugins ||= @subclasses&.map { |subclass| subclass.new(site) }
     end
 
-    def self.process(site, event, item, &block)
+    def self.send_event(site, event, item = nil)
       plugins(site)&.each do |plugin|
-        plugin.process(event, item, &block) if plugin.supports_event?(event)
+        plugin.process(event, item) if plugin.supports_event?(event)
       end
-
-      yield if block_given?
     end
 
     def initialize(site)
