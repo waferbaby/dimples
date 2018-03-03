@@ -22,9 +22,7 @@ module Dimples
     end
 
     def each(&block)
-      (1..@page_count).each do |index|
-        block.yield step_to(index)
-      end
+      (1..@page_count).each { |index| block.yield step_to(index) }
     end
 
     def step_to(page)
