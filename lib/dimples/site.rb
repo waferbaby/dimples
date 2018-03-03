@@ -29,6 +29,8 @@ module Dimples
     end
 
     def generate
+      trigger_event(:before_site_generation)
+
       prepare
 
       read_templates
@@ -42,6 +44,8 @@ module Dimples
       publish_pages
       publish_archives
       publish_categories if @config.generation.categories
+
+      trigger_event(:after_site_generation)
     rescue PublishingError, RenderingError, GenerationError => error
       @errors << error
     end
@@ -129,15 +133,17 @@ module Dimples
 
     def publish_posts
       @posts.each do |post|
-        Plugin.process(self, :post_write, post) do
-          path = File.join(
-            @paths[:output],
-            post.date.strftime(@config.paths.posts),
-            post.slug
-          )
+        trigger_event(:before_post_write, post)
 
-          post.write(path)
-        end
+        path = File.join(
+          @paths[:output],
+          post.date.strftime(@config.paths.posts),
+          post.slug
+        )
+
+        post.write(path)
+
+        trigger_event(:after_post_write, post)
       end
 
       publish_feeds(@posts, @paths[:output]) if @config.generation.main_feed
@@ -145,18 +151,20 @@ module Dimples
 
     def publish_pages
       @pages.each do |page|
-        Plugin.process(self, :page_write, page) do
-          path = if page.path
-                   File.dirname(page.path).sub(
-                     @paths[:sources][:pages],
-                     @paths[:output]
-                   )
-                 else
-                   @paths[:output]
-                 end
+        trigger_event(:before_page_write, page)
 
-          page.write(path)
-        end
+        path = if page.path
+                 File.dirname(page.path).sub(
+                   @paths[:sources][:pages],
+                   @paths[:output]
+                 )
+               else
+                 @paths[:output]
+               end
+
+        page.write(path)
+
+        trigger_event(:after_page_write, page)
       end
     end
 
@@ -270,6 +278,10 @@ module Dimples
 
     def archive_day(year, month, day)
       @archives[:day]["#{year}-#{month}-#{day}"] ||= []
+    end
+
+    def trigger_event(event, item = nil)
+      Plugin.send_event(self, event, item)
     end
   end
 end
