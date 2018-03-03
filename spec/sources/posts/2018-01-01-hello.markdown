@@ -1,0 +1,8 @@
+---
+title: Woof!
+categories:
+- personal
+- dog
+---
+
+This is my first post! I love my dog.
