@@ -5,13 +5,15 @@ describe 'Frontable' do
 
   describe '#read_with_front_matter' do
     context 'when a file has front matter' do
-      let(:source_path) { File.join(__dir__, 'sources', 'pages', 'index.markdown') }
+      let(:source_path) do
+        File.join(__dir__, 'sources', 'pages', 'index.markdown')
+      end
 
       it 'correctly parses the contents and metadata' do
         contents, metadata = read_with_front_matter(source_path)
 
         expect(contents).to eq('*Hey!*')
-        expect(metadata).to eq(title: "About", layout: false)
+        expect(metadata).to eq(title: 'About', layout: false)
       end
     end
 
