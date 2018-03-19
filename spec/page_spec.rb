@@ -99,18 +99,8 @@ describe 'Page' do
   end
 
   describe '#inspect' do
-    context 'when a path is provided' do
-      it 'shows the correct string' do
-        expect(subject.inspect).to eq("#<Dimples::Page @path=#{subject.path}>")
-      end
-    end
-
-    context 'when no path is provided' do
-      subject { Dimples::Page.new(site) }
-
-      it 'shows the correct string' do
-        expect(subject.inspect).to eq('#<Dimples::Page @path=>')
-      end
+    it 'shows the correct string' do
+      expect(subject.inspect).to eq("#<Dimples::Page @path=#{subject.path}>")
     end
   end
 end
