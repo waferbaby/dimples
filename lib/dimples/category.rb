@@ -3,8 +3,8 @@
 module Dimples
   # A single post category for a site.
   class Category
-    attr_accessor :name
-    attr_accessor :slug
+    attr_reader :name
+    attr_reader :slug
     attr_accessor :posts
 
     def initialize(site, slug)
