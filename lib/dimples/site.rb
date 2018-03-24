@@ -71,8 +71,9 @@ module Dimples
 
     def read_templates
       @templates = {}
+      template_glob = File.join(@paths[:sources][:templates], '**', '*.*')
 
-      globbed_files(@paths[:sources][:templates]).each do |path|
+      Dir.glob(template_glob).each do |path|
         basename = File.basename(path, File.extname(path))
         dir_name = File.dirname(path)
 
@@ -85,7 +86,9 @@ module Dimples
     end
 
     def read_posts
-      @posts = globbed_files(@paths[:sources][:posts]).sort.map do |path|
+      post_glob = File.join(@paths[:sources][:posts], '**', '*.*')
+
+      @posts = Dir.glob(post_glob).sort.map do |path|
         Post.new(self, path).tap do |post|
           add_archive_post(post)
           categorise_post(post)
@@ -96,9 +99,8 @@ module Dimples
     end
 
     def read_pages
-      @pages = globbed_files(@paths[:sources][:pages]).sort.map do |path|
-        Page.new(self, path)
-      end
+      page_glob = File.join(@paths[:sources][:pages], '**', '*.*')
+      @pages = Dir.glob(page_glob).sort.map { |path| Page.new(self, path) }
     end
 
     def add_archive_post(post)
@@ -264,10 +266,6 @@ module Dimples
       end
     end
 
-    def globbed_files(path)
-      Dir.glob(File.join(path, '**', '*.*'))
-    end
-
     def archive_year(year)
       @archives[:year][year] ||= []
     end
@@ -283,8 +281,6 @@ module Dimples
     def plugins
       @plugins ||= Plugin.subclasses&.map { |subclass| subclass.new(self) }
     end
-
-    private
 
     def trigger_event(event, item = nil)
       plugins.each do |plugin|
