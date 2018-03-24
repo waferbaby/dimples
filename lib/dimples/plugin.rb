@@ -12,18 +12,12 @@ module Dimples
       after_page_write
     ].freeze
 
+    class << self
+      attr_reader :subclasses
+    end
+
     def self.inherited(subclass)
       (@subclasses ||= []) << subclass
-    end
-
-    def self.plugins(site)
-      @plugins ||= @subclasses&.map { |subclass| subclass.new(site) }
-    end
-
-    def self.send_event(site, event, item = nil)
-      plugins(site)&.each do |plugin|
-        plugin.process(event, item) if plugin.supports_event?(event)
-      end
     end
 
     def initialize(site)
