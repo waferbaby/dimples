@@ -280,8 +280,16 @@ module Dimples
       @archives[:day]["#{year}-#{month}-#{day}"] ||= []
     end
 
+    def plugins
+      @plugins ||= Plugin.subclasses&.map { |subclass| subclass.new(self) }
+    end
+
+    private
+
     def trigger_event(event, item = nil)
-      Plugin.send_event(self, event, item)
+      plugins.each do |plugin|
+        plugin.process(event, item) if plugin.supports_event?(event)
+      end
     end
   end
 end
