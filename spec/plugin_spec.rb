@@ -17,6 +17,18 @@ describe 'Plugin' do
         expect(subclasses).to eq([TestPluginA, TestPluginB])
       end
     end
+
+    context 'when a plugin supports a list of events' do
+      before do
+        allow(subject).to receive(:supported_events).and_return(
+          [:before_site_generation]
+        )
+      end
+
+      it 'returns true for an event' do
+        expect(subject.supports_event?(:before_site_generation)).to eq(true)
+      end
+    end
   end
 
   describe '#supports_event?' do
