@@ -3,6 +3,8 @@
 module Dimples
   # A paginated collection of posts that can be walked forward or backwards.
   class Pager
+    PER_PAGE_DEFAULT = 10
+
     include Enumerable
 
     attr_reader :current_page
@@ -14,7 +16,7 @@ module Dimples
     def initialize(url, posts, options = {})
       @url = url
       @posts = posts
-      @per_page = options[:per_page] || 10
+      @per_page = options[:per_page] || PER_PAGE_DEFAULT
       @page_prefix = options[:page_prefix] || 'page'
       @page_count = (posts.length.to_f / @per_page.to_i).ceil
 
