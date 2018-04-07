@@ -17,7 +17,7 @@ describe 'Pager' do
       before { options[:per_page] = 5 }
 
       it 'yields the correct page numbers' do
-        expect { |b| subject.each(&b) }.to yield_successive_args(1, 2, 3, 4, 5, 6)
+        expect { |b| subject.each(&b) }.to yield_successive_args(*1..6)
       end
     end
   end
@@ -25,7 +25,8 @@ describe 'Pager' do
   describe '#posts_at' do
     context 'with default options' do
       it 'returns the correct number of paginated items' do
-        expect(subject.posts_at(1).count).to eq(Dimples::Pager::PER_PAGE_DEFAULT)
+        count = subject.posts_at(1).count
+        expect(count).to eq(Dimples::Pager::PER_PAGE_DEFAULT)
       end
     end
 
