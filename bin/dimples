@@ -26,6 +26,7 @@ dimples <#{valid_commands.join('|')}> [options]
 Options:
 BANNER
   opt :config, 'Config file path', type: :string
+  opt :output, 'Destination directory', type: :string
   opt :verbose, 'Verbose mode', default: false
 end
 
@@ -58,6 +59,8 @@ if Dir.exist?(plugins_path)
   end
 end
 
+config[:paths][:output] = options[:output] if options[:output]
+
 site = Dimples::Site.new(config)
 
 case command.to_sym
@@ -67,7 +70,7 @@ when :build
   site.generate
 
   if site.errors.empty?
-    puts 'Done! Your site has been built.'
+    puts "Done! Your site has been built (#{site.paths[:output]})."
   else
     puts 'Generation failed:'
     site.errors.each { |error| puts error }
