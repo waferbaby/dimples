@@ -17,7 +17,8 @@ module Dimples
 
       @paths = {}.tap do |paths|
         paths[:base] = Dir.pwd
-        paths[:output] = File.join(paths[:base], @config.paths.output)
+        paths[:output] = File.expand_path(@config.paths.output)
+
         paths[:sources] = {}.tap do |sources|
           %w[pages posts static templates].each do |type|
             sources[type.to_sym] = File.join(paths[:base], type)
