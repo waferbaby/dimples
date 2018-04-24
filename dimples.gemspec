@@ -15,6 +15,8 @@ Gem::Specification.new do |s|
   s.description = 'A simple tool for building static websites.'
   s.license     = 'MIT'
 
+  s.required_ruby_version = '~> 2.4'
+
   s.executables << 'dimples'
 
   s.files        = Dir.glob('lib/**/*')

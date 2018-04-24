@@ -1,7 +1,7 @@
 language: ruby
 sudo: false
 rvm:
-  - 2.5.0
+  - 2.4.3
 script:
   - bundle exec rake spec
   - bundle exec codeclimate-test-reporter
