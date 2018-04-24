@@ -18,7 +18,7 @@ module Dimples
 
     def self.default_paths
       {
-        output: 'site',
+        output: 'public',
         archives: 'archives',
         posts: 'archives/%Y/%m/%d',
         categories: 'archives/categories'

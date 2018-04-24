@@ -19,7 +19,7 @@ module Dimples
         paths[:base] = Dir.pwd
         paths[:output] = File.join(paths[:base], @config.paths.output)
         paths[:sources] = {}.tap do |sources|
-          %w[pages posts public templates].each do |type|
+          %w[pages posts static templates].each do |type|
             sources[type.to_sym] = File.join(paths[:base], type)
           end
         end
@@ -38,7 +38,7 @@ module Dimples
       read_pages
 
       create_output_directory
-      copy_assets
+      copy_static_assets
 
       publish_posts
       publish_pages
@@ -126,9 +126,9 @@ module Dimples
       raise GenerationError, message
     end
 
-    def copy_assets
-      return unless Dir.exist?(@paths[:sources][:public])
-      FileUtils.cp_r(File.join(@paths[:sources][:public], '.'), @paths[:output])
+    def copy_static_assets
+      return unless Dir.exist?(@paths[:sources][:static])
+      FileUtils.cp_r(File.join(@paths[:sources][:static], '.'), @paths[:output])
     rescue StandardError => e
       raise GenerationError, "Failed to copy site assets (#{e.message})"
     end
