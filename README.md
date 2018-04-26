@@ -156,7 +156,7 @@ Dimples has a number of options for customising how it works - here are the defa
 ```json
 {
   "paths": {
-    "output": "site",
+    "output": "./public",
     "archives": "archives",
     "posts": "archives/%Y/%m/%d",
     "categories": "archives/categories"
@@ -199,9 +199,10 @@ The source and destination paths for the output.
 
 Key | Default | Description
 ----|---------|-------------
-`output` | `site`. | The name of the directory, appended to the current working directory, where Dimples will build the site. This directory is generated for you if it doesn't exist (and **it's destroyed if it does!**).
+`output` | `./public` | The path of the directory where Dimples will build the site. This directory is generated for you if it doesn't exist (and **it's destroyed if it does!**).
 `archives` | `archives` | The name of the directory, appended to the `output` path, where the main paginated archives are generated.
-`posts` | `archives/%Y/%m/%d` | The name of the directory where individual posts end up (suffixed with the post slug). This string is passed to Ruby's `strftime` [Time method](http://ruby-doc.org/core-2.4.0/Time.html#method-i-strftime "The strftime method of the Time class."), so you can use any of its options here.
+`posts` | `archives/%Y/%m/%d` | The name of the directory, appended to the `output` path, where individual posts end up (suffixed with the post slug). This string is passed to Ruby's `strftime` [Time method](http://ruby-doc.org/core-2.4.0/Time.html#method-i-strftime "The strftime method of the Time class."), so you can use any of its options here.
+`categories` | `archives/categories` | The name of the directory, appended to the `output` path, where category index pages are generated (suffixed with the category slug).
 
 ### Generation
 
