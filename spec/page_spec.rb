@@ -7,6 +7,24 @@ describe 'Page' do
   let(:html) { '<p><em>Hey!</em></p>' }
   let(:source_path) { File.join(__dir__, 'sources', 'pages', 'index.markdown') }
 
+  describe '#initialize' do
+    context 'when a path is provided' do
+      it 'parses the metadata and contents' do
+        expect(subject.contents).to eq('*Hey!*')
+        expect(subject.metadata).to eq(title: 'About', layout: false)
+      end
+    end
+
+    context 'when no path is provided' do
+      subject { Dimples::Page.new(site) }
+
+      it 'sets the default metadata and contents' do
+        expect(subject.contents).to eq('')
+        expect(subject.metadata).to eq({})
+      end
+    end
+  end
+
   describe '#filename' do
     context 'with no filename provided in the metadata' do
       it 'returns the default filename' do
