@@ -4,8 +4,10 @@ module Dimples
   # A Ruby class that can receive events from Dimples as a site is processed.
   class Plugin
     EVENTS = %i[
-      before_site_generation
-      after_site_generation
+      before_file_scanning
+      after_file_scanning
+      before_publishing
+      after_publishing
       before_post_write
       before_page_write
       after_post_write
@@ -24,7 +26,7 @@ module Dimples
       @site = site
     end
 
-    def process(event, item, &block); end
+    def process(event, item); end
 
     def supported_events
       []
