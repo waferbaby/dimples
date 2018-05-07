@@ -30,25 +30,34 @@ module Dimples
     end
 
     def generate
-      trigger_event(:before_site_generation)
-
       prepare
+      scan_sources
+      create_output_directory
+      copy_static_assets
+      publish_files
+    rescue PublishingError, RenderingError, GenerationError => error
+      @errors << error
+    end
+
+    def scan_sources
+      trigger_event(:before_file_scanning)
 
       read_templates
       read_posts
       read_pages
 
-      create_output_directory
-      copy_static_assets
+      trigger_event(:after_file_scanning)
+    end
+
+    def publish_files
+      trigger_event(:before_publishing)
 
       publish_posts
       publish_pages
       publish_archives
       publish_categories if @config.generation.categories
 
-      trigger_event(:after_site_generation)
-    rescue PublishingError, RenderingError, GenerationError => error
-      @errors << error
+      trigger_event(:after_publishing)
     end
 
     def inspect
