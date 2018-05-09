@@ -159,6 +159,14 @@ module Dimples
       end
 
       publish_feeds(@posts, @paths[:output]) if @config.generation.main_feed
+
+      if @config.generation.paginated_posts
+        paginate_posts(
+          @posts,
+          File.join(@paths[:output], @config.paths.paginated_posts),
+          @config.layouts.paginated_post
+        )
+      end
     end
 
     def publish_pages
@@ -181,14 +189,6 @@ module Dimples
     end
 
     def publish_archives
-      if @config.generation.archives
-        paginate_posts(
-          @posts,
-          File.join(@paths[:output], @config.paths.archives),
-          @config.layouts.archive
-        )
-      end
-
       %w[year month day].each do |date_type|
         next unless @config.generation["#{date_type}_archives"]
         publish_date_archive(date_type.to_sym)
