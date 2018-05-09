@@ -20,6 +20,7 @@ module Dimples
       {
         output: './public',
         archives: 'archives',
+        paginated_posts: 'posts',
         posts: 'archives/%Y/%m/%d',
         categories: 'archives/categories'
       }
@@ -27,6 +28,7 @@ module Dimples
 
     def self.default_generation
       {
+        paginated_posts: true,
         archives: true,
         year_archives: true,
         month_archives: true,
@@ -41,6 +43,7 @@ module Dimples
       {
         post: 'post',
         category: 'category',
+        paginated_post: 'paginated_post',
         archive: 'archive',
         date_archive: 'archive'
       }
