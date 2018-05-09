@@ -9,6 +9,7 @@ module Dimples
     attr_reader :paths
     attr_reader :posts
     attr_reader :pages
+    attr_reader :archives
     attr_reader :templates
     attr_reader :latest_post
 
@@ -54,7 +55,7 @@ module Dimples
 
       publish_posts
       publish_pages
-      publish_archives
+      publish_archives if @config.generation.year_archives
       publish_categories if @config.generation.categories
 
       trigger_event(:after_publishing)
@@ -67,7 +68,7 @@ module Dimples
     private
 
     def prepare
-      @archives = { year: {}, month: {}, day: {} }
+      @archives = { year: {} }
 
       @categories = {}
       @templates = {}
@@ -114,9 +115,9 @@ module Dimples
     end
 
     def add_archive_post(post)
-      archive_year(post.year) << post
-      archive_month(post.year, post.month) << post
-      archive_day(post.year, post.month, post.day) << post
+      archive_year(post.year)[:posts] << post
+      archive_month(post.year, post.month)[:posts] << post
+      archive_day(post.year, post.month, post.day)[:posts] << post
     end
 
     def categorise_post(post)
@@ -160,13 +161,13 @@ module Dimples
 
       publish_feeds(@posts, @paths[:output]) if @config.generation.main_feed
 
-      if @config.generation.paginated_posts
-        paginate_posts(
-          @posts,
-          File.join(@paths[:output], @config.paths.paginated_posts),
-          @config.layouts.paginated_post
-        )
-      end
+      return unless @config.generation.paginated_posts
+
+      paginate_posts(
+        @posts,
+        File.join(@paths[:output], @config.paths.paginated_posts),
+        @config.layouts.paginated_post
+      )
     end
 
     def publish_pages
@@ -189,28 +190,45 @@ module Dimples
     end
 
     def publish_archives
-      %w[year month day].each do |date_type|
-        next unless @config.generation["#{date_type}_archives"]
-        publish_date_archive(date_type.to_sym)
+      @archives[:year].each do |year, year_archive|
+        publish_date_archive(year)
+        next unless @config.generation.month_archives
+
+        year_archive[:month].each do |month, month_archive|
+          publish_date_archive(year, month)
+          next unless @config.generation.day_archives
+
+          month_archive[:day].each do |day, _|
+            publish_date_archive(year, month, day)
+          end
+        end
       end
     end
 
-    def publish_date_archive(date_type)
-      @archives[date_type].each do |date, posts|
-        date_parts = date.split('-')
-        path = File.join(@paths[:output], @config.paths.archives, date_parts)
+    def publish_date_archive(year, month = nil, day = nil)
+      date_type = if day
+                    'day'
+                  elsif month
+                    'month'
+                  else
+                    'year'
+                  end
 
-        paginate_posts(
-          posts.reverse,
-          path,
-          @config.layouts.date_archive,
-          page: {
-            title: posts[0].date.strftime(@config.date_formats[date_type]),
-            archive_date: posts[0].date,
-            archive_type: date_type
-          }
-        )
-      end
+      date_parts = [year, month, day].compact
+      path = File.join(@paths[:output], @config.paths.archives, date_parts)
+
+      posts = archive(year, month, day)[:posts]
+
+      paginate_posts(
+        posts.reverse,
+        path,
+        @config.layouts.date_archive,
+        page: {
+          title: posts[0].date.strftime(@config.date_formats[date_type]),
+          archive_date: posts[0].date,
+          archive_type: date_type
+        }
+      )
     end
 
     def publish_categories
@@ -276,16 +294,34 @@ module Dimples
       end
     end
 
+    def archive(year, month = nil, day = nil)
+      if day
+        archive_day(year, month, day)
+      elsif month
+        archive_month(year, month)
+      else
+        archive_year(year)
+      end
+    end
+
     def archive_year(year)
-      @archives[:year][year] ||= []
+      @archives[:year][year.to_s] ||= {
+        month: {},
+        posts: []
+      }
     end
 
     def archive_month(year, month)
-      @archives[:month]["#{year}-#{month}"] ||= []
+      archive_year(year)[:month][month.to_s] ||= {
+        day: {},
+        posts: []
+      }
     end
 
     def archive_day(year, month, day)
-      @archives[:day]["#{year}-#{month}-#{day}"] ||= []
+      archive_month(year, month)[:day][day.to_s] ||= {
+        posts: []
+      }
     end
 
     def plugins
