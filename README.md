@@ -158,10 +158,12 @@ Dimples has a number of options for customising how it works - here are the defa
   "paths": {
     "output": "./public",
     "archives": "archives",
+    "paginated_posts": "posts",
     "posts": "archives/%Y/%m/%d",
     "categories": "archives/categories"
   },
   "generation": {
+    "paginated_posts": true,
     "archives": true,
     "year_archives": true,
     "month_archives": true,
@@ -173,6 +175,7 @@ Dimples has a number of options for customising how it works - here are the defa
   "layouts": {
     "post": "post",
     "category": "category",
+    "paginated_post": "paginated_post",
     "archive": "archive",
     "date_archive": "archive"
   },
@@ -201,6 +204,7 @@ Key | Default | Description
 ----|---------|-------------
 `output` | `./public` | The path of the directory where Dimples will build the site. This directory is generated for you if it doesn't exist (and **it's destroyed if it does!**).
 `archives` | `archives` | The name of the directory, appended to the `output` path, where the main paginated archives are generated.
+`paginated_posts` | `posts` | The name of the directory, appended to the `output` path, where index-style pages for all posts are generated.
 `posts` | `archives/%Y/%m/%d` | The name of the directory, appended to the `output` path, where individual posts end up (suffixed with the post slug). This string is passed to Ruby's `strftime` [Time method](http://ruby-doc.org/core-2.4.0/Time.html#method-i-strftime "The strftime method of the Time class."), so you can use any of its options here.
 `categories` | `archives/categories` | The name of the directory, appended to the `output` path, where category index pages are generated (suffixed with the category slug).
 
@@ -210,6 +214,7 @@ Choose what gets built when Dimples runs.
 
 Key | Default | Description
 ----|---------|-------------
+`paginated_posts` | true | If we should build out paginated pages for all posts.
 `archives` | true | If we should build the main paginated archive pages for all posts.
 `year_archives` | true | If we should build paginated year archives.
 `month_archives` | true | If we should build paginated month archives.
@@ -226,6 +231,7 @@ Key | Default | Description
 ----|---------|-------------
 `post` | `post` | A single post.
 `category` | `category` | Category pages.
+`paginated_post` | `paginated_post` | The paginated posts pages.
 `archive` | `archive` | The main archive pages.
 `date_archive` | `date_archive` | The year, month and day archive pages.
 
