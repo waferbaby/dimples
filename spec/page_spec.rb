@@ -4,14 +4,14 @@ describe 'Page' do
   subject { Dimples::Page.new(site, source_path) }
 
   let(:site) { double }
-  let(:html) { '<p><em>Hey!</em></p>' }
-  let(:source_path) { File.join(__dir__, 'sources', 'pages', 'index.markdown') }
+  let(:html) { '<p>I am a test website.</p>' }
+  let(:source_path) { File.join(__dir__, 'sources', 'pages', 'about', 'index.markdown') }
 
   describe '#initialize' do
     context 'when a path is provided' do
       it 'parses the metadata and contents' do
-        expect(subject.contents).to eq('*Hey!*')
-        expect(subject.metadata).to eq(title: 'About', layout: false)
+        expect(subject.contents).to eq('I am a test website.')
+        expect(subject.metadata).to eq(title: 'About')
       end
     end
 
