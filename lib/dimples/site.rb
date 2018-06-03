@@ -40,27 +40,6 @@ module Dimples
       @errors << error
     end
 
-    def scan_sources
-      trigger_event(:before_file_scanning)
-
-      read_templates
-      read_posts
-      read_pages
-
-      trigger_event(:after_file_scanning)
-    end
-
-    def publish_files
-      trigger_event(:before_publishing)
-
-      publish_posts
-      publish_pages
-      publish_archives if @config.generation.year_archives
-      publish_categories if @config.generation.categories
-
-      trigger_event(:after_publishing)
-    end
-
     def inspect
       "#<#{self.class} @paths=#{paths}>"
     end
@@ -78,6 +57,16 @@ module Dimples
       @errors = []
 
       @latest_post = nil
+    end
+
+    def scan_sources
+      trigger_event(:before_file_scanning)
+
+      read_templates
+      read_posts
+      read_pages
+
+      trigger_event(:after_file_scanning)
     end
 
     def read_templates
@@ -142,6 +131,17 @@ module Dimples
       FileUtils.cp_r(File.join(@paths[:sources][:static], '.'), @paths[:output])
     rescue StandardError => e
       raise GenerationError, "Failed to copy site assets (#{e.message})"
+    end
+
+    def publish_files
+      trigger_event(:before_publishing)
+
+      publish_posts
+      publish_pages
+      publish_archives if @config.generation.year_archives
+      publish_categories if @config.generation.categories
+
+      trigger_event(:after_publishing)
     end
 
     def publish_posts
