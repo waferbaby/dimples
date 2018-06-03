@@ -1,6 +1,5 @@
 ---
 title: About
-layout: false
 ---
 
-*Hey!*
+I am a test website.
