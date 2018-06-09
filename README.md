@@ -155,8 +155,9 @@ Dimples has a number of options for customising how it works - here are the defa
 
 ```json
 {
+  "source": "./",
+  "destination": "./public",
   "paths": {
-    "output": "./public",
     "archives": "archives",
     "paginated_posts": "posts",
     "posts": "archives/%Y/%m/%d",
@@ -196,17 +197,20 @@ Dimples has a number of options for customising how it works - here are the defa
 }
 ```
 
+### Source and Destination
+
+Both of these options are full directory paths - by default, the `source` is the current working directory, and the `destination` is the same with `public` appended.
+
 ### Paths
 
-The source and destination paths for the output.
+The relative paths used to build generated files - each is appended to the `destination` directory.
 
 Key | Default | Description
 ----|---------|-------------
-`output` | `./public` | The path of the directory where Dimples will build the site. This directory is generated for you if it doesn't exist (and **it's destroyed if it does!**).
-`archives` | `archives` | The name of the directory, appended to the `output` path, where the main paginated archives are generated.
-`paginated_posts` | `posts` | The name of the directory, appended to the `output` path, where index-style pages for all posts are generated.
-`posts` | `archives/%Y/%m/%d` | The name of the directory, appended to the `output` path, where individual posts end up (suffixed with the post slug). This string is passed to Ruby's `strftime` [Time method](http://ruby-doc.org/core-2.4.0/Time.html#method-i-strftime "The strftime method of the Time class."), so you can use any of its options here.
-`categories` | `archives/categories` | The name of the directory, appended to the `output` path, where category index pages are generated (suffixed with the category slug).
+`archives` | `archives` | The path for the main paginated archives.
+`paginated_posts` | `posts` | The path for index-style pages for all posts.
+`posts` | `archives/%Y/%m/%d` | The path for posts (suffixed with the individual post slug). This string is passed to Ruby's `strftime` [Time method](http://ruby-doc.org/core-2.4.0/Time.html#method-i-strftime "The strftime method of the Time class."), so you can use any of its options here.
+`categories` | `archives/categories` | The path for category index pages (suffixed with the individual category slug).
 
 ### Generation
 
