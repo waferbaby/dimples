@@ -5,7 +5,15 @@ describe 'Page' do
 
   let(:site) { double }
   let(:html) { '<p>I am a test website.</p>' }
-  let(:source_path) { File.join(__dir__, 'sources', 'pages', 'about', 'index.markdown') }
+  let(:source_path) do
+    File.join(
+      __dir__,
+      'sources',
+      'pages',
+      'about',
+      'index.markdown'
+    )
+  end
 
   describe '#initialize' do
     context 'when a path is provided' do
