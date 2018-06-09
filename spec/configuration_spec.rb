@@ -5,7 +5,9 @@ describe 'Configuration' do
     let(:defaults) { Dimples::Configuration.defaults }
 
     it 'returns the default paths' do
-      expect(defaults[:paths][:output]).to eq('./public')
+      expect(defaults[:source]).to eq(File.expand_path('./'))
+      expect(defaults[:destination]).to eq(File.expand_path('./public'))
+
       expect(defaults[:paths][:archives]).to eq('archives')
       expect(defaults[:paths][:posts]).to eq('archives/%Y/%m/%d')
       expect(defaults[:paths][:categories]).to eq('archives/categories')
