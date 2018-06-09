@@ -26,7 +26,8 @@ dimples <#{valid_commands.join('|')}> [options]
 Options:
 BANNER
   opt :config, 'Config file path', type: :string
-  opt :output, 'Destination directory', type: :string
+  opt :source, 'Source directory', type: :string
+  opt :destination, 'Destination directory', type: :string
   opt :verbose, 'Verbose mode', default: false
 end
 
@@ -37,8 +38,14 @@ unless valid_commands.include?(command)
   Trollop.die "Command must be '#{valid_commands.join('\', \'')}'"
 end
 
-plugins_path = File.join(Dir.pwd, 'plugins')
-config_path = options[:config] || File.join(Dir.pwd, 'config.json')
+source_path = if options[:source]
+                File.expand_path(options[:source])
+              else
+                Dir.pwd
+              end
+
+plugins_path = File.join(source_path, 'plugins')
+config_path = options[:config] || File.join(source_path, 'config.json')
 
 if File.exist?(config_path)
   begin
@@ -59,7 +66,11 @@ if Dir.exist?(plugins_path)
   end
 end
 
-config[:paths][:output] = options[:output] if options[:output]
+config[:source] = source_path
+
+if options[:destination]
+  config[:destination] = File.expand_path(options[:destination])
+end
 
 site = Dimples::Site.new(config)
 
@@ -70,7 +81,7 @@ when :build
   site.generate
 
   if site.errors.empty?
-    puts "Done! Your site has been built (#{site.paths[:output]})."
+    puts "Done! Your site has been built in #{site.paths[:destination]}."
   else
     puts 'Generation failed:'
     site.errors.each { |error| puts error }
