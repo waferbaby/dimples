@@ -17,13 +17,11 @@ module Dimples
       @config = Hashie::Mash.new(Configuration.defaults).deep_merge(config)
 
       @paths = {}.tap do |paths|
-        paths[:base] = Dir.pwd
-        paths[:output] = File.expand_path(@config.paths.output)
+        paths[:source] = File.expand_path(@config.source)
+        paths[:destination] = File.expand_path(@config.destination)
 
-        paths[:sources] = {}.tap do |sources|
-          %w[pages posts static templates].each do |type|
-            sources[type.to_sym] = File.join(paths[:base], type)
-          end
+        %w[pages posts static templates].each do |type|
+          paths[type.to_sym] = File.join(paths[:source], type)
         end
       end
 
@@ -71,13 +69,13 @@ module Dimples
 
     def read_templates
       @templates = {}
-      template_glob = File.join(@paths[:sources][:templates], '**', '*.*')
+      template_glob = File.join(@paths[:templates], '**', '*.*')
 
       Dir.glob(template_glob).each do |path|
         basename = File.basename(path, File.extname(path))
         dir_name = File.dirname(path)
 
-        unless dir_name == @paths[:sources][:templates]
+        unless dir_name == @paths[:templates]
           basename = dir_name.split(File::SEPARATOR)[-1] + '.' + basename
         end
 
@@ -86,7 +84,7 @@ module Dimples
     end
 
     def read_posts
-      post_glob = File.join(@paths[:sources][:posts], '**', '*.*')
+      post_glob = File.join(@paths[:posts], '**', '*.*')
 
       @posts = Dir.glob(post_glob).sort.map do |path|
         Post.new(self, path).tap do |post|
@@ -99,7 +97,7 @@ module Dimples
     end
 
     def read_pages
-      page_glob = File.join(@paths[:sources][:pages], '**', '*.*')
+      page_glob = File.join(@paths[:pages], '**', '*.*')
       @pages = Dir.glob(page_glob).sort.map { |path| Page.new(self, path) }
     end
 
@@ -119,16 +117,19 @@ module Dimples
     end
 
     def create_output_directory
-      FileUtils.remove_dir(@paths[:output]) if Dir.exist?(@paths[:output])
-      Dir.mkdir(@paths[:output])
+      if Dir.exist?(@paths[:destination])
+        FileUtils.remove_dir(@paths[:destination])
+      end
+
+      Dir.mkdir(@paths[:destination])
     rescue StandardError => e
       message = "Couldn't prepare the output directory (#{e.message})"
       raise GenerationError, message
     end
 
     def copy_static_assets
-      return unless Dir.exist?(@paths[:sources][:static])
-      FileUtils.cp_r(File.join(@paths[:sources][:static], '.'), @paths[:output])
+      return unless Dir.exist?(@paths[:static])
+      FileUtils.cp_r(File.join(@paths[:static], '.'), @paths[:destination])
     rescue StandardError => e
       raise GenerationError, "Failed to copy site assets (#{e.message})"
     end
@@ -149,7 +150,7 @@ module Dimples
         trigger_event(:before_post_write, post)
 
         path = File.join(
-          @paths[:output],
+          @paths[:destination],
           post.date.strftime(@config.paths.posts),
           post.slug
         )
@@ -159,13 +160,15 @@ module Dimples
         trigger_event(:after_post_write, post)
       end
 
-      publish_feeds(@posts, @paths[:output]) if @config.generation.main_feed
+      if @config.generation.main_feed
+        publish_feeds(@posts, @paths[:destination])
+      end
 
       return unless @config.generation.paginated_posts
 
       paginate_posts(
         @posts,
-        File.join(@paths[:output], @config.paths.paginated_posts),
+        File.join(@paths[:destination], @config.paths.paginated_posts),
         @config.layouts.paginated_post
       )
     end
@@ -176,11 +179,11 @@ module Dimples
 
         path = if page.path
                  File.dirname(page.path).sub(
-                   @paths[:sources][:pages],
-                   @paths[:output]
+                   @paths[:pages],
+                   @paths[:destination]
                  )
                else
-                 @paths[:output]
+                 @paths[:destination]
                end
 
         page.write(path)
@@ -215,7 +218,7 @@ module Dimples
                   end
 
       date_parts = [year, month, day].compact
-      path = File.join(@paths[:output], @config.paths.archives, date_parts)
+      path = File.join(@paths[:destination], @config.paths.archives, date_parts)
 
       posts = archive(year, month, day)[:posts]
 
@@ -234,7 +237,7 @@ module Dimples
     def publish_categories
       @categories.each_value do |category|
         path = File.join(
-          @paths[:output],
+          @paths[:destination],
           @config.paths.categories,
           category.slug
         )
@@ -255,7 +258,7 @@ module Dimples
 
     def paginate_posts(posts, path, layout, context = {})
       pager = Pager.new(
-        path.sub(@paths[:output], '') + '/',
+        path.sub(@paths[:destination], '') + '/',
         posts,
         @config.pagination
       )
