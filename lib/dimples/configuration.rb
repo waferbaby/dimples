@@ -5,6 +5,8 @@ module Dimples
   module Configuration
     def self.defaults
       {
+        source: Dir.pwd,
+        destination: File.join(Dir.pwd, 'public'),
         paths: default_paths,
         generation: default_generation,
         layouts: default_layouts,
@@ -18,7 +20,6 @@ module Dimples
 
     def self.default_paths
       {
-        output: './public',
         archives: 'archives',
         paginated_posts: 'posts',
         posts: 'archives/%Y/%m/%d',
