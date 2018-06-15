@@ -201,7 +201,7 @@ module Dimples
           publish_date_archive(year, month)
           next unless @config.generation.day_archives
 
-          month_archive[:day].each do |day, _|
+          month_archive[:day].each_key do |day|
             publish_date_archive(year, month, day)
           end
         end
