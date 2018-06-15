@@ -5,8 +5,8 @@ describe 'Site' do
 
   let(:config) { { source: File.join(__dir__, 'sources') } }
 
-  describe '#read_templates' do
-    before { subject.send(:read_templates) }
+  describe '#generate' do
+    before { subject.generate }
 
     it 'finds all the templates' do
       expect(subject.templates.count).to eq(3)
@@ -18,10 +18,6 @@ describe 'Site' do
         expect(template).to be_a(Dimples::Template)
       end
     end
-  end
-
-  describe '#read_posts' do
-    before { subject.send(:read_posts) }
 
     it 'finds all the posts' do
       expect(subject.posts.count).to eq(2)
@@ -30,13 +26,11 @@ describe 'Site' do
         expect(page).to be_a(Dimples::Post)
       end
     end
-  end
-
-  describe '#read_pages' do
-    before { subject.send(:read_pages) }
 
     it 'finds all the pages' do
-      expect(subject.pages.count).to eq(2)
+      subject.send(:read_pages)
+
+      expect(subject.pages.count).to eq(1)
 
       subject.pages.each do |page|
         expect(page).to be_a(Dimples::Page)
