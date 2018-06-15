@@ -7,6 +7,7 @@ describe 'Site' do
 
   describe '#generate' do
     before { subject.generate }
+    after { FileUtils.remove_dir(subject.paths[:destination]) }
 
     it 'finds all the templates' do
       expect(subject.templates.count).to eq(3)
