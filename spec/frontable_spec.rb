@@ -12,7 +12,7 @@ describe 'Frontable' do
       contents, metadata = read_with_front_matter(source_path)
 
       expect(contents).to eq('I am a test website.')
-      expect(metadata).to eq(title: 'About')
+      expect(metadata).to eq(title: 'About', layout: 'default')
     end
   end
 end

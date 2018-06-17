@@ -15,11 +15,13 @@ describe 'Page' do
     )
   end
 
+  before { allow(site).to receive(:templates).and_return({}) }
+
   describe '#initialize' do
     context 'when a path is provided' do
       it 'parses the metadata and contents' do
         expect(subject.contents).to eq('I am a test website.')
-        expect(subject.metadata).to eq(title: 'About')
+        expect(subject.metadata).to eq(title: 'About', layout: 'default')
       end
     end
 

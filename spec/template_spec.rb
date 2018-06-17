@@ -6,10 +6,12 @@ describe 'Template' do
   let(:site) { double }
   let(:source_path) { File.join(__dir__, 'sources', 'templates', 'post.erb') }
 
+  before { allow(site).to receive(:templates).and_return({}) }
+
   describe '#initialize' do
     it 'parses the metadata and contents' do
       expect(subject.contents).to eq('<article><%= yield %></article>')
-      expect(subject.metadata).to eq(title: 'Post')
+      expect(subject.metadata).to eq(title: 'Post', layout: 'default')
     end
   end
 
