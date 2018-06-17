@@ -38,4 +38,10 @@ describe 'Site' do
       end
     end
   end
+
+  describe '#inspect' do
+    it 'shows the correct string' do
+      expect(subject.inspect).to eq("#<Dimples::Site @paths=#{subject.paths}>")
+    end
+  end
 end
