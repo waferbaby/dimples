@@ -332,7 +332,7 @@ module Dimples
     end
 
     def trigger_event(event, item = nil)
-      plugins.each do |plugin|
+      plugins&.each do |plugin|
         plugin.process(event, item) if plugin.supports_event?(event)
       end
     end
