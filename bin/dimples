@@ -5,8 +5,8 @@ $LOAD_PATH.unshift(File.join(__dir__, '..', 'lib'))
 
 require 'dimples'
 require 'dimples/version'
+require 'optimist'
 require 'json'
-require 'trollop'
 
 trap('SIGINT') do
   puts 'Generation cancelled!'
@@ -15,7 +15,7 @@ end
 
 valid_commands = %w[build]
 
-options = Trollop.options do
+options = Optimist.options do
   version "dimples v#{Dimples::VERSION}"
   banner <<-BANNER
 A simple static site generator.
@@ -31,11 +31,11 @@ BANNER
   opt :verbose, 'Verbose mode', default: false
 end
 
-Trollop.educate if ARGV.empty?
+Optimist.educate if ARGV.empty?
 command = ARGV[0]
 
 unless valid_commands.include?(command)
-  Trollop.die "Command must be '#{valid_commands.join('\', \'')}'"
+  Optimist.die "Command must be '#{valid_commands.join('\', \'')}'"
 end
 
 source_path = if options[:source]
@@ -50,14 +50,14 @@ config_path = options[:config] || File.join(source_path, 'config.json')
 if File.exist?(config_path)
   begin
     file_contents = File.read(config_path)
-    Trollop.die "Config file is empty (#{config_path})" if file_contents.empty?
+    Optimist.die "Config file is empty (#{config_path})" if file_contents.empty?
 
     config = JSON.parse(file_contents, symbolize_names: true)
   rescue JSON::ParserError
-    Trollop.die "Invalid or malformed config file (#{config_path})"
+    Optimist.die "Invalid or malformed config file (#{config_path})"
   end
 else
-  Trollop.die "Unable to find config file (#{config_path})"
+  Optimist.die "Unable to find config file (#{config_path})"
 end
 
 if Dir.exist?(plugins_path)
