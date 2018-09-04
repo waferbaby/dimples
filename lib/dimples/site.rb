@@ -38,6 +38,10 @@ module Dimples
       @errors << error
     end
 
+    def data
+      @config.data || {}
+    end
+
     def inspect
       "#<#{self.class} @paths=#{paths}>"
     end
