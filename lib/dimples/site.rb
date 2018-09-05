@@ -30,10 +30,18 @@ module Dimples
 
     def generate
       prepare
-      scan_sources
+
+      read_templates
+      read_posts
+      read_pages
+
       create_output_directory
       copy_static_assets
-      publish_files
+
+      publish_posts
+      publish_pages
+      publish_archives if @config.generation.year_archives
+      publish_categories if @config.generation.categories
     rescue PublishingError, RenderingError, GenerationError => error
       @errors << error
     end
@@ -61,17 +69,9 @@ module Dimples
       @latest_post = nil
     end
 
-    def scan_sources
-      trigger_event(:before_file_scanning)
-
-      read_templates
-      read_posts
-      read_pages
-
-      trigger_event(:after_file_scanning)
-    end
-
     def read_templates
+      trigger_event(:before_template_scanning)
+
       @templates = {}
       template_glob = File.join(@paths[:templates], '**', '*.*')
 
@@ -85,9 +85,13 @@ module Dimples
 
         @templates[basename] = Template.new(self, path)
       end
+
+      trigger_event(:after_template_scanning)
     end
 
     def read_posts
+      trigger_event(:before_post_scanning)
+
       post_glob = File.join(@paths[:posts], '**', '*.*')
 
       @posts = Dir.glob(post_glob).sort.map do |path|
@@ -98,11 +102,17 @@ module Dimples
       end.reverse
 
       @latest_post = @posts[0]
+
+      trigger_event(:after_post_scanning)
     end
 
     def read_pages
+      trigger_event(:before_page_scanning)
+
       page_glob = File.join(@paths[:pages], '**', '*.*')
       @pages = Dir.glob(page_glob).sort.map { |path| Page.new(self, path) }
+
+      trigger_event(:after_page_scanning)
     end
 
     def add_archive_post(post)
@@ -136,17 +146,6 @@ module Dimples
       FileUtils.cp_r(File.join(@paths[:static], '.'), @paths[:destination])
     rescue StandardError => e
       raise GenerationError, "Failed to copy site assets (#{e.message})"
-    end
-
-    def publish_files
-      trigger_event(:before_publishing)
-
-      publish_posts
-      publish_pages
-      publish_archives if @config.generation.year_archives
-      publish_categories if @config.generation.categories
-
-      trigger_event(:after_publishing)
     end
 
     def publish_posts
