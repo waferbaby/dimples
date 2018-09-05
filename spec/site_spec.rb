@@ -45,14 +45,11 @@ describe 'Site' do
   end
 
   describe '#create_output_directory' do
-    before { FileUtils.remove_dir(subject.paths[:destination]) }
+    before { FileUtils.remove_dir(subject.paths[:destination], force: true) }
 
-    context 'when no directory already exists' do
-      before { subject.send(:create_output_directory) }
-
-      it 'creates the directory' do
-        expect(Dir.exist?(subject.paths[:destination])).to be_truthy
-      end
+    it 'creates the directory' do
+      subject.send(:create_output_directory)
+      expect(Dir.exist?(subject.paths[:destination])).to be_truthy
     end
   end
 
