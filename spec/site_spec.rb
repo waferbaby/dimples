@@ -3,7 +3,12 @@
 describe 'Site' do
   subject { Dimples::Site.new(config) }
 
-  let(:config) { { source: File.join(__dir__, 'sources') } }
+  let(:config) do
+    {
+      source: File.join(__dir__, 'sources'),
+      destination: File.join(@site_output, 'public')
+    }
+  end
 
   describe '#data' do
     context 'with no custom data' do
@@ -15,7 +20,7 @@ describe 'Site' do
     context 'with custom data' do
       before { config[:data] = Hashie::Mash.new(description: 'A test website') }
 
-      it 'returns the correct hash' do
+      it 'returns the correct values' do
         expect(subject.data.description).to eq('A test website')
       end
     end
@@ -61,11 +66,33 @@ describe 'Site' do
   end
 
   describe '#create_output_directory' do
-    before { FileUtils.remove_dir(subject.paths[:destination], force: true) }
+    before do
+      FileUtils.remove_dir(subject.paths[:destination], force: true)
+      subject.send(:create_output_directory)
+    end
 
     it 'creates the directory' do
-      subject.send(:create_output_directory)
       expect(Dir.exist?(subject.paths[:destination])).to be_truthy
+    end
+  end
+
+  describe '#copy_static_assets' do
+    before do
+      FileUtils.mkdir_p(subject.paths[:destination])
+      subject.send(:copy_static_assets)
+    end
+
+    it 'copies all assets into the correct directory' do
+      source_files = Dir.glob(
+        File.join(subject.paths[:static], '**', '*.*')
+      )
+
+      destination_files = Dir.glob(
+        File.join(subject.paths[:static], '**', '*.*')
+      )
+
+      expect(source_files.sort).to eq(destination_files.sort)
+
     end
   end
 
