@@ -12,7 +12,7 @@ RSpec.configure do |config|
     @site_output = File.join(__dir__, 'tmp')
   end
 
-  config.after(:example) do
+  config.after(:each) do
     FileUtils.rm_rf(@site_output) if Dir.exist?(@site_output)
   end
 
