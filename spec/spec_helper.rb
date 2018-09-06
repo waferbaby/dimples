@@ -13,7 +13,7 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    FileUtils.rm_rf(@site_output) if Dir.exist?(@site_output)
+    FileUtils.remove_dir(@site_output, force: true)
   end
 
   config.expect_with :rspec do |expectations|
