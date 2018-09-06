@@ -132,7 +132,7 @@ module Dimples
 
     def create_output_directory
       FileUtils.remove_dir(@paths[:destination], force: true)
-      Dir.mkdir(@paths[:destination])
+      FileUtils.mkdir_p(@paths[:destination])
     rescue StandardError => e
       message = "Couldn't prepare the output directory (#{e.message})"
       raise GenerationError, message
