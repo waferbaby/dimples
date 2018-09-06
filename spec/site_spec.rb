@@ -5,6 +5,22 @@ describe 'Site' do
 
   let(:config) { { source: File.join(__dir__, 'sources') } }
 
+  describe '#data' do
+    context 'with no custom data' do
+      it 'returns an empty hash' do
+        expect(subject.data).to eq({})
+      end
+    end
+
+    context 'with custom data' do
+      before { config[:data] = Hashie::Mash.new(description: 'A test website') }
+
+      it 'returns the correct hash' do
+        expect(subject.data.description).to eq('A test website')
+      end
+    end
+  end
+
   describe '#read_templates' do
     before { subject.send(:read_templates) }
 
