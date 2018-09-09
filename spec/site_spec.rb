@@ -66,21 +66,18 @@ describe 'Site' do
   end
 
   describe '#create_output_directory' do
-    before do
-      FileUtils.remove_dir(subject.paths[:destination], force: true)
-    end
-
     context 'when permissions are correct' do
       before { subject.send(:create_output_directory) }
+      after { FileUtils.remove_dir(@site_output, force: true) }
 
       it 'creates the directory' do
         expect(Dir.exist?(subject.paths[:destination])).to be_truthy
       end
     end
+
     context 'when permissions are incorrect' do
-      before do
-        FileUtils.mkdir_p(@site_output, mode: 0o400)
-      end
+      before { FileUtils.mkdir_p(@site_output, mode: 0o400) }
+      after { FileUtils.remove_dir(@site_output, force: true) }
 
       it 'raises an exception' do
         expect { subject.send(:create_output_directory) }.to raise_error(
