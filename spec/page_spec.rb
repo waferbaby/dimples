@@ -95,9 +95,8 @@ describe 'Page' do
   describe '#write' do
     let(:page_directory) { File.join(@site_output, 'pages') }
 
-    before do
-      allow(subject).to receive(:render).and_return(html)
-    end
+    before { allow(subject).to receive(:render).and_return(html) }
+    after { FileUtils.remove_dir(@site_output, force: true) }
 
     context 'when we have correct permissions' do
       it 'writes out the file' do
@@ -115,6 +114,7 @@ describe 'Page' do
 
     context 'when we have incorrect permissions' do
       before { FileUtils.mkdir_p(@site_output, mode: 0o400) }
+      after { FileUtils.remove_dir(@site_output, force: true) }
 
       it 'raises an exception' do
         expect { subject.write(page_directory) }.to raise_error(
