@@ -12,10 +12,6 @@ RSpec.configure do |config|
     @site_output = File.join(__dir__, 'tmp')
   end
 
-  config.after(:each) do
-    FileUtils.remove_dir(@site_output, force: true)
-  end
-
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
   end
