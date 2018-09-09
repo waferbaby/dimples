@@ -131,7 +131,10 @@ module Dimples
     end
 
     def create_output_directory
-      FileUtils.remove_dir(@paths[:destination], force: true)
+      if Dir.exist?(@paths[:destination])
+        FileUtils.remove_dir(@paths[:destination])
+      end
+
       FileUtils.mkdir_p(@paths[:destination])
     rescue StandardError => e
       message = "Couldn't prepare the output directory (#{e.message})"
