@@ -8,9 +8,8 @@ end
 require 'dimples'
 
 RSpec.configure do |config|
-  config.before(:example) do
-    @site_output = File.join(__dir__, 'tmp')
-  end
+  config.before(:all) { @site_output = File.join(__dir__, 'tmp') }
+  config.after(:all) { FileUtils.remove_dir(@site_output, force: true) }
 
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
