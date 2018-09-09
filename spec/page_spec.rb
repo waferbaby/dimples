@@ -114,9 +114,7 @@ describe 'Page' do
     end
 
     context 'when we have incorrect permissions' do
-      before do
-        Dir.mkdir(@site_output, 0o400)
-      end
+      before { FileUtils.mkdir_p(@site_output, mode: 0o400) }
 
       it 'raises an exception' do
         expect { subject.write(page_directory) }.to raise_error(
