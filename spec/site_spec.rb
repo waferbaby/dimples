@@ -68,11 +68,25 @@ describe 'Site' do
   describe '#create_output_directory' do
     before do
       FileUtils.remove_dir(subject.paths[:destination], force: true)
-      subject.send(:create_output_directory)
     end
 
-    it 'creates the directory' do
-      expect(Dir.exist?(subject.paths[:destination])).to be_truthy
+    context 'when permissions are correct' do
+      before { subject.send(:create_output_directory) }
+
+      it 'creates the directory' do
+        expect(Dir.exist?(subject.paths[:destination])).to be_truthy
+      end
+    end
+    context 'when permissions are incorrect' do
+      before do
+        FileUtils.mkdir_p(@site_output, mode: 0o400)
+      end
+
+      it 'raises an exception' do
+        expect { subject.send(:create_output_directory) }.to raise_error(
+          Dimples::GenerationError
+        )
+      end
     end
   end
 
@@ -92,7 +106,6 @@ describe 'Site' do
       )
 
       expect(source_files.sort).to eq(destination_files.sort)
-
     end
   end
 
