@@ -6,9 +6,7 @@ describe 'Category' do
   let(:site) { double }
   let(:config) { Hashie::Mash.new(category_names: {}) }
 
-  before do
-    allow(site).to receive(:config).and_return(config)
-  end
+  before { allow(site).to receive(:config).and_return(config) }
 
   describe '#initialize' do
     context 'when no custom category name exists' do
@@ -19,9 +17,7 @@ describe 'Category' do
     end
 
     context 'when a custom category name exists' do
-      before do
-        config.category_names[:mac] = 'Macintosh'
-      end
+      before { config.category_names[:mac] = 'Macintosh' }
 
       it 'uses the name instead of the slug' do
         expect(subject.slug).to eq('mac')

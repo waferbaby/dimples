@@ -43,9 +43,7 @@ describe 'Page' do
     end
 
     context 'with a filename in the metadata' do
-      before do
-        subject.metadata[:filename] = 'home'
-      end
+      before { subject.metadata[:filename] = 'home' }
 
       it 'overrides the default value' do
         expect(subject.filename).to eq('home')
@@ -61,9 +59,7 @@ describe 'Page' do
     end
 
     context 'with an extension in the metadata' do
-      before do
-        subject.metadata[:extension] = 'txt'
-      end
+      before { subject.metadata[:extension] = 'txt' }
 
       it 'overrides the default value' do
         expect(subject.extension).to eq('txt')
