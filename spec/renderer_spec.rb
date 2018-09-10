@@ -12,14 +12,10 @@ describe 'Renderer' do
   end
 
   describe '#render' do
-    before do
-      allow(source).to receive(:path).and_return('test.erb')
-    end
+    before { allow(source).to receive(:path).and_return('test.erb') }
 
     context 'when no options are passed in' do
-      before do
-        allow(source).to receive(:contents).and_return('Hello')
-      end
+      before { allow(source).to receive(:contents).and_return('Hello') }
 
       it 'correctly renders' do
         expect(subject.render).to eq('Hello')
@@ -51,6 +47,22 @@ describe 'Renderer' do
         )
 
         expect(output).to eq('<h1>Welcome</h1>\n<p>Hey there</p>')
+      end
+    end
+
+    context 'when a layout is defined' do
+      let(:template) { double('code', render: 'The code is 12345.') }
+
+      before do
+        source.metadata[:layout] = 'code'
+
+        allow(site).to receive(:templates).and_return('code' => template)
+        allow(source).to receive(:contents).and_return('Hello')
+      end
+
+      it 'renders the template' do
+        expect(template).to receive(:render)
+        subject.render
       end
     end
   end
