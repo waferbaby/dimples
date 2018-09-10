@@ -129,4 +129,28 @@ describe 'Page' do
       expect(subject.inspect).to eq("#<Dimples::Page @path=#{subject.path}>")
     end
   end
+
+  describe '#method_missing' do
+    context 'when accessing custom data via a method' do
+      before { subject.metadata[:custom_data] = 'my_returned_data' }
+
+      it 'returns its value' do
+        expect(subject.custom_data).to eq('my_returned_data')
+      end
+    end
+
+    context 'when setting custom data via a method' do
+      before { subject.custom_data = 'my_set_data' }
+
+      it 'stores a value' do
+        expect(subject.metadata[:custom_data]).to eq('my_set_data')
+      end
+    end
+
+    context 'when accessing unset custom data via a method' do
+      it 'calls the super method' do
+        expect { subject.unset_custom_data }.to raise_error(NoMethodError)
+      end
+    end
+  end
 end
