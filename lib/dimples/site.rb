@@ -70,8 +70,6 @@ module Dimples
     end
 
     def read_templates
-      trigger_event(:before_template_scanning)
-
       @templates = {}
       template_glob = File.join(@paths[:templates], '**', '*.*')
 
@@ -85,13 +83,9 @@ module Dimples
 
         @templates[basename] = Template.new(self, path)
       end
-
-      trigger_event(:after_template_scanning)
     end
 
     def read_posts
-      trigger_event(:before_post_scanning)
-
       post_glob = File.join(@paths[:posts], '**', '*.*')
 
       @posts = Dir.glob(post_glob).sort.map do |path|
@@ -102,17 +96,11 @@ module Dimples
       end.reverse
 
       @latest_post = @posts[0]
-
-      trigger_event(:after_post_scanning)
     end
 
     def read_pages
-      trigger_event(:before_page_scanning)
-
       page_glob = File.join(@paths[:pages], '**', '*.*')
       @pages = Dir.glob(page_glob).sort.map { |path| Page.new(self, path) }
-
-      trigger_event(:after_page_scanning)
     end
 
     def add_archive_post(post)
@@ -150,8 +138,6 @@ module Dimples
 
     def publish_posts
       @posts.each do |post|
-        trigger_event(:before_post_write, post)
-
         path = File.join(
           @paths[:destination],
           post.date.strftime(@config.paths.posts),
@@ -159,8 +145,6 @@ module Dimples
         )
 
         post.write(path)
-
-        trigger_event(:after_post_write, post)
       end
 
       if @config.generation.main_feed
@@ -178,8 +162,6 @@ module Dimples
 
     def publish_pages
       @pages.each do |page|
-        trigger_event(:before_page_write, page)
-
         path = if page.path
                  File.dirname(page.path).sub(
                    @paths[:pages],
@@ -190,8 +172,6 @@ module Dimples
                end
 
         page.write(path)
-
-        trigger_event(:after_page_write, page)
       end
     end
 
@@ -320,16 +300,6 @@ module Dimples
 
     def archive_day(year, month, day)
       archive_month(year, month)[:day][day.to_s] ||= { posts: [] }
-    end
-
-    def plugins
-      @plugins ||= Plugin.subclasses&.map { |subclass| subclass.new(self) }
-    end
-
-    def trigger_event(event, item = nil)
-      plugins&.each do |plugin|
-        plugin.process(event, item) if plugin.supports_event?(event)
-      end
     end
   end
 end

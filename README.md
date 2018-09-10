@@ -28,7 +28,6 @@ It assumes your directory structure will look like this:
 
 - `config.json`
 - `pages/`
-- `plugins/`
 - `posts/`
 - `public/`
 - `templates/`
@@ -37,10 +36,6 @@ It assumes your directory structure will look like this:
 ### Pages
 
 Any files in `pages/` will be turned into static pages, maintaining any folder hierarchy you're using.
-
-### Plugins
-
-A plugin allows you to customise posts and pages before and after they're generated.
 
 ### Posts
 
