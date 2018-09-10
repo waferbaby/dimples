@@ -153,4 +153,13 @@ describe 'Page' do
       end
     end
   end
+
+  describe '#respond_to_missing?' do
+    before { subject.custom_data = 'my_set_data' }
+
+    it 'checks for metadata requests' do
+      expect(subject.respond_to?(:custom_data)).to be_truthy
+      expect(subject.respond_to?(:custom_data=)).to be_truthy
+    end
+  end
 end
