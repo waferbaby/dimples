@@ -311,23 +311,15 @@ module Dimples
     end
 
     def archive_year(year)
-      @archives[:year][year.to_s] ||= {
-        month: {},
-        posts: []
-      }
+      @archives[:year][year.to_s] ||= { month: {}, posts: [] }
     end
 
     def archive_month(year, month)
-      archive_year(year)[:month][month.to_s] ||= {
-        day: {},
-        posts: []
-      }
+      archive_year(year)[:month][month.to_s] ||= { day: {}, posts: [] }
     end
 
     def archive_day(year, month, day)
-      archive_month(year, month)[:day][day.to_s] ||= {
-        posts: []
-      }
+      archive_month(year, month)[:day][day.to_s] ||= { posts: [] }
     end
 
     def plugins
