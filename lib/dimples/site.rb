@@ -137,15 +137,7 @@ module Dimples
     end
 
     def publish_posts
-      @posts.each do |post|
-        path = File.join(
-          @paths[:destination],
-          post.date.strftime(@config.paths.posts),
-          post.slug
-        )
-
-        post.write(path)
-      end
+      @posts.each { |post| publish_post(post) }
 
       if @config.generation.main_feed
         publish_feeds(@posts, @paths[:destination])
@@ -160,38 +152,50 @@ module Dimples
       )
     end
 
-    def publish_pages
-      @pages.each do |page|
-        path = if page.path
-                 File.dirname(page.path).sub(
-                   @paths[:pages],
-                   @paths[:destination]
-                 )
-               else
-                 @paths[:destination]
-               end
+    def publish_post(post)
+      path = File.join(
+        @paths[:destination],
+        post.date.strftime(@config.paths.posts),
+        post.slug
+      )
 
-        page.write(path)
-      end
+      post.write(path)
+    end
+
+    def publish_pages
+      @pages.each { |page| publish_page(page) }
+    end
+
+    def publish_page(page)
+      path = if page.path
+               File.dirname(page.path).sub(
+                 @paths[:pages],
+                 @paths[:destination]
+               )
+             else
+               @paths[:destination]
+             end
+
+      page.write(path)
     end
 
     def publish_archives
       @archives[:year].each do |year, year_archive|
-        publish_date_archive(year)
+        publish_archive(year)
         next unless @config.generation.month_archives
 
         year_archive[:month].each do |month, month_archive|
-          publish_date_archive(year, month)
+          publish_archive(year, month)
           next unless @config.generation.day_archives
 
           month_archive[:day].each_key do |day|
-            publish_date_archive(year, month, day)
+            publish_archive(year, month, day)
           end
         end
       end
     end
 
-    def publish_date_archive(year, month = nil, day = nil)
+    def publish_archive(year, month = nil, day = nil)
       date_type = if day
                     'day'
                   elsif month
@@ -203,7 +207,7 @@ module Dimples
       date_parts = [year, month, day].compact
       path = File.join(@paths[:destination], @config.paths.archives, date_parts)
 
-      posts = archive(year, month, day)[:posts]
+      posts = archives_at(year, month, day)[:posts]
 
       paginate_posts(
         posts.reverse,
@@ -218,25 +222,47 @@ module Dimples
     end
 
     def publish_categories
-      @categories.each_value do |category|
-        path = File.join(
-          @paths[:destination],
-          @config.paths.categories,
-          category.slug
-        )
+      @categories.each_value { |category| publish_category(category) }
+    end
 
-        category_posts = category.posts.reverse
-        context = { page: { title: category.name, category: category } }
+    def publish_category(category)
+      path = File.join(
+        @paths[:destination],
+        @config.paths.categories,
+        category.slug
+      )
 
-        paginate_posts(
-          category_posts,
-          path,
-          @config.layouts.category,
-          context
-        )
+      category_posts = category.posts.reverse
+      context = { page: { title: category.name, category: category } }
 
-        publish_feeds(category_posts, path, context)
+      paginate_posts(
+        category_posts,
+        path,
+        @config.layouts.category,
+        context
+      )
+
+      publish_feeds(category_posts, path, context)
+    end
+
+    def publish_feeds(posts, path, context = {})
+      @config.feed_formats.each do |format|
+        publish_feed(format, posts, path, context)
       end
+    end
+
+    def publish_feed(format, posts, path, context = {})
+      feed_layout = "feeds.#{format}"
+      return unless @templates.key?(feed_layout)
+
+      page = Page.new(self)
+
+      page.layout = feed_layout
+      page.feed_posts = posts.slice(0, @config.pagination.per_page)
+      page.filename = 'feed'
+      page.extension = format
+
+      page.write(path, context)
     end
 
     def paginate_posts(posts, path, layout, context = {})
@@ -264,23 +290,7 @@ module Dimples
       end
     end
 
-    def publish_feeds(posts, path, context = {})
-      @config.feed_formats.each do |feed_format|
-        feed_layout = "feeds.#{feed_format}"
-        next unless @templates.key?(feed_layout)
-
-        page = Page.new(self)
-
-        page.layout = feed_layout
-        page.feed_posts = posts.slice(0, @config.pagination.per_page)
-        page.filename = 'feed'
-        page.extension = feed_format
-
-        page.write(path, context)
-      end
-    end
-
-    def archive(year, month = nil, day = nil)
+    def archives_at(year, month = nil, day = nil)
       if day
         archive_day(year, month, day)
       elsif month
