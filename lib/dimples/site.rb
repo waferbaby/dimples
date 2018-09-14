@@ -145,7 +145,8 @@ module Dimples
 
       return unless @config.generation.paginated_posts
 
-      paginate_posts(
+      Dimples::Pager.paginate(
+        self,
         @posts,
         File.join(@paths[:destination], @config.paths.paginated_posts),
         @config.layouts.paginated_post
@@ -209,7 +210,8 @@ module Dimples
 
       posts = archives_at(year, month, day)[:posts]
 
-      paginate_posts(
+      Dimples::Pager.paginate(
+        self,
         posts.reverse,
         path,
         @config.layouts.date_archive,
@@ -235,7 +237,8 @@ module Dimples
       category_posts = category.posts.reverse
       context = { page: { title: category.name, category: category } }
 
-      paginate_posts(
+      Dimples::Pager.paginate(
+        self,
         category_posts,
         path,
         @config.layouts.category,
@@ -263,31 +266,6 @@ module Dimples
       page.extension = format
 
       page.write(path, context)
-    end
-
-    def paginate_posts(posts, path, layout, context = {})
-      pager = Pager.new(
-        path.sub(@paths[:destination], '') + '/',
-        posts,
-        @config.pagination
-      )
-
-      pager.each do |index|
-        page = Page.new(self)
-        page.layout = layout
-
-        page_prefix = @config.pagination.page_prefix
-        page_path = if index == 1
-                      path
-                    else
-                      File.join(path, "#{page_prefix}#{index}")
-                    end
-
-        page.write(
-          page_path,
-          context.merge(pagination: pager.to_context)
-        )
-      end
     end
 
     def archives_at(year, month = nil, day = nil)
