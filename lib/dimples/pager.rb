@@ -13,6 +13,31 @@ module Dimples
     attr_reader :page_count
     attr_reader :item_count
 
+    def self.paginate(site, posts, path, layout, context = {})
+      pager = Pager.new(
+        path.sub(site.paths[:destination], '') + '/',
+        posts,
+        site.config.pagination
+      )
+
+      pager.each do |index|
+        page = Page.new(site)
+        page.layout = layout
+
+        page_prefix = site.config.pagination.page_prefix
+        page_path = if index == 1
+                      path
+                    else
+                      File.join(path, "#{page_prefix}#{index}")
+                    end
+
+        page.write(
+          page_path,
+          context.merge(pagination: pager.to_context)
+        )
+      end
+    end
+
     def initialize(url, posts, options = {})
       @url = url
       @posts = posts
