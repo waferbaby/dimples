@@ -9,7 +9,7 @@ module Dimples
     attr_reader :paths
     attr_reader :posts
     attr_reader :pages
-    attr_reader :archives
+    attr_reader :archive
     attr_reader :templates
     attr_reader :latest_post
 
@@ -57,7 +57,7 @@ module Dimples
     private
 
     def prepare
-      @archives = { year: {} }
+      @archive = Dimples::Archive.new
 
       @categories = {}
       @templates = {}
@@ -69,11 +69,14 @@ module Dimples
       @latest_post = nil
     end
 
+    def read_files(path)
+      Dir.glob(File.join(path, '**', '*.*')).sort
+    end
+
     def read_templates
       @templates = {}
-      template_glob = File.join(@paths[:templates], '**', '*.*')
 
-      Dir.glob(template_glob).each do |path|
+      read_files(@paths[:templates]).each do |path|
         basename = File.basename(path, File.extname(path))
         dir_name = File.dirname(path)
 
@@ -86,11 +89,9 @@ module Dimples
     end
 
     def read_posts
-      post_glob = File.join(@paths[:posts], '**', '*.*')
-
-      @posts = Dir.glob(post_glob).sort.map do |path|
+      @posts = read_files(@paths[:posts]).map do |path|
         Post.new(self, path).tap do |post|
-          add_archive_post(post)
+          @archive.add_post(post)
           categorise_post(post)
         end
       end.reverse
@@ -99,14 +100,7 @@ module Dimples
     end
 
     def read_pages
-      page_glob = File.join(@paths[:pages], '**', '*.*')
-      @pages = Dir.glob(page_glob).sort.map { |path| Page.new(self, path) }
-    end
-
-    def add_archive_post(post)
-      archive_year(post.year)[:posts] << post
-      archive_month(post.year, post.month)[:posts] << post
-      archive_day(post.year, post.month, post.day)[:posts] << post
+      @pages = read_files(@paths[:pages]).map { |path| Page.new(self, path) }
     end
 
     def categorise_post(post)
@@ -181,15 +175,15 @@ module Dimples
     end
 
     def publish_archives
-      @archives[:year].each do |year, year_archive|
+      @archive.years.each do |year|
         publish_archive(year)
         next unless @config.generation.month_archives
 
-        year_archive[:month].each do |month, month_archive|
+        @archive.months(year).each do |month|
           publish_archive(year, month)
           next unless @config.generation.day_archives
 
-          month_archive[:day].each_key do |day|
+          @archive.days(year, month).each do |day|
             publish_archive(year, month, day)
           end
         end
@@ -205,22 +199,21 @@ module Dimples
                     'year'
                   end
 
+      posts = @archive.posts_for_date(year, month, day)
+
       date_parts = [year, month, day].compact
       path = File.join(@paths[:destination], @config.paths.archives, date_parts)
+      layout = @config.layouts.date_archive
 
-      posts = archives_at(year, month, day)[:posts]
-
-      Dimples::Pager.paginate(
-        self,
-        posts.reverse,
-        path,
-        @config.layouts.date_archive,
+      data = {
         page: {
           title: posts[0].date.strftime(@config.date_formats[date_type]),
           archive_date: posts[0].date,
           archive_type: date_type
         }
-      )
+      }
+
+      Dimples::Pager.paginate(self, posts.reverse, path, layout, data)
     end
 
     def publish_categories
@@ -266,28 +259,6 @@ module Dimples
       page.extension = format
 
       page.write(path, context)
-    end
-
-    def archives_at(year, month = nil, day = nil)
-      if day
-        archive_day(year, month, day)
-      elsif month
-        archive_month(year, month)
-      else
-        archive_year(year)
-      end
-    end
-
-    def archive_year(year)
-      @archives[:year][year.to_s] ||= { month: {}, posts: [] }
-    end
-
-    def archive_month(year, month)
-      archive_year(year)[:month][month.to_s] ||= { day: {}, posts: [] }
-    end
-
-    def archive_day(year, month, day)
-      archive_month(year, month)[:day][day.to_s] ||= { posts: [] }
     end
   end
 end
