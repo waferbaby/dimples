@@ -25,12 +25,4 @@ describe 'Category' do
       end
     end
   end
-
-  describe '#inspect' do
-    it 'shows the correct string' do
-      expect(subject.inspect).to eq(
-        "#<Dimples::Category @slug=#{subject.slug} @name=#{subject.name}>"
-      )
-    end
-  end
 end

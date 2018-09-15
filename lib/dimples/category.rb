@@ -14,9 +14,5 @@ module Dimples
 
       @posts = []
     end
-
-    def inspect
-      "#<#{self.class} @slug=#{slug} @name=#{name}>"
-    end
   end
 end

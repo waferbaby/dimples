@@ -47,10 +47,6 @@ module Dimples
       raise PublishingError, "Failed to publish file at #{output_path} (#{e})"
     end
 
-    def inspect
-      "#<#{self.class} @path=#{path}>"
-    end
-
     private
 
     def renderer

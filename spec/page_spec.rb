@@ -120,12 +120,6 @@ describe 'Page' do
     end
   end
 
-  describe '#inspect' do
-    it 'shows the correct string' do
-      expect(subject.inspect).to eq("#<Dimples::Page @path=#{subject.path}>")
-    end
-  end
-
   describe '#method_missing' do
     context 'when accessing custom data via a method' do
       before { subject.metadata[:custom_data] = 'my_returned_data' }
