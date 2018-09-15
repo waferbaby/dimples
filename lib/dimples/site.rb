@@ -248,17 +248,10 @@ module Dimples
     end
 
     def publish_feed(format, posts, path, context = {})
-      feed_layout = "feeds.#{format}"
-      return unless @templates.key?(feed_layout)
+      feed = Feed.new(self, format)
 
-      page = Page.new(self)
-
-      page.layout = feed_layout
-      page.feed_posts = posts.slice(0, @config.pagination.per_page)
-      page.filename = 'feed'
-      page.extension = format
-
-      page.write(path, context)
+      feed.feed_posts = posts.slice(0, @config.pagination.per_page)
+      feed.write(path, context)
     end
   end
 end
