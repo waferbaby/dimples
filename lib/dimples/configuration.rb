@@ -30,7 +30,6 @@ module Dimples
     def self.default_generation
       {
         paginated_posts: true,
-        archives: true,
         year_archives: true,
         month_archives: true,
         day_archives: true,
