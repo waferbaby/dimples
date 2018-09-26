@@ -15,7 +15,6 @@ describe 'Configuration' do
 
     it 'returns the default generation options' do
       generation_types = %i[
-        archives
         year_archives
         month_archives
         day_archives
