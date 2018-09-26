@@ -94,6 +94,7 @@ Key | Description
 `site.posts` | All the posts in your site, ordered by the most recent first.
 `site.latest_post` | The most recent post on the site.
 `site.categories` | All categories across the site.
+`site.data` | An optional key/value dictionary you can define in your config.
 
 ### Page
 
@@ -160,7 +161,6 @@ Dimples has a number of options for customising how it works - here are the defa
   },
   "generation": {
     "paginated_posts": true,
-    "archives": true,
     "year_archives": true,
     "month_archives": true,
     "day_archives": true,
@@ -188,7 +188,8 @@ Dimples has a number of options for customising how it works - here are the defa
     "atom"
   ],
   "category_names": {},
-  "rendering": {}
+  "rendering": {},
+  "data": {}
 }
 ```
 
@@ -214,7 +215,6 @@ Choose what gets built when Dimples runs.
 Key | Default | Description
 ----|---------|-------------
 `paginated_posts` | true | If we should build out paginated pages for all posts.
-`archives` | true | If we should build the main paginated archive pages for all posts.
 `year_archives` | true | If we should build paginated year archives.
 `month_archives` | true | If we should build paginated month archives.
 `day_archives` | true | If we should build paginated day archives.
@@ -274,3 +274,17 @@ By default, Dimples will capitalise your category's slug as its title, but you c
 ### Rendering
 
 These options will be passed directly to the renderer Tilt picks for your posts, pages and templates based on the file extension.
+
+### Data
+
+A collection of your own custom key/value pairs that will be made available to all pages, posts and templates via `site.data`. For example:
+
+```json
+{
+  "data": {
+    "tagline": "This is my static website"
+  }
+}
+```
+
+This would give you `site.data.tagline`.
