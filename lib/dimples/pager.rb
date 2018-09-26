@@ -53,15 +53,23 @@ module Dimples
     end
 
     def step_to(page)
-      @current_page = (1..@page_count).cover?(page) ? page : 1
-      @previous_page = (@current_page - 1).positive? ? @current_page - 1 : nil
-      @next_page = @current_page + 1 <= @page_count ? @current_page + 1 : nil
+      @current_page = page
+      @previous_page = previous_page? ? @current_page - 1 : nil
+      @next_page = next_page? ? @current_page + 1 : nil
 
       @current_page
     end
 
     def posts_at(page)
       @posts.slice((page - 1) * @per_page, @per_page)
+    end
+
+    def previous_page?
+      (@current_page - 1).positive?
+    end
+
+    def next_page?
+      @current_page + 1 <= @page_count
     end
 
     def current_page_url
