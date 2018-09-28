@@ -131,7 +131,15 @@ module Dimples
     end
 
     def publish_posts
-      @posts.each { |post| publish_post(post) }
+      @posts.each do |post|
+        path = File.join(
+          @paths[:destination],
+          post.date.strftime(@config.paths.posts),
+          post.slug
+        )
+
+        post.write(path)
+      end
 
       if @config.generation.main_feed
         publish_feeds(@posts, @paths[:destination])
@@ -147,31 +155,19 @@ module Dimples
       )
     end
 
-    def publish_post(post)
-      path = File.join(
-        @paths[:destination],
-        post.date.strftime(@config.paths.posts),
-        post.slug
-      )
-
-      post.write(path)
-    end
-
     def publish_pages
-      @pages.each { |page| publish_page(page) }
-    end
-
-    def publish_page(page)
-      path = if page.path
-               File.dirname(page.path).sub(
-                 @paths[:pages],
+      @pages.each do |page|
+        path = if page.path
+                 File.dirname(page.path).sub(
+                   @paths[:pages],
+                   @paths[:destination]
+                 )
+               else
                  @paths[:destination]
-               )
-             else
-               @paths[:destination]
-             end
+               end
 
-      page.write(path)
+        page.write(path)
+      end
     end
 
     def publish_archives
@@ -217,41 +213,35 @@ module Dimples
     end
 
     def publish_categories
-      @categories.each_value { |category| publish_category(category) }
-    end
+      @categories.each_value do |category|
+        path = File.join(
+          @paths[:destination],
+          @config.paths.categories,
+          category.slug
+        )
 
-    def publish_category(category)
-      path = File.join(
-        @paths[:destination],
-        @config.paths.categories,
-        category.slug
-      )
+        category_posts = category.posts.reverse
+        context = { page: { title: category.name, category: category } }
 
-      category_posts = category.posts.reverse
-      context = { page: { title: category.name, category: category } }
+        Dimples::Pager.paginate(
+          self,
+          category_posts,
+          path,
+          @config.layouts.category,
+          context
+        )
 
-      Dimples::Pager.paginate(
-        self,
-        category_posts,
-        path,
-        @config.layouts.category,
-        context
-      )
-
-      publish_feeds(category_posts, path, context)
+        publish_feeds(category_posts, path, context)
+      end
     end
 
     def publish_feeds(posts, path, context = {})
       @config.feed_formats.each do |format|
-        publish_feed(format, posts, path, context)
+        feed = Feed.new(self, format)
+
+        feed.feed_posts = posts.slice(0, @config.pagination.per_page)
+        feed.write(path, context)
       end
-    end
-
-    def publish_feed(format, posts, path, context = {})
-      feed = Feed.new(self, format)
-
-      feed.feed_posts = posts.slice(0, @config.pagination.per_page)
-      feed.write(path, context)
     end
   end
 end
