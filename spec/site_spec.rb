@@ -10,6 +10,55 @@ describe 'Site' do
     }
   end
 
+  describe '#generate' do
+    context 'when successfully generating a site' do
+      before { subject.generate }
+
+      it 'creates the output directory' do
+        expect(Dir.exist?(subject.paths[:destination])).to be_truthy
+      end
+
+      it 'copies the static assets' do
+        Dir.glob(File.join(subject.paths[:static], '**', '*.*')).each do |path|
+          copied_path = path.sub(
+            subject.paths[:static],
+            subject.paths[:destination]
+          )
+
+          expect(File.exist?(copied_path)).to be_truthy
+          expect(File.read(path)).to eq(File.read(copied_path))
+        end
+      end
+
+      it 'publishes all the posts' do
+        subject.posts.each do |post|
+          post_path = File.join(
+            subject.paths[:destination],
+            post.date.strftime(subject.config.paths.posts),
+            post.slug,
+            'index.html'
+          )
+
+          expect(File.exist?(post_path)).to be_truthy
+        end
+      end
+
+      it 'publishes all the pages' do
+        subject.pages.each do |page|
+          page_path = File.join(
+            File.dirname(page.path).sub(
+              subject.paths[:pages],
+              subject.paths[:destination]
+            ),
+            'index.html'
+          )
+
+          expect(File.exist?(page_path)).to be_truthy
+        end
+      end
+    end
+  end
+
   describe '#data' do
     context 'with no custom data' do
       it 'returns an empty hash' do
