@@ -3,12 +3,14 @@
 describe 'Site' do
   subject { Dimples::Site.new(config) }
 
-  let(:config) do
+  let(:paths) do
     {
       source: File.join(__dir__, 'sources'),
       destination: File.join(@site_output, 'public')
     }
   end
+
+  let(:config) { paths }
 
   describe '#generate' do
     context 'when successfully generating a site' do
@@ -54,6 +56,56 @@ describe 'Site' do
           )
 
           expect(File.exist?(page_path)).to be_truthy
+        end
+      end
+
+      %w[year month day].each do |type|
+        context "when considering #{type} archives" do
+          let(:archive_paths) do
+            dates = case type
+                    when 'year'
+                      subject.archive.years
+                    when 'month'
+                      subject.archive.years.flat_map do |year|
+                        [year] + subject.archive.months(year)
+                      end
+                    when 'day'
+                      subject.archive.years.flat_map do |year|
+                        subject.archive.months(year).flat_map do |month|
+                          [year, month] + subject.archive.days(year, month)
+                        end
+                      end
+                    end
+
+            [].tap do |paths|
+              paths << File.join(
+                subject.paths[:destination],
+                subject.config.paths.archives,
+                dates,
+                'index.html'
+              )
+            end
+          end
+
+          context "if #{type} generation is enabled" do
+            it "generates the #{type} pages" do
+              archive_paths.each do |path|
+                expect(File.exist?(path)).to be_truthy
+              end
+            end
+          end
+
+          context "if #{type} generation is disabled" do
+            let(:config) do
+              paths.merge(generation: { "#{type}_archives": false })
+            end
+
+            it "generates no #{type} pages" do
+              archive_paths.each do |path|
+                expect(File.exist?(path)).to be_falsey
+              end
+            end
+          end
         end
       end
     end
