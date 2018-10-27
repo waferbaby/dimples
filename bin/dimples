@@ -24,7 +24,8 @@ Usage:
 dimples <#{valid_commands.join('|')}> [options]
 
 Options:
-BANNER
+  BANNER
+
   opt :config, 'Config file path', type: :string
   opt :source, 'Source directory', type: :string
   opt :destination, 'Destination directory', type: :string

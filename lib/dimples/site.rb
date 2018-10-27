@@ -125,6 +125,7 @@ module Dimples
 
     def copy_static_assets
       return unless Dir.exist?(@paths[:static])
+
       FileUtils.cp_r(File.join(@paths[:static], '.'), @paths[:destination])
     rescue StandardError => e
       raise GenerationError, "Failed to copy site assets (#{e.message})"

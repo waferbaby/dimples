@@ -86,6 +86,7 @@ module Dimples
 
     def previous_page_url
       return unless @previous_page
+
       @previous_page != 1 ? "#{@url}#{@page_prefix}#{@previous_page}" : @url
     end
 
