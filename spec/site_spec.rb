@@ -16,12 +16,33 @@ describe 'Site' do
     context 'when successfully generating a site' do
       before { subject.generate }
 
+      it 'reads all the templates' do
+        source_paths = Dir[File.join(subject.paths[:templates], '**', '*.erb')]
+        template_paths = subject.templates.map { |_, template| template.path }
+
+        expect(source_paths.sort).to eq(template_paths.sort)
+      end
+
+      it 'reads all the posts' do
+        source_paths = Dir[File.join(subject.paths[:posts], '**', '*.markdown')]
+        post_paths = subject.posts.map(&:path)
+
+        expect(source_paths.sort).to eq(post_paths.sort)
+      end
+
+      it 'reads all the pages' do
+        source_paths = Dir[File.join(subject.paths[:pages], '**', '*.markdown')]
+        page_paths = subject.pages.map(&:path)
+
+        expect(source_paths.sort).to eq(page_paths.sort)
+      end
+
       it 'creates the output directory' do
         expect(Dir.exist?(subject.paths[:destination])).to be_truthy
       end
 
       it 'copies the static assets' do
-        Dir.glob(File.join(subject.paths[:static], '**', '*.*')).each do |path|
+        Dir[File.join(subject.paths[:static], '**', '*.*')].each do |path|
           copied_path = path.sub(
             subject.paths[:static],
             subject.paths[:destination]
@@ -106,6 +127,36 @@ describe 'Site' do
               end
             end
           end
+        end
+      end
+
+      context 'when generation is enabled' do
+        it 'publishes all the category pages' do
+          subject.categories.each_key do |slug|
+            path = File.join(
+              subject.paths[:destination],
+              subject.config.paths.categories,
+              slug.to_s,
+              'index.html'
+            )
+
+            expect(File.exist?(path)).to be_truthy
+          end
+        end
+      end
+
+      context 'when generation is disabled' do
+        let(:config) do
+          paths.merge(generation: { "categories": false })
+        end
+
+        it 'publishes no category pages' do
+          path = File.join(
+            subject.paths[:destination],
+            subject.config.paths.categories
+          )
+
+          expect(Dir.exist?(path)).to be_falsey
         end
       end
     end
