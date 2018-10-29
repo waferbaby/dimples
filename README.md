@@ -12,17 +12,13 @@ A simple, opinionated static site generator.
 
 ## Installation
 
-Assuming you're using Bundler, add this to your Gemfile:
-
 ```ruby
-gem "dimples"
+gem install dimples
 ```
-
-And then run `bundle`.
 
 ## Usage
 
-Dimples includes a very simple command-line tool, imaginatively named `dimples`, which lets you generate a site in the current directory by running `dimples build`.
+Dimples is a very simple command-line tool, imaginatively named `dimples`, which lets you generate a site in the current directory by running `dimples build`.
 
 It assumes your directory structure will look like this:
 
