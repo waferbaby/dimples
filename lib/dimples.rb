@@ -2,6 +2,7 @@
 
 $LOAD_PATH.unshift(__dir__)
 
+require 'fileutils'
 require 'hashie'
 require 'tilt'
 require 'yaml'
