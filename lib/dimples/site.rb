@@ -118,7 +118,6 @@ module Dimples
       else
         FileUtils.mkdir_p(@paths[:destination])
       end
-
     rescue StandardError => e
       message = "Couldn't prepare the output directory (#{e.message})"
       raise GenerationError, message
