@@ -31,17 +31,15 @@ It assumes your directory structure will look like this:
 
 ### The 'pages' directory
 
-Any files in here will be turned into static pages, maintaining whatever folder hierarchy you're using.
+All files here will be turned into static pages, maintaining whatever directory structure you're using.
 
 ### The 'posts' directory
 
-Dimples assumes your posts in here will be named in the following format:
-
-`{year}-{month}-{day}-{slug}.{extension}`
+Dimples assumes your posts here will be named `{year}-{month}-{day}-{slug}.{extension}`.
 
 ### The 'static' directory
 
-Any files in here are copied as is into the final site.
+All files here are copied as is into the destination directory.
 
 ### The 'templates' directory
 
