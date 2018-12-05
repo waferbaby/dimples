@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
 
   s.executables << 'dimples'
 
-  s.files        = Dir.glob('lib/**/*')
+  s.files        = Dir['lib/**/*']
   s.require_path = 'lib'
 
   s.add_runtime_dependency 'hashie', '~> 3.5', '>= 3.5.7'

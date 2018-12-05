@@ -70,7 +70,7 @@ module Dimples
     end
 
     def read_files(path)
-      Dir.glob(File.join(path, '**', '*.*')).sort
+      Dir[File.join(path, '**', '*.*')].sort
     end
 
     def read_templates
@@ -114,10 +114,11 @@ module Dimples
 
     def create_output_directory
       if Dir.exist?(@paths[:destination])
-        FileUtils.remove_dir(@paths[:destination])
+        FileUtils.rm_r(@paths[:destination], secure: true)
+      else
+        FileUtils.mkdir_p(@paths[:destination])
       end
 
-      FileUtils.mkdir_p(@paths[:destination])
     rescue StandardError => e
       message = "Couldn't prepare the output directory (#{e.message})"
       raise GenerationError, message

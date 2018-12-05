@@ -3,7 +3,7 @@
 require 'rspec/core/rake_task'
 
 RSpec::Core::RakeTask.new(:spec) do |task|
-  task.pattern = Dir.glob('spec/**/*_spec.rb')
+  task.pattern = Dir['spec/**/*_spec.rb']
 end
 
 task default: :spec
@@ -19,5 +19,5 @@ task :publish do
 end
 
 task :cleanup do
-  FileUtils.rm(Dir.glob('dimples*.gem'))
+  FileUtils.rm(Dir['dimples*.gem'])
 end
