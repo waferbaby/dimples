@@ -25,25 +25,25 @@ It assumes your directory structure will look like this:
 - `config.json`
 - `pages/`
 - `posts/`
-- `public/`
+- `static/`
 - `templates/`
   - `feeds/`
 
-### Pages
+### pages/
 
 Any files in `pages/` will be turned into static pages, maintaining any folder hierarchy you're using.
 
-### Posts
+### posts/
 
 Dimples assumes your posts will be named in the following format:
 
 `{year}-{month}-{day}-{slug}.{extension}`
 
-### Public
+### static/
 
 Any files in here are copied as is into the final site.
 
-### Templates
+### templates/
 
 Templates wrap the contents of your pages and posts. Any template stored in the `feeds` subdirectory will map its filename to the feed's extension - `templates/feeds/atom.(extension)` becomes `feed.atom`, and so on.
 
