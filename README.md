@@ -1,7 +1,7 @@
+[![Build Status](https://travis-ci.org/waferbaby/dimples.svg?branch=master)](https://travis-ci.org/waferbaby/dimples) [![Test Coverage](https://codeclimate.com/github/waferbaby/dimples/badges/coverage.svg)](https://codeclimate.com/github/waferbaby/dimples) [![Gem Version](https://badge.fury.io/rb/dimples.svg)](http://badge.fury.io/rb/dimples)
+
 # Dimples
 A simple, opinionated static site generator.
-
-[![Build Status](https://travis-ci.org/waferbaby/dimples.svg?branch=master)](https://travis-ci.org/waferbaby/dimples) [![Test Coverage](https://codeclimate.com/github/waferbaby/dimples/badges/coverage.svg)](https://codeclimate.com/github/waferbaby/dimples) [![Gem Version](https://badge.fury.io/rb/dimples.svg)](http://badge.fury.io/rb/dimples)
 
 **Note:** This is a new version of Dimples, and it's a _complete_ rewrite. You can still find [the original here](https://github.com/waferbaby/dimples/tree/v4 "Version 4 of the gem.").
 
@@ -29,21 +29,21 @@ It assumes your directory structure will look like this:
 - `templates/`
   - `feeds/`
 
-### pages/
+### The 'pages' directory
 
-Any files in `pages/` will be turned into static pages, maintaining any folder hierarchy you're using.
+Any files in here will be turned into static pages, maintaining whatever folder hierarchy you're using.
 
-### posts/
+### The 'posts' directory
 
-Dimples assumes your posts will be named in the following format:
+Dimples assumes your posts in here will be named in the following format:
 
 `{year}-{month}-{day}-{slug}.{extension}`
 
-### static/
+### The 'static' directory
 
 Any files in here are copied as is into the final site.
 
-### templates/
+### The 'templates' directory
 
 Templates wrap the contents of your pages and posts. Any template stored in the `feeds` subdirectory will map its filename to the feed's extension - `templates/feeds/atom.(extension)` becomes `feed.atom`, and so on.
 
@@ -63,11 +63,11 @@ categories:
 Today I read documentation about a static site generator.
 ```
 
-Some elements in frontmatter hold special meaning to Dimples: `layout` defines which template to render for the given source file (and this is true for pages, posts _and_ templates.)
+As your pages, posts and templates are rendered, Dimples will look for a `layout` element in the frontmatter and use that to render the file's contents within the template (otherwise, it's rendered as is.) The `layout` value will map to a template file in `templates/` without the file extension, so `layout: post` would match `templates/post.erb`.
 
 ## Generation
 
-As your pages, posts and templates are rendered, Dimples makes special variables available:
+As each file is generated, Dimples makes special variables available:
 
 - `site`, the entire `Dimples::Site` instance.
 - `page`, the current page being rendered.
@@ -77,11 +77,10 @@ Anything in your frontmatter is available to either the `page` (for a page or po
 
 ```yaml
 title: My title
-layout: category
 custom_field: true
 ```
 
-If this was a page or post, you'd have access to `page.title`, `page.layout` and `page.custom_field`, and if this was a template, `template.title`, `template.layout` and `template.custom_field`.
+If this was a page or post, you'd have access to `page.title` and `page.custom_field`, and if this was a template, `template.title` and `template.custom_field`.
 
 ### Site
 
@@ -93,6 +92,8 @@ Key | Description
 `site.data` | An optional key/value dictionary you can define in your config.
 
 ### Page
+
+All pages receive the following:
 
 Key | Description
 ----|------------
@@ -125,7 +126,7 @@ The `template` object pulls in anything from that template file's frontmatter, s
 
 ### Pagination
 
-If the page being generated is part of a paginated collection, there's also a `pagination` object.
+If the page being generated is part of a paginated collection, there's also a `pagination` object:
 
 Key | Description
 ----|------------
@@ -259,11 +260,9 @@ An array of feed formats your site supports - these will be matched by name to t
 By default, Dimples will capitalise your category's slug as its title, but you can override that here:
 
 ```json
-{
-  "category_names": {
-    "bsd": "BSD",
-    "mac": "Macintosh"
-  }
+"category_names": {
+  "bsd": "BSD",
+  "mac": "Macintosh"
 }
 ```
 
@@ -276,10 +275,8 @@ These options will be passed directly to the renderer Tilt picks for your posts,
 A collection of your own custom key/value pairs that will be made available to all pages, posts and templates via `site.data`. For example:
 
 ```json
-{
-  "data": {
-    "tagline": "This is my static website"
-  }
+"data": {
+  "tagline": "This is my static website"
 }
 ```
 
