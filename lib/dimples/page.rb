@@ -3,8 +3,6 @@
 module Dimples
   # A single page on a site.
   class Page
-    include Frontable
-
     attr_accessor :contents
     attr_accessor :metadata
     attr_accessor :path
@@ -14,7 +12,8 @@ module Dimples
       @path = path
 
       if @path
-        @contents, @metadata = read_with_front_matter(@path)
+        data = File.read(@path)
+        @contents, @metadata = FrontMatter.parse(data)
       else
         @contents = ''
         @metadata = {}

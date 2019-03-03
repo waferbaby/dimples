@@ -7,12 +7,11 @@ require 'hashie'
 require 'tilt'
 require 'yaml'
 
-require 'dimples/frontable'
-
 require 'dimples/archive'
 require 'dimples/category'
 require 'dimples/configuration'
 require 'dimples/errors'
+require 'dimples/frontmatter'
 require 'dimples/pager'
 require 'dimples/renderer'
 

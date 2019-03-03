@@ -3,8 +3,6 @@
 module Dimples
   # A single template used when rendering pages, posts and other templates.
   class Template
-    include Frontable
-
     attr_accessor :path
     attr_accessor :contents
     attr_accessor :metadata
@@ -12,7 +10,9 @@ module Dimples
     def initialize(site, path)
       @site = site
       @path = path
-      @contents, @metadata = read_with_front_matter(path)
+
+      data = File.read(path)
+      @contents, @metadata = FrontMatter.parse(data)
     end
 
     def render(context = {}, body = nil)
