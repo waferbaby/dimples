@@ -45,9 +45,9 @@ All files here are copied as is into the destination directory.
 
 Templates wrap the contents of your pages and posts. Any template stored in the `feeds` subdirectory will map its filename to the feed's extension - `templates/feeds/atom.(extension)` becomes `feed.atom`, and so on.
 
-## Frontmatter
+## Front Matter
 
-Dimples supports YAML frontmatter at the beginning of a post, page or template file.
+Dimples supports YAML front matter at the beginning of a post, page or template file.
 
 ```yaml
 ---
@@ -61,7 +61,7 @@ categories:
 Today I read documentation about a static site generator.
 ```
 
-As your pages, posts and templates are rendered, Dimples will look for a `layout` element in the frontmatter and use that to render the file's contents within the template (otherwise, it's rendered as is.) The `layout` value will map to a template file in `templates/` without the file extension, so `layout: post` would match `templates/post.erb`.
+As your pages, posts and templates are rendered, Dimples will look for a `layout` element in the front matter and use that to render the file's contents within the template (otherwise, it's rendered as is.) The `layout` value will map to a template file in `templates/` without the file extension, so `layout: post` would match `templates/post.erb`.
 
 ## Generation
 
@@ -71,7 +71,7 @@ As each file is generated, Dimples makes special variables available:
 - `page`, the current page being rendered.
 - `template`, the current template being rendered.
 
-Anything in your frontmatter is available to either the `page` (for a page or post) or `template` (for a template) objects.
+Anything in your front matter is available to either the `page` (for a page or post) or `template` (for a template) objects.
 
 ```yaml
 title: My title
@@ -120,7 +120,7 @@ Key | Description
 
 ### Template
 
-The `template` object pulls in anything from that template file's frontmatter, similar to how `page` works.
+The `template` object pulls in anything from that template file's front matter, similar to how `page` works.
 
 ### Pagination
 
