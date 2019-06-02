@@ -42,8 +42,8 @@ module Dimples
       publish_pages
       publish_archives if @config.generation.year_archives
       publish_categories if @config.generation.categories
-    rescue PublishingError, RenderingError, GenerationError => error
-      @errors << error
+    rescue PublishingError, RenderingError, GenerationError => e
+      @errors << e
     end
 
     def data
