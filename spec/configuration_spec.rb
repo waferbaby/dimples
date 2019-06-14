@@ -46,7 +46,7 @@ describe 'Configuration' do
     end
 
     it 'returns the default pagination options' do
-      expect(defaults[:pagination][:page_prefix]).to eq('page')
+      expect(defaults[:pagination][:page_prefix]).to eq('page_')
       expect(defaults[:pagination][:per_page]).to eq(10)
     end
   end
