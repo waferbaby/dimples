@@ -24,11 +24,10 @@ module Dimples
         page = Page.new(site)
         page.layout = layout
 
-        page_prefix = site.config.pagination.page_prefix
         page_path = if index == 1
                       path
                     else
-                      File.join(path, "#{page_prefix}#{index}")
+                      File.join(path, "page_#{index}")
                     end
 
         page.write(
@@ -42,7 +41,7 @@ module Dimples
       @url = url
       @posts = posts
       @per_page = options[:per_page] || PER_PAGE_DEFAULT
-      @page_prefix = options[:page_prefix] || 'page'
+      @page_prefix = options[:page_prefix] || 'page_'
       @page_count = (posts.length.to_f / @per_page.to_i).ceil
 
       step_to(1)
