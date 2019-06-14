@@ -63,7 +63,7 @@ module Dimples
 
     def self.default_pagination
       {
-        page_prefix: 'page',
+        page_prefix: 'page_',
         per_page: 10
       }
     end
