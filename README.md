@@ -171,7 +171,7 @@ Dimples has a number of options for customising how it works - here are the defa
     "date_archive": "archive"
   },
   "pagination": {
-    "page_prefix": "page",
+    "page_prefix": "page_",
     "per_page": 10
   },
   "date_formats": {
@@ -235,7 +235,7 @@ Settings for all paginated pages.
 
 Key | Default | Description
 ----|---------|-------------
-`page_prefix` | `page` | The prefix used when generating page URL slugs ("page2").
+`page_prefix` | `page` | The prefix used when generating page URL slugs ("page_2").
 `per_page` | 10 | The number of posts to show per page. This applies to your feeds, too.
 
 ### Date formats
