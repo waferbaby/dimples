@@ -48,7 +48,7 @@ describe 'Pager' do
   describe '#last_page_url' do
     context 'with default options' do
       it 'returns the correct URL' do
-        expect(subject.last_page_url).to eq('/page3')
+        expect(subject.last_page_url).to eq('/page_3')
       end
     end
 
@@ -73,7 +73,7 @@ describe 'Pager' do
         before { subject.step_to(2) }
 
         it 'returns the correct URL' do
-          expect(subject.current_page_url).to eq('/page2')
+          expect(subject.current_page_url).to eq('/page_2')
         end
       end
 
@@ -81,7 +81,7 @@ describe 'Pager' do
         before { subject.step_to(3) }
 
         it 'returns the correct URL' do
-          expect(subject.current_page_url).to eq('/page3')
+          expect(subject.current_page_url).to eq('/page_3')
         end
       end
     end
@@ -133,7 +133,7 @@ describe 'Pager' do
         before { subject.step_to(3) }
 
         it 'returns the correct URL' do
-          expect(subject.previous_page_url).to eq('/page2')
+          expect(subject.previous_page_url).to eq('/page_2')
         end
       end
     end
@@ -169,7 +169,7 @@ describe 'Pager' do
     context 'with default options' do
       context 'on the first page' do
         it 'returns the correct URL' do
-          expect(subject.next_page_url).to eq('/page2')
+          expect(subject.next_page_url).to eq('/page_2')
         end
       end
 
@@ -177,7 +177,7 @@ describe 'Pager' do
         before { subject.step_to(2) }
 
         it 'returns the correct URL' do
-          expect(subject.next_page_url).to eq('/page3')
+          expect(subject.next_page_url).to eq('/page_3')
         end
       end
 
