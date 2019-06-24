@@ -3,6 +3,10 @@
 module Dimples
   # Default configuration options for a site.
   module Configuration
+    def self.prepare(config)
+      Hashie::Mash.new(defaults).deep_merge(config)
+    end
+
     def self.defaults
       {
         source: Dir.pwd,

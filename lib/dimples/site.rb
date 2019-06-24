@@ -14,7 +14,7 @@ module Dimples
     attr_reader :latest_post
 
     def initialize(config = {})
-      @config = Hashie::Mash.new(Configuration.defaults).deep_merge(config)
+      @config = Configuration.prepare(config)
 
       @paths = {}.tap do |paths|
         paths[:source] = File.expand_path(@config.source)
