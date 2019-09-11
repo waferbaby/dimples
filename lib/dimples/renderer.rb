@@ -12,7 +12,13 @@ module Dimples
       context[:site] ||= @site
       context[:pagination] ||= nil
 
-      output = engine.render(scope, context) { body }.strip
+      begin
+        output = engine.render(scope, context) { body }.strip
+      rescue StandardError => e
+        raise RenderingError,
+              "Unable to render #{@source.path || 'dynamic file'} (#{e})"
+      end
+
       @source.metadata[:rendered_contents] = output
 
       if @source.metadata[:layout]
