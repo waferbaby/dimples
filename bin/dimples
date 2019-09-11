@@ -29,7 +29,6 @@ Options:
   opt :config, 'Config file path', type: :string
   opt :source, 'Source directory', type: :string
   opt :destination, 'Destination directory', type: :string
-  opt :verbose, 'Verbose mode', default: false
 end
 
 Optimist.educate if ARGV.empty?
@@ -47,17 +46,17 @@ source_path = if options[:source]
 
 config_path = options[:config] || File.join(source_path, 'config.json')
 
-if File.exist?(config_path)
-  begin
-    file_contents = File.read(config_path)
-    Optimist.die "Config file is empty (#{config_path})" if file_contents.empty?
-
-    config = JSON.parse(file_contents, symbolize_names: true)
-  rescue JSON::ParserError
-    Optimist.die "Invalid or malformed config file (#{config_path})"
-  end
-else
+unless File.exist?(config_path)
   Optimist.die "Unable to find config file (#{config_path})"
+end
+
+begin
+  file_contents = File.read(config_path)
+  Optimist.die "Config file is empty (#{config_path})" if file_contents.empty?
+
+  config = JSON.parse(file_contents, symbolize_names: true)
+rescue JSON::ParserError
+  Optimist.die "Invalid or malformed config file (#{config_path})"
 end
 
 config[:source] = source_path
