@@ -64,6 +64,14 @@ describe 'Renderer' do
         expect(template).to receive(:render)
         subject.render
       end
+
+      context 'when an invalid source is used' do
+        before { allow(source).to receive(:contents).and_return('<%= x %>') }
+
+        it 'raises a rendering exception' do
+          expect { subject.render }.to raise_error(Dimples::RenderingError)
+        end
+      end
     end
   end
 end
