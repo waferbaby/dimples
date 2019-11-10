@@ -1,9 +1,7 @@
-[![Build Status](https://travis-ci.org/waferbaby/dimples.svg?branch=master)](https://travis-ci.org/waferbaby/dimples) [![Test Coverage](https://codeclimate.com/github/waferbaby/dimples/badges/coverage.svg)](https://codeclimate.com/github/waferbaby/dimples) [![Gem Version](https://badge.fury.io/rb/dimples.svg)](http://badge.fury.io/rb/dimples)
+[![Gem Version](https://img.shields.io/gem/v/dimples)](https://img.shields.io/gem/v/dimples) [![Build Status](https://travis-ci.org/waferbaby/dimples.svg?branch=master)](https://travis-ci.org/waferbaby/dimples) [![License](https://img.shields.io/github/license/waferbaby/usesthis)](https://img.shields.io/github/license/waferbaby/usesthis)
 
 # Dimples
 A simple, opinionated static site generator.
-
-**Note:** This is a new version of Dimples, and it's a _complete_ rewrite. You can still find [the original here](https://github.com/waferbaby/dimples/tree/v4 "Version 4 of the gem.").
 
 ## Requirements
 
