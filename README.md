@@ -1,4 +1,6 @@
-[![Gem Version](https://img.shields.io/gem/v/dimples)](https://img.shields.io/gem/v/dimples) [![Build Status](https://travis-ci.org/waferbaby/dimples.svg?branch=master)](https://travis-ci.org/waferbaby/dimples) [![License](https://img.shields.io/github/license/waferbaby/usesthis)](https://img.shields.io/github/license/waferbaby/usesthis)
+![Gem Version](https://img.shields.io/gem/v/dimples)
+![Build Status](https://img.shields.io/travis/waferbaby/dimples)
+![License](https://img.shields.io/github/license/waferbaby/usesthis)
 
 # Dimples
 A simple, opinionated static site generator.
