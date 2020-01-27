@@ -15,6 +15,7 @@ module Dimples
       @metadata[:date] = Date.new(parts[1].to_i, parts[2].to_i, parts[3].to_i)
       @metadata[:slug] = parts[4]
       @metadata[:categories] ||= []
+      @metadata[:draft] ||= false
     end
 
     def year
