@@ -27,6 +27,7 @@ module Dimples
         archives: 'archives',
         paginated_posts: 'posts',
         posts: 'archives/%Y/%m/%d',
+        drafts: 'archives/drafts/%Y/%m/%d',
         categories: 'archives/categories'
       }
     end

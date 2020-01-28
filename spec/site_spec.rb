@@ -53,11 +53,28 @@ describe 'Site' do
         end
       end
 
-      it 'publishes all the posts' do
-        subject.posts.each do |post|
+      it 'publishes all the published posts' do
+        published_posts = subject.posts.select { |post| !post.draft }
+
+        published_posts.each do |post|
           post_path = File.join(
             subject.paths[:destination],
             post.date.strftime(subject.config.paths.posts),
+            post.slug,
+            'index.html'
+          )
+
+          expect(File.exist?(post_path)).to be_truthy
+        end
+      end
+
+      it 'publishes all the draft posts' do
+        draft_posts = subject.posts.select { |post| post.draft }
+
+        draft_posts.each do |post|
+          post_path = File.join(
+            subject.paths[:destination],
+            post.date.strftime(subject.config.paths.drafts),
             post.slug,
             'index.html'
           )

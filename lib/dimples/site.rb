@@ -135,22 +135,24 @@ module Dimples
       @posts.each do |post|
         path = File.join(
           @paths[:destination],
-          post.date.strftime(@config.paths.posts),
+          post.date.strftime(post.draft ? @config.paths.drafts : @config.paths.posts),
           post.slug
         )
 
         post.write(path)
       end
 
+      published_posts = @posts.select { |post| !post.draft }
+
       if @config.generation.main_feed
-        publish_feeds(@posts, @paths[:destination])
+        publish_feeds(published_posts, @paths[:destination])
       end
 
       return unless @config.generation.paginated_posts
 
       Dimples::Pager.paginate(
         self,
-        @posts,
+        published_posts,
         File.join(@paths[:destination], @config.paths.paginated_posts),
         @config.layouts.paginated_post
       )
