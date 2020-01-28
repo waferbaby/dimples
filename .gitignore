@@ -1,4 +1,6 @@
-coverage
-Gemfile.lock
 *.gem
+.bundle
+Gemfile.lock
+coverage
 test/site
+vendor
