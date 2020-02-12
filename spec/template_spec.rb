@@ -17,7 +17,7 @@ describe 'Template' do
 
   describe '#render' do
     before do
-      config = Hashie::Mash.new(rendering: {})
+      config = Dimples::Configuration.prepare({})
       allow(site).to receive(:config).and_return(config)
     end
 

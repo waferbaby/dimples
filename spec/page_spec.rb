@@ -70,7 +70,7 @@ describe 'Page' do
   describe '#render' do
     context 'when the page has a path' do
       before do
-        config = Hashie::Mash.new(rendering: {})
+        config = Dimples::Configuration.prepare({})
         allow(site).to receive(:config).and_return(config)
       end
 
