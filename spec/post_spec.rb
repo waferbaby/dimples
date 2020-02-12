@@ -9,7 +9,7 @@ describe 'Post' do
   end
 
   before do
-    config = Hashie::Mash.new(layouts: { post: 'post' })
+    config = Dimples::Configuration.prepare({})
     allow(site).to receive(:config).and_return(config)
   end
 
@@ -19,6 +19,24 @@ describe 'Post' do
       expect(subject.metadata[:slug]).to eq('hello')
       expect(subject.metadata[:layout]).to eq('post')
       expect(subject.metadata[:categories]).to eq(%w[personal dog])
+    end
+  end
+
+  describe '#url' do
+    context 'when the post is a draft' do
+      before { subject.draft = true }
+
+      it 'returns the draft URL' do
+        expect(subject.url).to eq('/archives/drafts/2018/01/01/hello/')
+      end
+    end
+
+    context 'when the post is final' do
+      before { subject.draft = false }
+
+      it 'returns the proper URL' do
+        expect(subject.url).to eq('/archives/2018/01/01/hello/')
+      end
     end
   end
 
