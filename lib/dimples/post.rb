@@ -18,6 +18,11 @@ module Dimples
       @metadata[:draft] ||= false
     end
 
+    def url
+      path = date.strftime(draft ? @site.config.paths.drafts : @site.config.paths.posts)
+      "/#{path}/#{slug}/"
+    end
+
     def year
       @year ||= @metadata[:date].strftime('%Y')
     end

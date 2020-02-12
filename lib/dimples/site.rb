@@ -133,12 +133,7 @@ module Dimples
 
     def publish_posts
       @posts.each do |post|
-        path = File.join(
-          @paths[:destination],
-          post.date.strftime(post.draft ? @config.paths.drafts : @config.paths.posts),
-          post.slug
-        )
-
+        path = File.join(@paths[:destination], post.url.split('/'))
         post.write(path)
       end
 
