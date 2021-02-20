@@ -18,7 +18,7 @@ module Dimples
 
       @paths = {}.tap do |paths|
         paths[:source] = File.expand_path(@config.source)
-        paths[:destination] = File.expand_path(@config.destination)
+        paths[:destination] = File.expand_path(Time.now.strftime(@config.destination))
 
         %w[pages posts static templates].each do |type|
           paths[type.to_sym] = File.join(paths[:source], type)
