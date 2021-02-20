@@ -1,5 +1,5 @@
 ![Gem Version](https://img.shields.io/gem/v/dimples)
-![Build Status](https://img.shields.io/travis/waferbaby/dimples)
+![Status](https://img.shields.io/github/checks-status/waferbaby/dimples/master)
 ![License](https://img.shields.io/github/license/waferbaby/usesthis)
 
 # Dimples
@@ -190,7 +190,12 @@ Dimples has a number of options for customising how it works - here are the defa
 
 ### Source and Destination
 
-Both of these options are full directory paths - by default, the `source` is the current working directory, and the `destination` is the same with `public` appended.
+Both of these are full directory paths.
+
+Key | Default | Description
+----|---------|-------------
+`source` | `./` | The directory where your site's files and config live.
+`destination` | './public | The directory where your site will be built. This string is passed to Ruby's `strftime` [Time method](http://ruby-doc.org/core-2.7.2/Time.html#method-i-strftime "The strftime method of the Time class."), so you can use any of its options here.
 
 ### Paths
 
@@ -200,7 +205,7 @@ Key | Default | Description
 ----|---------|-------------
 `archives` | `archives` | The path for the main paginated archives.
 `paginated_posts` | `posts` | The path for index-style pages for all posts.
-`posts` | `archives/%Y/%m/%d` | The path for posts (suffixed with the individual post slug). This string is passed to Ruby's `strftime` [Time method](http://ruby-doc.org/core-2.4.0/Time.html#method-i-strftime "The strftime method of the Time class."), so you can use any of its options here.
+`posts` | `archives/%Y/%m/%d` | The path for posts (suffixed with the individual post slug). This string is passed to Ruby's `strftime` [Time method](http://ruby-doc.org/core-2.7.2/Time.html#method-i-strftime "The strftime method of the Time class."), so you can use any of its options here.
 `categories` | `archives/categories` | The path for category index pages (suffixed with the individual category slug).
 
 ### Generation
