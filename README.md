@@ -195,7 +195,7 @@ Both of these are full directory paths.
 Key | Default | Description
 ----|---------|-------------
 `source` | `./` | The directory where your site's files and config live.
-`destination` | './public | The directory where your site will be built. This string is passed to Ruby's `strftime` [Time method](http://ruby-doc.org/core-2.7.2/Time.html#method-i-strftime "The strftime method of the Time class."), so you can use any of its options here.
+`destination` | `./public` | The directory where your site will be built. This string is passed to Ruby's `strftime` [Time method](http://ruby-doc.org/core-2.7.2/Time.html#method-i-strftime "The strftime method of the Time class."), so you can use any of its options here.
 
 ### Paths
 
