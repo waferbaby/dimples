@@ -12,6 +12,18 @@ describe 'Site' do
 
   let(:config) { paths }
 
+  describe '#initialize' do
+    context 'when the output path has date formatting' do
+      let(:date_format) { '%Y-%m-%d/%T' }
+      before { paths[:destination] = File.join(@site_output, 'builds', date_format) }
+
+      it 'correctly formats it' do
+        date_path = Time.now.strftime(date_format)
+        expect(subject.paths[:destination]).to eq("#{@site_output}/builds/#{date_path}")
+      end
+    end
+  end
+
   describe '#generate' do
     context 'when successfully generating a site' do
       before { subject.generate }
