@@ -1,6 +1,0 @@
----
-title: Draft
-draft: true
----
-
-This is a test post.
