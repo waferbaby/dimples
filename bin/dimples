@@ -4,79 +4,11 @@
 $LOAD_PATH.unshift(File.join(__dir__, '..', 'lib'))
 
 require 'dimples'
-require 'dimples/version'
-require 'optimist'
-require 'json'
 
-trap('SIGINT') do
-  puts 'Generation cancelled!'
-  exit!
-end
+path = if ARGV[0]
+         File.expand_path(ARGV[0])
+       else
+         Dir.pwd()
+       end
 
-valid_commands = %w[build]
-
-options = Optimist.options do
-  version "dimples v#{Dimples::VERSION}"
-  banner <<-BANNER
-A simple static site generator.
-
-Usage:
-dimples <#{valid_commands.join('|')}> [options]
-
-Options:
-  BANNER
-
-  opt :config, 'Config file path', type: :string
-  opt :source, 'Source directory', type: :string
-  opt :destination, 'Destination directory', type: :string
-end
-
-Optimist.educate if ARGV.empty?
-command = ARGV[0]
-
-unless valid_commands.include?(command)
-  Optimist.die "Command must be '#{valid_commands.join('\', \'')}'"
-end
-
-source_path = if options[:source]
-                File.expand_path(options[:source])
-              else
-                Dir.pwd
-              end
-
-config_path = options[:config] || File.join(source_path, 'config.json')
-
-unless File.exist?(config_path)
-  Optimist.die "Unable to find config file (#{config_path})"
-end
-
-begin
-  file_contents = File.read(config_path)
-  Optimist.die "Config file is empty (#{config_path})" if file_contents.empty?
-
-  config = JSON.parse(file_contents, symbolize_names: true)
-rescue JSON::ParserError
-  Optimist.die "Invalid or malformed config file (#{config_path})"
-end
-
-config[:source] = source_path
-
-if options[:destination]
-  config[:destination] = File.expand_path(options[:destination])
-end
-
-site = Dimples::Site.new(config)
-
-case command.to_sym
-when :build
-  puts 'Building site...'
-
-  site.generate
-
-  if site.errors.empty?
-    puts "Done! Your site has been built in #{site.paths[:destination]}."
-  else
-    puts 'Generation failed:'
-    site.errors.each { |error| puts error }
-  end
-end
+Dimples::Site.generate(File.join(path, 'site'))
