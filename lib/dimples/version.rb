@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module Dimples
-  VERSION = '6.6.0'
+  VERSION = '7.0'
 end
