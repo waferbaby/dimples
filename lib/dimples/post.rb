@@ -1,11 +1,11 @@
+require_relative 'document'
+
 require 'date'
-require 'redcarpet'
-require 'yaml'
 
 module Dimples
-  class Post
+  class Post < Document
     def date
-      @metadata.fetch(:date, Date.now)
+      @metadata.fetch(:date, DateTime.now)
     end
   end
 end
