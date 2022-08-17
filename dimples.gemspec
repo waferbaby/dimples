@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
   s.files        = Dir['lib/**/*']
   s.require_path = 'lib'
 
-  s.add_runtime_dependency 'erubis', '~> 2.7'
+  s.add_runtime_dependency 'erubi', '~> 1.10'
   s.add_runtime_dependency 'redcarpet', '~> 3.5'
 
   s.add_development_dependency 'rake', '~> 12.3.3'
