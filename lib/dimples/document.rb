@@ -6,15 +6,17 @@ module Dimples
 
     attr_accessor :metadata, :contents, :path
 
-    def initialize(path)
+    def initialize(path = nil)
       @path = path
-      @contents = File.read(path)
+      @metadata = {}
 
-      if matches = contents.match(FRONT_MATTER_PATTERN)
-        @metadata = YAML.load(matches[1], symbolize_names: true)
-        @contents = matches.post_match.strip
-      else
-        @metadata = {}
+      if @path
+        @contents = File.read(path)
+
+        if matches = contents.match(FRONT_MATTER_PATTERN)
+          @metadata = YAML.load(matches[1], symbolize_names: true)
+          @contents = matches.post_match.strip
+        end
       end
     end
 
@@ -48,7 +50,12 @@ module Dimples
     def renderer
       @renderer ||= begin
                       callback = proc { contents }
-                      Tilt.new(@path, {}, &callback)
+
+                      if @path
+                        Tilt.new(@path, {}, &callback)
+                      else
+                        Tilt::StringTemplate.new(&callback)
+                      end
                     end
     end
 
