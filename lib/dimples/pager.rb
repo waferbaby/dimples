@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 module Dimples
-  # A paginated collection of posts that can be walked forward or backwards.
   class Pager
-    PER_PAGE_DEFAULT = 10
+    PER_PAGE = 10
 
     include Enumerable
 
@@ -13,35 +12,11 @@ module Dimples
     attr_reader :page_count
     attr_reader :item_count
 
-    def self.paginate(site, posts, path, layout, context = {})
-      pager = Pager.new(
-        path.sub(site.paths[:destination], '') + '/',
-        posts,
-        site.config.pagination
-      )
-
-      pager.each do |index|
-        page = Page.new(site)
-        page.layout = layout
-
-        page_path = if index == 1
-                      path
-                    else
-                      File.join(path, "page_#{index}")
-                    end
-
-        page.write(
-          page_path,
-          context.merge(pagination: pager.to_context)
-        )
-      end
-    end
-
-    def initialize(url, posts, options = {})
+    def initialize(url, posts)
       @url = url
       @posts = posts
-      @per_page = options[:per_page] || PER_PAGE_DEFAULT
-      @page_prefix = options[:page_prefix] || 'page_'
+      @per_page = PER_PAGE
+      @page_prefix = 'page_'
       @page_count = (posts.length.to_f / @per_page.to_i).ceil
 
       step_to(1)
@@ -94,7 +69,7 @@ module Dimples
     end
 
     def to_context
-      Hashie::Mash.new(
+      {
         posts: posts_at(current_page),
         current_page: @current_page,
         page_count: @page_count,
@@ -108,7 +83,7 @@ module Dimples
           previous_page: previous_page_url,
           next_page: next_page_url
         }
-      )
+      }
     end
   end
 end
