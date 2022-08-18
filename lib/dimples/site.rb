@@ -9,6 +9,8 @@ module Dimples
       new(output_path).generate
     end
 
+    attr_accessor :posts, :archives, :categories
+
     def initialize(output_path)
       @paths = {
         source: File.expand_path(Dir.pwd),
@@ -32,7 +34,7 @@ module Dimples
 
       Dir.mkdir(@paths[:destination])
 
-      generate_posts
+       # generate_posts
       generate_pages
       generate_archives
     end
@@ -89,23 +91,33 @@ module Dimples
 
       @posts.each do |post|
         path = File.join(directory_path, post.slug, post.filename)
-        generate_file(path, render_template('post', post.render(), post: post)) 
+        generate_file(path, render(post, post: post))
       end
     end
 
     def generate_pages
+      @pages.each do |page|
+        path = if page.path
+                 File.dirname(page.path).sub(
+                   @paths[:pages],
+                   @paths[:destination]
+                 )
+               else
+                 @paths[:destination]
+               end
+
+        generate_file(File.join(path, page.filename), render(page, page: page))
+      end
     end
 
     def generate_archives
     end
 
-    def render_template(layout, content, context = {})
-      return content unless @templates[layout]
-
+    def render(object, context = {}, content = nil)
       context[:site] ||= self
 
-      output = @templates[layout].render(content, context)
-      output = render_template(@templates[layout].layout, output, context) if @templates[layout].layout
+      output = object.render(context, content)
+      output = render(@templates[object.layout], context, output) if object.layout
 
       output
     end
