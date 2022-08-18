@@ -8,6 +8,10 @@ module Dimples
       @metadata.fetch(:date, DateTime.now)
     end
 
+    def layout
+      @metadata.fetch(:layout, 'post')
+    end
+
     def slug
       File.basename(@path, '.markdown')
     end
