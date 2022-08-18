@@ -4,18 +4,6 @@ require 'date'
 
 module Dimples
   class Post < Document
-    def title
-      @metadata.fetch(:title, 'Untitled')
-    end
-
-    def summary
-      @metadata.fetch(:summary, '')
-    end
-
-    def categories
-      @metadata.fetch(:categories, [])
-    end
-
     def date
       @metadata.fetch(:date, DateTime.now)
     end
