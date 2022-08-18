@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require 'redcarpet'
+require_relative 'pager'
+
 require 'tilt'
 
 module Dimples
@@ -34,7 +35,7 @@ module Dimples
 
       Dir.mkdir(@paths[:destination])
 
-       # generate_posts
+      generate_posts
       generate_pages
       generate_archives
     end
@@ -85,6 +86,24 @@ module Dimples
       File.write(path, content)
     end
 
+    def generate_paginated_posts(posts, path, context = {})
+      pager = Dimples::Pager.new(path.sub(@paths[:destination], '') + '/', posts)
+
+      pager.each do |index|
+        page = Dimples::Page.new()
+        page.metadata[:layout] = 'posts'
+
+        page_path = if index == 1
+                      path
+                    else
+                      File.join(path, "page_#{index}")
+                    end
+
+        context.merge!(pagination: pager.to_context)
+        generate_file(File.join(page_path, page.filename), render(page, context))
+      end
+    end
+
     def generate_posts
       directory_path = File.join(@paths[:destination], 'posts')
       Dir.mkdir(directory_path)
@@ -111,13 +130,26 @@ module Dimples
     end
 
     def generate_archives
+      archives_path = File.join(@paths[:destination], 'archives')
+
+      @archives.each do |year, months|
+        year_path = File.join(archives_path, year.to_s)
+        generate_paginated_posts(months.values.flatten, year_path, year: year)
+
+        months.each do |month, posts|
+          generate_paginated_posts(posts, File.join(year_path, month), year: year, month: month)
+        end
+      end
     end
 
     def render(object, context = {}, content = nil)
       context[:site] ||= self
 
       output = object.render(context, content)
-      output = render(@templates[object.layout], context, output) if object.layout
+
+      if object.layout && @templates[object.layout]
+        output = render(@templates[object.layout], context, output)
+      end
 
       output
     end
