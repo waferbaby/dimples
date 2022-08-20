@@ -11,11 +11,11 @@ module Dimples
     attr_reader :next_page
     attr_reader :page_count
 
-    def initialize(url, posts)
+    def initialize(url, posts, options = {})
       @url = url
       @posts = posts
-      @per_page = PER_PAGE
-      @page_prefix = 'page_'
+      @per_page = options.fetch(:per_page, PER_PAGE)
+      @page_prefix = options.fetch(:page_prefix, 'page_')
       @page_count = (posts.length.to_f / @per_page.to_i).ceil
 
       step_to(1)
