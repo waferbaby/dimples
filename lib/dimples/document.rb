@@ -1,22 +1,17 @@
-require 'yaml'
+require_relative 'frontmatter'
 
 module Dimples
   class Document
-    FRONT_MATTER_PATTERN = /^(-{3}\n.*?\n?)^(-{3}*$\n?)/m.freeze
-
     attr_accessor :metadata, :contents, :path, :rendered_contents
 
     def initialize(path = nil)
       @path = path
-      @metadata = {}
 
       if @path
-        @contents = File.read(path)
-
-        if matches = contents.match(FRONT_MATTER_PATTERN)
-          @metadata = YAML.load(matches[1], symbolize_names: true)
-          @contents = matches.post_match.strip
-        end
+        @metadata, @contents = Dimples::FrontMatter.parse(File.read(path))
+      else
+        @metadata = {}
+        @contents = ''
       end
     end
 
