@@ -4,7 +4,7 @@ module Dimples
   class Document
     FRONT_MATTER_PATTERN = /^(-{3}\n.*?\n?)^(-{3}*$\n?)/m.freeze
 
-    attr_accessor :metadata, :contents, :path
+    attr_accessor :metadata, :contents, :path, :rendered_contents
 
     def initialize(path = nil)
       @path = path
@@ -42,7 +42,7 @@ module Dimples
         context_obj.instance_variable_set("@#{key}", value)
       end
 
-      renderer.render(context_obj) { content }
+      @rendered_contents = renderer.render(context_obj) { content }
     end
 
     private
