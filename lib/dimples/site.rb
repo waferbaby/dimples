@@ -19,6 +19,8 @@ module Dimples
         destination: File.expand_path(output_path)
       }
 
+      @config = read_config
+
       %w[pages posts static templates].each do |type|
         @paths[type.to_sym] = File.join(@paths[:source], type)
       end
@@ -44,6 +46,13 @@ module Dimples
     end
 
     private
+
+    def read_config
+      config_path = File.join(@paths[:source], '.config')
+
+      return {} unless File.exist?(config_path)
+      YAML.load(File.read(config_path), symbolize_names: true)
+    end
 
     def read_files(path)
       Dir[File.join(path, '**', '*.*')].sort
@@ -107,7 +116,7 @@ module Dimples
     end
 
     def generate_posts
-      directory_path = File.join(@paths[:destination], 'posts')
+      directory_path = File.join(@paths[:destination], @config.dig(:paths, :posts) || 'posts')
       Dir.mkdir(directory_path)
 
       @posts.each do |post|
