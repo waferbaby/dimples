@@ -137,7 +137,9 @@ module Dimples
     def generate_categories
       @categories.each do |category, posts|
         category_path = File.join(@paths[:destination], 'categories', category)
+
         generate_paginated_posts(posts, category_path, category: category)
+        generate_feed(posts.slice(0, 10), category_path)
       end
     end
 
