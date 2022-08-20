@@ -2,7 +2,7 @@
 
 module Dimples
   class Pager
-    PER_PAGE = 10
+    PER_PAGE = 5
 
     include Enumerable
 
@@ -10,7 +10,6 @@ module Dimples
     attr_reader :previous_page
     attr_reader :next_page
     attr_reader :page_count
-    attr_reader :item_count
 
     def initialize(url, posts)
       @url = url
