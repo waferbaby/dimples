@@ -2,6 +2,7 @@
 
 require_relative 'pager'
 
+require 'fileutils'
 require 'tilt'
 
 module Dimples
@@ -10,7 +11,7 @@ module Dimples
       new(output_path).generate
     end
 
-    attr_accessor :posts, :archives, :categories
+    attr_accessor :posts, :categories
 
     def initialize(output_path)
       @paths = {
@@ -37,7 +38,9 @@ module Dimples
 
       generate_posts
       generate_pages
-      generate_archives
+      generate_categories
+
+      copy_assets
     end
 
     private
@@ -47,20 +50,19 @@ module Dimples
     end
 
     def scan_posts
-      @archives = {}
+      @posts = read_files(@paths[:posts]).map do |path|
+        Dimples::Post.new(path)
+      end
+
+      @posts.sort_by! { |post| post.date }.reverse!
+
       @categories = {}
 
-      @posts = read_files(@paths[:posts]).map do |path|
-        post = Dimples::Post.new(path)
-
-        year = post.date.year
-        month = post.date.strftime('%m')
-
-        @archives[year] ||= {}
-        @archives[year][month] ||= []
-        @archives[year][month] << post
-
-        post
+      @posts.each do |post|
+        post.categories.each do |category|
+          @categories[category] ||= []
+          @categories[category] << post
+        end
       end
     end
 
@@ -79,7 +81,7 @@ module Dimples
       end
     end
 
-    def generate_file(path, content)
+    def write_file(path, content)
       directory_path = File.dirname(path)
 
       Dir.mkdir(directory_path) unless Dir.exist?(directory_path)
@@ -100,7 +102,7 @@ module Dimples
                     end
 
         context.merge!(pagination: pager.to_context)
-        generate_file(File.join(page_path, page.filename), render(page, context))
+        write_file(File.join(page_path, page.filename), render(page, context))
       end
     end
 
@@ -110,8 +112,11 @@ module Dimples
 
       @posts.each do |post|
         path = File.join(directory_path, post.slug, post.filename)
-        generate_file(path, render(post, post: post))
+        write_file(path, render(post, post: post))
       end
+
+      generate_paginated_posts(@posts, directory_path)
+      generate_feed(@posts.slice(0, 10), @paths[:destination])
     end
 
     def generate_pages
@@ -125,21 +130,27 @@ module Dimples
                  @paths[:destination]
                end
 
-        generate_file(File.join(path, page.filename), render(page, page: page))
+        write_file(File.join(path, page.filename), render(page, page: page))
       end
     end
 
-    def generate_archives
-      archives_path = File.join(@paths[:destination], 'archives')
-
-      @archives.each do |year, months|
-        year_path = File.join(archives_path, year.to_s)
-        generate_paginated_posts(months.values.flatten, year_path, year: year)
-
-        months.each do |month, posts|
-          generate_paginated_posts(posts, File.join(year_path, month), year: year, month: month)
-        end
+    def generate_categories
+      @categories.each do |category, posts|
+        category_path = File.join(@paths[:destination], 'categories', category)
+        generate_paginated_posts(posts, category_path, category: category)
       end
+    end
+
+    def generate_feed(posts, path)
+      page = Dimples::Page.new()
+      page.metadata[:layout] = 'feed'
+
+      write_file(File.join(path, 'feed.atom'), render(page, posts: posts))
+    end
+
+    def copy_assets
+      return unless Dir.exist?(@paths[:static])
+      FileUtils.cp_r(File.join(@paths[:static], '.'), @paths[:destination])
     end
 
     def render(object, context = {}, content = nil)
