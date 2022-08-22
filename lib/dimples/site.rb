@@ -51,6 +51,7 @@ module Dimples
       config_path = File.join(@paths[:source], '.config')
 
       return {} unless File.exist?(config_path)
+
       YAML.load(File.read(config_path), symbolize_names: true)
     end
 
@@ -101,7 +102,7 @@ module Dimples
       pager = Dimples::Pager.new(path.sub(@paths[:destination], '') + '/', posts)
 
       pager.each do |index|
-        page = Dimples::Page.new()
+        page = Dimples::Page.new
         page.metadata[:layout] = 'posts'
 
         page_path = if index == 1
@@ -153,7 +154,7 @@ module Dimples
     end
 
     def generate_feed(posts, path)
-      page = Dimples::Page.new()
+      page = Dimples::Page.new
       page.metadata[:layout] = 'feed'
 
       write_file(File.join(path, 'feed.atom'), render(page, posts: posts))
@@ -161,6 +162,7 @@ module Dimples
 
     def copy_assets
       return unless Dir.exist?(@paths[:static])
+
       FileUtils.cp_r(File.join(@paths[:static], '.'), @paths[:destination])
     end
 
@@ -169,9 +171,7 @@ module Dimples
 
       output = object.render(context, content)
 
-      if object.layout && @templates[object.layout]
-        output = render(@templates[object.layout], context, output)
-      end
+      output = render(@templates[object.layout], context, output) if object.layout && @templates[object.layout]
 
       output
     end

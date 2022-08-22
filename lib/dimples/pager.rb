@@ -6,10 +6,7 @@ module Dimples
 
     include Enumerable
 
-    attr_reader :current_page
-    attr_reader :previous_page
-    attr_reader :next_page
-    attr_reader :page_count
+    attr_reader :current_page, :previous_page, :next_page, :page_count
 
     def initialize(url, posts, options = {})
       @url = url

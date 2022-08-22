@@ -44,22 +44,18 @@ module Dimples
 
     def renderer
       @renderer ||= begin
-                      callback = proc { contents }
+        callback = proc { contents }
 
-                      if @path
-                        Tilt.new(@path, {}, &callback)
-                      else
-                        Tilt::StringTemplate.new(&callback)
-                      end
-                    end
+        if @path
+          Tilt.new(@path, {}, &callback)
+        else
+          Tilt::StringTemplate.new(&callback)
+        end
+      end
     end
 
-    def method_missing(method_name, *args, &block)
-      if @metadata.key?(method_name)
-        @metadata[method_name]
-      else
-        nil
-      end
+    def method_missing(method_name, *_args)
+      @metadata[method_name] if @metadata.key?(method_name)
     end
   end
 end
