@@ -1,9 +1,6 @@
 AllCops:
   TargetRubyVersion: 2.4
 
-Layout/IndentHeredoc:
-  Enabled: false
-
 Metrics/AbcSize:
   Max: 30
 
