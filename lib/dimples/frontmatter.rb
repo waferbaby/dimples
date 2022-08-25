@@ -10,7 +10,7 @@ module Dimples
       metadata = {}
 
       if (matches = contents.match(PATTERN))
-        metadata = YAML.safe_load(matches[1], symbolize_names: true)
+        metadata = YAML.safe_load(matches[1], symbolize_names: true, permitted_classes: [Date])
         contents = matches.post_match.strip
       end
 
