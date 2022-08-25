@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require_relative 'frontmatter'
 
 module Dimples
   class Document
     attr_accessor :metadata, :contents, :path, :rendered_contents
 
-    def initialize(path = nil)
+    def initialize(path = nil, metadata = {})
       @path = path
 
       if @path
@@ -13,6 +15,8 @@ module Dimples
         @metadata = {}
         @contents = ''
       end
+
+      @metadata.merge!(metadata)
     end
 
     def filename
@@ -56,6 +60,10 @@ module Dimples
 
     def method_missing(method_name, *_args)
       @metadata[method_name] if @metadata.key?(method_name)
+    end
+
+    def respond_to_missing?(method_name, include_private)
+      @metadata.key?(method_name) || super
     end
   end
 end

@@ -21,9 +21,7 @@ module Dimples
 
       @config = read_config
 
-      %w[pages posts static templates].each do |type|
-        @paths[type.to_sym] = File.join(@paths[:source], type)
-      end
+      %w[pages posts static templates].each { |type| @paths[type.to_sym] = File.join(@paths[:source], type) }
 
       scan_posts
       scan_pages
@@ -52,7 +50,7 @@ module Dimples
 
       return {} unless File.exist?(config_path)
 
-      YAML.load(File.read(config_path), symbolize_names: true)
+      YAML.safe_load(File.read(config_path), symbolize_names: true)
     end
 
     def read_files(path)
@@ -60,11 +58,8 @@ module Dimples
     end
 
     def scan_posts
-      @posts = read_files(@paths[:posts]).map do |path|
-        Dimples::Post.new(path)
-      end
-
-      @posts.sort_by! { |post| post.date }.reverse!
+      @posts = read_files(@paths[:posts]).map { Dimples::Post.new(path) }
+      @posts.sort_by!(&:date).reverse!
 
       @categories = {}
 
@@ -99,11 +94,10 @@ module Dimples
     end
 
     def generate_paginated_posts(posts, path, context = {})
-      pager = Dimples::Pager.new(path.sub(@paths[:destination], '') + '/', posts)
+      pager = Dimples::Pager.new("#{path.sub(@paths[:destination], '')}/", posts)
 
       pager.each do |index|
-        page = Dimples::Page.new
-        page.metadata[:layout] = 'posts'
+        page = Dimples::Page.new(nil, layout: 'posts')
 
         page_path = if index == 1
                       path
@@ -111,8 +105,7 @@ module Dimples
                       File.join(path, "page_#{index}")
                     end
 
-        context.merge!(pagination: pager.to_context)
-        write_file(File.join(page_path, page.filename), render(page, context))
+        write_file(File.join(page_path, page.filename), render(page, context.merge!(pagination: pager.to_context)))
       end
     end
 
@@ -132,10 +125,7 @@ module Dimples
     def generate_pages
       @pages.each do |page|
         path = if page.path
-                 File.dirname(page.path).sub(
-                   @paths[:pages],
-                   @paths[:destination]
-                 )
+                 File.dirname(page.path).sub(@paths[:pages], @paths[:destination])
                else
                  @paths[:destination]
                end
@@ -154,9 +144,7 @@ module Dimples
     end
 
     def generate_feed(posts, path)
-      page = Dimples::Page.new
-      page.metadata[:layout] = 'feed'
-
+      page = Dimples::Page.new(nil, layout: 'feed')
       write_file(File.join(path, 'feed.atom'), render(page, posts: posts))
     end
 
