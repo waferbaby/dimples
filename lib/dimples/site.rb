@@ -4,6 +4,7 @@ require_relative 'pager'
 
 require 'fileutils'
 require 'tilt'
+require 'date'
 
 module Dimples
   class Site
@@ -58,7 +59,7 @@ module Dimples
     end
 
     def scan_posts
-      @posts = read_files(@paths[:posts]).map { Dimples::Post.new(path) }
+      @posts = read_files(@paths[:posts]).map { |path| Dimples::Post.new(path) }
       @posts.sort_by!(&:date).reverse!
 
       @categories = {}
