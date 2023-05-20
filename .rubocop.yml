@@ -1,19 +1,9 @@
+require:
+  - standard
+  - rubocop-rspec
+
+inherit_gem:
+  standard: config/base.yml
+
 AllCops:
-  TargetRubyVersion: 2.4
-
-Metrics/AbcSize:
-  Max: 30
-
-Metrics/BlockLength:
-  Max: 30
-  Exclude:
-    - 'spec/**/*.rb'
-
-Metrics/ClassLength:
-  Enabled: false
-
-Metrics/MethodLength:
-  Max: 20
-
-Metrics/ModuleLength:
-  Enabled: false
+  NewCops: enable
