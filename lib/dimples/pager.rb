@@ -12,7 +12,7 @@ module Dimples
       @url = url
       @posts = posts
       @per_page = options.fetch(:per_page, PER_PAGE)
-      @page_prefix = options.fetch(:page_prefix, 'page_')
+      @page_prefix = options.fetch(:page_prefix, "page_")
       @page_count = (posts.length.to_f / @per_page.to_i).ceil
 
       step_to(1)
@@ -43,7 +43,7 @@ module Dimples
     end
 
     def current_page_url
-      @current_page != 1 ? "#{@url}#{@page_prefix}#{@current_page}" : @url
+      (@current_page != 1) ? "#{@url}#{@page_prefix}#{@current_page}" : @url
     end
 
     def first_page_url
@@ -51,13 +51,13 @@ module Dimples
     end
 
     def last_page_url
-      @page_count != 1 ? "#{@url}#{@page_prefix}#{@page_count}" : @url
+      (@page_count != 1) ? "#{@url}#{@page_prefix}#{@page_count}" : @url
     end
 
     def previous_page_url
       return unless @previous_page
 
-      @previous_page != 1 ? "#{@url}#{@page_prefix}#{@previous_page}" : @url
+      (@previous_page != 1) ? "#{@url}#{@page_prefix}#{@previous_page}" : @url
     end
 
     def next_page_url

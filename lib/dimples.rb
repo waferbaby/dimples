@@ -2,7 +2,7 @@
 
 $LOAD_PATH.unshift(__dir__)
 
-require 'dimples/page'
-require 'dimples/post'
-require 'dimples/template'
-require 'dimples/site'
+require "dimples/page"
+require "dimples/post"
+require "dimples/template"
+require "dimples/site"

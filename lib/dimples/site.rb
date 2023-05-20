@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative 'pager'
+require_relative "pager"
 
-require 'fileutils'
-require 'tilt'
-require 'date'
+require "fileutils"
+require "tilt"
+require "date"
 
 module Dimples
   class Site
@@ -47,7 +47,7 @@ module Dimples
     private
 
     def read_config
-      config_path = File.join(@paths[:source], '.config')
+      config_path = File.join(@paths[:source], ".config")
 
       return {} unless File.exist?(config_path)
 
@@ -55,7 +55,7 @@ module Dimples
     end
 
     def read_files(path)
-      Dir[File.join(path, '**', '*.*')].sort
+      Dir[File.join(path, "**", "*.*")].sort
     end
 
     def scan_posts
@@ -81,7 +81,7 @@ module Dimples
     def scan_templates
       @templates = {}.tap do |templates|
         read_files(@paths[:templates]).each do |path|
-          key = File.basename(path, '.erb')
+          key = File.basename(path, ".erb")
           templates[key] = Dimples::Template.new(path)
         end
       end
@@ -95,23 +95,23 @@ module Dimples
     end
 
     def generate_paginated_posts(posts, path, context = {})
-      pager = Dimples::Pager.new("#{path.sub(@paths[:destination], '')}/", posts)
+      pager = Dimples::Pager.new("#{path.sub(@paths[:destination], "")}/", posts)
 
       pager.each do |index|
-        page = Dimples::Page.new(nil, layout: 'posts')
+        page = Dimples::Page.new(nil, layout: "posts")
 
         page_path = if index == 1
-                      path
-                    else
-                      File.join(path, "page_#{index}")
-                    end
+          path
+        else
+          File.join(path, "page_#{index}")
+        end
 
         write_file(File.join(page_path, page.filename), render(page, context.merge!(pagination: pager.to_context)))
       end
     end
 
     def generate_posts
-      directory_path = File.join(@paths[:destination], @config.dig(:paths, :posts) || 'posts')
+      directory_path = File.join(@paths[:destination], @config.dig(:paths, :posts) || "posts")
       Dir.mkdir(directory_path)
 
       @posts.each do |post|
@@ -126,10 +126,10 @@ module Dimples
     def generate_pages
       @pages.each do |page|
         path = if page.path
-                 File.dirname(page.path).sub(@paths[:pages], @paths[:destination])
-               else
-                 @paths[:destination]
-               end
+          File.dirname(page.path).sub(@paths[:pages], @paths[:destination])
+        else
+          @paths[:destination]
+        end
 
         write_file(File.join(path, page.filename), render(page, page: page))
       end
@@ -137,7 +137,7 @@ module Dimples
 
     def generate_categories
       @categories.each do |category, posts|
-        category_path = File.join(@paths[:destination], 'categories', category)
+        category_path = File.join(@paths[:destination], "categories", category)
 
         generate_paginated_posts(posts, category_path, category: category)
         generate_feed(posts.slice(0, 10), category_path)
@@ -145,14 +145,14 @@ module Dimples
     end
 
     def generate_feed(posts, path)
-      page = Dimples::Page.new(nil, layout: 'feed')
-      write_file(File.join(path, 'feed.atom'), render(page, posts: posts))
+      page = Dimples::Page.new(nil, layout: "feed")
+      write_file(File.join(path, "feed.atom"), render(page, posts: posts))
     end
 
     def copy_assets
       return unless Dir.exist?(@paths[:static])
 
-      FileUtils.cp_r(File.join(@paths[:static], '.'), @paths[:destination])
+      FileUtils.cp_r(File.join(@paths[:static], "."), @paths[:destination])
     end
 
     def render(object, context = {}, content = nil)

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require_relative 'document'
+require_relative "document"
 
-require 'date'
+require "date"
 
 module Dimples
   class Post < Document
@@ -11,11 +11,11 @@ module Dimples
     end
 
     def layout
-      @metadata.fetch(:layout, 'post')
+      @metadata.fetch(:layout, "post")
     end
 
     def slug
-      File.basename(@path, '.markdown')
+      File.basename(@path, ".markdown")
     end
   end
 end
