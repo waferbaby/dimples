@@ -1,23 +1,25 @@
 require "dimples"
 
 describe Dimples::Document do
-  context "for a file-based document" do
-    subject { Dimples::Document.new("spec/fixtures/document.markdown") }
+  context "when a file-based document" do
+    subject(:document) { described_class.new("spec/fixtures/document.markdown") }
 
     it "reads in its frontmatter" do
-      expect(subject.metadata).to eql({title: "Test Document", filename: "test", extension: "txt"})
+      expect(document.metadata).to eql(
+        { title: "Test Document", filename: "test", extension: "txt" }
+      )
     end
 
     it "returns the correct filename" do
-      expect(subject.filename).to eql("test.txt")
+      expect(document.filename).to eql("test.txt")
     end
   end
 
-  context "for a dynamically created document" do
-    subject { Dimples::Document.new }
+  context "when a dynamically created document" do
+    subject(:document) { described_class.new }
 
     it "returns the correct default filename" do
-      expect(subject.filename).to eql("index.html")
+      expect(document.filename).to eql("index.html")
     end
   end
 end
