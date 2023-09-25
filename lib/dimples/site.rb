@@ -8,21 +8,26 @@ require "date"
 
 module Dimples
   class Site
-    def self.generate(output_path)
-      new(output_path).generate
+    DEFAULT_CONFIG = { overwrite_directory: false }
+
+    def self.generate(source_path, output_path, config)
+      new(source_path, output_path, config).generate
     end
 
-    attr_accessor :posts, :categories
+    attr_accessor :posts, :pages, :categories, :config
 
-    def initialize(output_path)
+    def initialize(source_path, output_path, config)
       @paths = {
-        source: File.expand_path(Dir.pwd),
-        destination: File.expand_path(output_path)
+        source: File.expand_path(source_path || Dir.pwd),
+        destination: File.expand_path(output_path || File.join(Dir.pwd, "site"))
       }
 
-      @config = read_config
+      @config = DEFAULT_CONFIG
+      @config.merge!(config) if config&.is_a?(Hash)
 
-      %w[pages posts static templates].each { |type| @paths[type.to_sym] = File.join(@paths[:source], type) }
+      %w[pages posts static templates].each do |type|
+        @paths[type.to_sym] = File.join(@paths[:source], type)
+      end
 
       scan_posts
       scan_pages
@@ -31,8 +36,11 @@ module Dimples
 
     def generate
       if Dir.exist?(@paths[:destination])
-        puts "Error: The output directory (#{@paths[:destination]}) already exists."
-        return
+        unless @config[:overwrite_directory]
+          raise GenerationError.new("The build directory (#{@paths[:destination]}) already exists.")
+        end
+
+        FileUtils.rm_rf(@paths[:destination])
       end
 
       Dir.mkdir(@paths[:destination])
@@ -46,14 +54,6 @@ module Dimples
 
     private
 
-    def read_config
-      config_path = File.join(@paths[:source], ".config")
-
-      return {} unless File.exist?(config_path)
-
-      YAML.safe_load(File.read(config_path), symbolize_names: true)
-    end
-
     def read_files(path)
       Dir[File.join(path, "**", "*.*")].sort
     end
@@ -65,7 +65,7 @@ module Dimples
       @categories = {}
 
       @posts.each do |post|
-        post.categories.each do |category|
+        post.categories&.each do |category|
           @categories[category] ||= []
           @categories[category] << post
         end
@@ -73,18 +73,17 @@ module Dimples
     end
 
     def scan_pages
-      @pages = read_files(@paths[:pages]).map do |path|
-        Dimples::Page.new(path)
-      end
+      @pages = read_files(@paths[:pages]).map { |path| Dimples::Page.new(path) }
     end
 
     def scan_templates
-      @templates = {}.tap do |templates|
-        read_files(@paths[:templates]).each do |path|
-          key = File.basename(path, ".erb")
-          templates[key] = Dimples::Template.new(path)
+      @templates =
+        {}.tap do |templates|
+          read_files(@paths[:templates]).each do |path|
+            key = File.basename(path, ".erb")
+            templates[key] = Dimples::Template.new(path)
+          end
         end
-      end
     end
 
     def write_file(path, content)
@@ -100,13 +99,17 @@ module Dimples
       pager.each do |index|
         page = Dimples::Page.new(nil, layout: "posts")
 
-        page_path = if index == 1
-          path
-        else
-          File.join(path, "page_#{index}")
-        end
+        page_path =
+          if index == 1
+            path
+          else
+            File.join(path, "page_#{index}")
+          end
 
-        write_file(File.join(page_path, page.filename), render(page, context.merge!(pagination: pager.to_context)))
+        write_file(
+          File.join(page_path, page.filename),
+          render(page, context.merge!(pagination: pager.to_context))
+        )
       end
     end
 
@@ -125,11 +128,12 @@ module Dimples
 
     def generate_pages
       @pages.each do |page|
-        path = if page.path
-          File.dirname(page.path).sub(@paths[:pages], @paths[:destination])
-        else
-          @paths[:destination]
-        end
+        path =
+          if page.path
+            File.dirname(page.path).sub(@paths[:pages], @paths[:destination])
+          else
+            @paths[:destination]
+          end
 
         write_file(File.join(path, page.filename), render(page, page: page))
       end
@@ -160,7 +164,8 @@ module Dimples
 
       output = object.render(context, content)
 
-      output = render(@templates[object.layout], context, output) if object.layout && @templates[object.layout]
+      output = render(@templates[object.layout], context, output) if object.layout &&
+        @templates[object.layout]
 
       output
     end
