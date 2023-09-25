@@ -5,10 +5,23 @@ $LOAD_PATH.unshift(File.join(__dir__, "..", "lib"))
 
 require "dimples"
 
-path = if ARGV[0]
-  File.expand_path(ARGV[0])
-else
-  File.join(Dir.pwd, "site")
+source_path = ARGV[0]
+output_path = ARGV[1]
+
+config_path = File.join(Dir.pwd, "config.yml")
+
+config = {}
+
+if File.exist?(config_path)
+  begin
+    config = YAML.safe_load(File.read(config_path), symbolize_names: true)
+  rescue YAML::Error
+    puts "Error reading config file - reverting to defaults"
+  end
 end
 
-Dimples::Site.generate(path)
+begin
+  Dimples::Site.generate(source_path, output_path, config)
+rescue Dimples::Error => error
+  puts "Error: #{error.message}"
+end
