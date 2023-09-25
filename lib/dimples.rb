@@ -2,6 +2,7 @@
 
 $LOAD_PATH.unshift(__dir__)
 
+require "dimples/errors"
 require "dimples/page"
 require "dimples/post"
 require "dimples/template"
