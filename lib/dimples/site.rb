@@ -8,7 +8,7 @@ require "date"
 
 module Dimples
   class Site
-    DEFAULT_CONFIG = { overwrite_directory: false }
+    DEFAULT_CONFIG = { generation: { overwrite_directory: false }, paths: { posts: "posts" } }
 
     def self.generate(source_path, output_path, config)
       new(source_path, output_path, config).generate
@@ -36,8 +36,8 @@ module Dimples
 
     def generate
       if Dir.exist?(@paths[:destination])
-        unless @config[:overwrite_directory]
-          raise GenerationError.new("The build directory (#{@paths[:destination]}) already exists.")
+        unless @config.dig(:generation, :overwrite_directory)
+          raise GenerationError.new("The site directory (#{@paths[:destination]}) already exists.")
         end
 
         FileUtils.rm_rf(@paths[:destination])
@@ -114,7 +114,7 @@ module Dimples
     end
 
     def generate_posts
-      directory_path = File.join(@paths[:destination], @config.dig(:paths, :posts) || "posts")
+      directory_path = File.join(@paths[:destination], @config.dig(:paths, :posts))
       Dir.mkdir(directory_path)
 
       @posts.each do |post|
