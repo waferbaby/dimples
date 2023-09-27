@@ -1,23 +1,17 @@
 # frozen_string_literal: true
 
-require "rspec/core/rake_task"
-
-RSpec::Core::RakeTask.new(:spec) do |task|
-  task.pattern = Dir["spec/**/*.rb"]
-end
-
-task default: :spec
-
+desc "Build the gem"
 task :build do
-  Rake::Task["cleanup"].invoke
-  puts `gem build dimples.gemspec`
+  sh "gem build dimples.gemspec"
 end
 
+desc "Publish the gem to rubygems.org"
 task :publish do
-  puts `gem push dimples*.gem`
-  Rake::Task["cleanup"].invoke
-end
+  require_relative "lib/dimples/version"
 
-task :cleanup do
-  FileUtils.rm(Dir["dimples*.gem"])
+  version = Dimples::VERSION
+  filename = "dimples-#{version}.gem"
+
+  sh "gem push #{filename}"
+  sh "rm #{filename}"
 end
