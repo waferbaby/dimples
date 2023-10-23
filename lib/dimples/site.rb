@@ -23,7 +23,7 @@ module Dimples
       }
 
       @config = DEFAULT_CONFIG
-      @config.merge!(config) if config&.is_a?(Hash)
+      @config = @config.merge(config) if config.is_a?(Hash)
 
       %w[pages posts static templates].each do |type|
         @paths[type.to_sym] = File.join(@paths[:source], type)
