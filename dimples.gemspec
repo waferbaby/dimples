@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.description = "A simple tool for building static websites."
   s.license = "MIT"
 
-  s.required_ruby_version = "> 2.7"
+  s.required_ruby_version = '> 3.0'
 
   s.executables << "dimples"
 
@@ -26,8 +26,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "redcarpet", "~> 3.5"
   s.add_runtime_dependency "tilt", "~> 2.0"
 
-  s.add_development_dependency "rake", "~> 13.0"
-  s.add_development_dependency "rspec", "~> 3.12"
-  s.add_development_dependency "rubocop-rspec", "~> 2.22"
-  s.add_development_dependency "standard", "~> 1.28"
+  s.metadata['rubygems_mfa_required'] = 'true'
 end
