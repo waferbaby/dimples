@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require "yaml"
+require 'yaml'
 
 module Dimples
   module FrontMatter
-    PATTERN = /^(-{3}\n.*?\n?)^(-{3}*$\n?)/m.freeze
+    PATTERN = /^(-{3}\n.*?\n?)^(-{3}*$\n?)/m
 
     def self.parse(contents)
       metadata = {}

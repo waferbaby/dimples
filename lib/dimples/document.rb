@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "frontmatter"
+require_relative 'frontmatter'
 
 module Dimples
   class Document
@@ -13,7 +13,7 @@ module Dimples
         @metadata, @contents = Dimples::FrontMatter.parse(File.read(path))
       else
         @metadata = {}
-        @contents = ""
+        @contents = ''
       end
 
       @metadata.merge!(metadata)
@@ -24,18 +24,18 @@ module Dimples
     end
 
     def basename
-      @metadata.fetch(:filename, "index")
+      @metadata.fetch(:filename, 'index')
     end
 
     def extension
-      @metadata.fetch(:extension, "html")
+      @metadata.fetch(:extension, 'html')
     end
 
     def layout
       @metadata.fetch(:layout, nil)
     end
 
-    def render(context = {}, content = "")
+    def render(context = {}, content = '')
       context_obj = Object.new
       context.each do |key, value|
         context_obj.instance_variable_set("@#{key}", value)

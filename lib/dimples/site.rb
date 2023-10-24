@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require_relative "pager"
+require_relative 'pager'
 
-require "fileutils"
-require "tilt"
-require "date"
+require 'fileutils'
+require 'tilt'
+require 'date'
 
 module Dimples
   class Site
-    DEFAULT_CONFIG = { generation: { overwrite_directory: false }, paths: { posts: "posts" } }
+    DEFAULT_CONFIG = { generation: { overwrite_directory: false }, paths: { posts: 'posts' } }.freeze
 
     def self.generate(source_path, output_path, config)
       new(source_path, output_path, config).generate
@@ -19,7 +19,7 @@ module Dimples
     def initialize(source_path, output_path, config)
       @paths = {
         source: File.expand_path(source_path || Dir.pwd),
-        destination: File.expand_path(output_path || File.join(Dir.pwd, "site"))
+        destination: File.expand_path(output_path || File.join(Dir.pwd, 'site'))
       }
 
       @config = DEFAULT_CONFIG
@@ -37,7 +37,7 @@ module Dimples
     def generate
       if Dir.exist?(@paths[:destination])
         unless @config.dig(:generation, :overwrite_directory)
-          raise GenerationError.new("The site directory (#{@paths[:destination]}) already exists.")
+          raise GenerationError, "The site directory (#{@paths[:destination]}) already exists."
         end
 
         FileUtils.rm_rf(@paths[:destination])
@@ -55,7 +55,7 @@ module Dimples
     private
 
     def read_files(path)
-      Dir[File.join(path, "**", "*.*")].sort
+      Dir[File.join(path, '**', '*.*')]
     end
 
     def scan_posts
@@ -80,7 +80,7 @@ module Dimples
       @templates =
         {}.tap do |templates|
           read_files(@paths[:templates]).each do |path|
-            key = File.basename(path, ".erb")
+            key = File.basename(path, '.erb')
             templates[key] = Dimples::Template.new(path)
           end
         end
@@ -89,15 +89,15 @@ module Dimples
     def write_file(path, content)
       directory_path = File.dirname(path)
 
-      Dir.mkdir(directory_path) unless Dir.exist?(directory_path)
+      FileUtils.mkdir_p(directory_path)
       File.write(path, content)
     end
 
     def generate_paginated_posts(posts, path, context = {})
-      pager = Dimples::Pager.new("#{path.sub(@paths[:destination], "")}/", posts)
+      pager = Dimples::Pager.new("#{path.sub(@paths[:destination], '')}/", posts)
 
       pager.each do |index|
-        page = Dimples::Page.new(nil, layout: "posts")
+        page = Dimples::Page.new(nil, layout: 'posts')
 
         page_path =
           if index == 1
@@ -141,7 +141,7 @@ module Dimples
 
     def generate_categories
       @categories.each do |category, posts|
-        category_path = File.join(@paths[:destination], "categories", category)
+        category_path = File.join(@paths[:destination], 'categories', category)
 
         generate_paginated_posts(posts, category_path, category: category)
         generate_feed(posts.slice(0, 10), category_path)
@@ -149,14 +149,14 @@ module Dimples
     end
 
     def generate_feed(posts, path)
-      page = Dimples::Page.new(nil, layout: "feed")
-      write_file(File.join(path, "feed.atom"), render(page, posts: posts))
+      page = Dimples::Page.new(nil, layout: 'feed')
+      write_file(File.join(path, 'feed.atom'), render(page, posts: posts))
     end
 
     def copy_assets
       return unless Dir.exist?(@paths[:static])
 
-      FileUtils.cp_r(File.join(@paths[:static], "."), @paths[:destination])
+      FileUtils.cp_r(File.join(@paths[:static], '.'), @paths[:destination])
     end
 
     def render(object, context = {}, content = nil)
@@ -165,7 +165,7 @@ module Dimples
       output = object.render(context, content)
 
       output = render(@templates[object.layout], context, output) if object.layout &&
-        @templates[object.layout]
+                                                                     @templates[object.layout]
 
       output
     end

@@ -1,27 +1,27 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-$LOAD_PATH.unshift(File.join(__dir__, "..", "lib"))
+$LOAD_PATH.unshift(File.join(__dir__, '..', 'lib'))
 
-require "dimples"
+require 'dimples'
 
 source_path = ARGV[0]
 output_path = ARGV[1]
 
-config_path = File.join(Dir.pwd, "config.yml")
+config_path = File.join(Dir.pwd, 'config.yml')
 
 config = {}
 
 if File.exist?(config_path)
   begin
-    config = YAML.safe_load(File.read(config_path), symbolize_names: true)
+    config = YAML.safe_load_file(config_path, symbolize_names: true)
   rescue YAML::Error
-    puts "Error reading config file - reverting to defaults"
+    puts 'Error reading config file - reverting to defaults'
   end
 end
 
 begin
   Dimples::Site.generate(source_path, output_path, config)
-rescue Dimples::Error => error
-  puts "Error: #{error.message}"
+rescue Dimples::Error => e
+  puts "Error: #{e.message}"
 end
