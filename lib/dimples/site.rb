@@ -7,6 +7,7 @@ require 'tilt'
 require 'date'
 
 module Dimples
+  # A
   class Site
     DEFAULT_CONFIG = { generation: { overwrite_directory: false }, paths: { posts: 'posts' } }.freeze
 
@@ -25,9 +26,7 @@ module Dimples
       @config = DEFAULT_CONFIG
       @config = @config.merge(config) if config.is_a?(Hash)
 
-      %w[pages posts static templates].each do |type|
-        @paths[type.to_sym] = File.join(@paths[:source], type)
-      end
+      %w[pages posts static templates].each { |type| @paths[type.to_sym] = File.join(@paths[:source], type) }
 
       scan_posts
       scan_pages
@@ -35,15 +34,7 @@ module Dimples
     end
 
     def generate
-      if Dir.exist?(@paths[:destination])
-        unless @config.dig(:generation, :overwrite_directory)
-          raise GenerationError, "The site directory (#{@paths[:destination]}) already exists."
-        end
-
-        FileUtils.rm_rf(@paths[:destination])
-      end
-
-      Dir.mkdir(@paths[:destination])
+      prepare_output_directory
 
       generate_posts
       generate_pages
@@ -53,6 +44,18 @@ module Dimples
     end
 
     private
+
+    def prepare_output_directory
+      if Dir.exist?(@paths[:destination])
+        unless @config.dig(:generation, :overwrite_directory)
+          raise GenerationError, "The site directory (#{@paths[:destination]}) already exists."
+        end
+
+        FileUtils.rm_rf(@paths[:destination])
+      end
+
+      Dir.mkdir(@paths[:destination])
+    end
 
     def read_files(path)
       Dir[File.join(path, '**', '*.*')]
@@ -98,13 +101,7 @@ module Dimples
 
       pager.each do |index|
         page = Dimples::Page.new(nil, layout: 'posts')
-
-        page_path =
-          if index == 1
-            path
-          else
-            File.join(path, "page_#{index}")
-          end
+        page_path = index == 1 ? path : File.join(path, "page_#{index}")
 
         write_file(
           File.join(page_path, page.filename),
@@ -163,11 +160,7 @@ module Dimples
       context[:site] ||= self
 
       output = object.render(context, content)
-
-      output = render(@templates[object.layout], context, output) if object.layout &&
-                                                                     @templates[object.layout]
-
-      output
+      render(@templates[object.layout], context, output) if object.layout && @templates[object.layout]
     end
   end
 end
