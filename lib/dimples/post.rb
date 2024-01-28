@@ -2,7 +2,14 @@
 
 module Dimples
   # A page from a site with a date.
-  class Post < Page
+  class Post
+    include Metadata
+
+    def initialize(path, config)
+      @config = config
+      parse_file(path)
+    end
+
     def date
       @metadata.fetch(:date, File.birthtime(@path))
     end
@@ -27,14 +34,8 @@ module Dimples
       @url ||= output_directory.gsub(@config[:output][:root], '')
     end
 
-    private
-
-    def template_class
-      Tilt::RedcarpetTemplate
-    end
-
-    def template_options
-      { smartypants: true }
+    def template
+      @template ||= Tilt::RedcarpetTemplate.new { @contents }
     end
   end
 end
