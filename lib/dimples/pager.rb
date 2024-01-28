@@ -24,7 +24,10 @@ module Dimples
     end
 
     def each
-      (1..@page_count).each { |index| yield(step_to(index), to_context) if block_given? }
+      (1..@page_count).each do |index|
+        step_to(index)
+        yield metadata if block_given?
+      end
     end
 
     def step_to(page)
@@ -79,7 +82,7 @@ module Dimples
       }
     end
 
-    def to_context
+    def metadata
       {
         posts: posts_at(current_page),
         current_page: @current_page,
