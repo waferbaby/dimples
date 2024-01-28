@@ -5,8 +5,8 @@ module Dimples
   class Config
     def self.defaults
       {
-        sources: { root: '.', posts: './posts', pages: './pages', static: './static' },
-        output: { root: './site', posts: './site/posts' }
+        sources: { root: '.', posts: './posts', pages: './pages', layouts: './layouts', static: './static' },
+        output: { root: './site', posts: './site/posts', categories: './site/categories' }
       }
     end
 
