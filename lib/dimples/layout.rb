@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Dimples
+  # A class for a single layout used on a site.
   class Layout
     include Metadata
 
