@@ -11,19 +11,19 @@ module Dimples
     end
 
     def date
-      @metadata.fetch(:date, File.birthtime(@path))
+      @metadata[:date] || File.birthtime(@path)
     end
 
     def layout
-      @metadata.fetch(:layout, 'post')
+      @metadata[:layout] || 'post'
     end
 
     def categories
-      @metadata.fetch(:categories, [])
+      @metadata[:categories] || []
     end
 
     def slug
-      @metadata.fetch(:slug, File.basename(@path, '.markdown'))
+      @metadata[:slug] || File.basename(@path, '.markdown')
     end
 
     def output_directory

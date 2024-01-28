@@ -10,7 +10,7 @@ module Dimples
     end
 
     def layout
-      @metadata.fetch(:layout, nil)
+      @metadata[:layout]
     end
 
     def template

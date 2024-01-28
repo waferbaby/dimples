@@ -11,7 +11,7 @@ module Dimples
     end
 
     def layout
-      @metadata.fetch(:layout, 'default')
+      @metadata[:layout] || 'default'
     end
 
     def output_directory
