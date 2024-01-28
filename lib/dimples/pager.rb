@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Dimples
+  # A class for paginating a collection of posts.
   class Pager
     PER_PAGE = 5
 
@@ -8,18 +9,22 @@ module Dimples
 
     attr_reader :current_page, :previous_page, :next_page, :page_count
 
-    def initialize(url, posts, options = {})
+    def self.paginate(url, posts, config, ...)
+      new(url, posts, config).each(...)
+    end
+
+    def initialize(url, posts, config)
       @url = url
       @posts = posts
-      @per_page = options.fetch(:per_page, PER_PAGE)
-      @page_prefix = options.fetch(:page_prefix, 'page_')
+      @per_page = config.dig(:pagination, :per_page) || PER_PAGE
+      @page_prefix = config.dig(:pagination, :page_prefix) || 'page_'
       @page_count = (posts.length.to_f / @per_page.to_i).ceil
 
       step_to(1)
     end
 
-    def each(&block)
-      (1..@page_count).each { |index| block.yield step_to(index) }
+    def each
+      (1..@page_count).each { |index| yield(step_to(index), to_context) if block_given? }
     end
 
     def step_to(page)
@@ -64,6 +69,16 @@ module Dimples
       "#{@url}#{@page_prefix}#{@next_page}" if @next_page
     end
 
+    def urls
+      {
+        current_page: current_page_url,
+        first_page: first_page_url,
+        last_page: last_page_url,
+        previous_page: previous_page_url,
+        next_page: next_page_url
+      }
+    end
+
     def to_context
       {
         posts: posts_at(current_page),
@@ -72,13 +87,7 @@ module Dimples
         post_count: @posts.count,
         previous_page: @previous_page,
         next_page: @next_page,
-        urls: {
-          current_page: current_page_url,
-          first_page: first_page_url,
-          last_page: last_page_url,
-          previous_page: previous_page_url,
-          next_page: next_page_url
-        }
+        urls: urls
       }
     end
   end
