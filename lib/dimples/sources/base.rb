@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Dimples
   module Sources
     # A base class representing a source file with frontmatter metadata that can be rendered.
