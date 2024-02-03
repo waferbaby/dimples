@@ -64,28 +64,27 @@ module Dimples
 
     def generate_posts
       posts.each(&:write)
-      Pager.paginate(self, '/interviews/', posts)
-
-      layouts['feed'].write(
-        File.join(@config[:output][:root], 'feed.atom'),
-        posts: posts.slice(0, 10)
-      )
+      Pager.paginate(self, @config[:output][:posts].gsub(@config[:output][:root], '').concat('/'), posts)
+      generate_feed(@config[:output][:root], posts)
     end
 
     def generate_categories
       categories.each do |category, posts|
         metadata = { title: category.capitalize, category: category }
         Pager.paginate(self, "/categories/#{category}/", posts, metadata)
-
-        layouts['feed'].write(
-          File.join(@config[:output][:root], 'categories', category, 'feed.atom'),
-          posts: posts.slice(0, 10)
-        )
+        generate_feed(File.join(@config[:output][:root], 'categories', category), posts)
       end
     end
 
     def generate_pages
       pages.each(&:write)
+    end
+
+    def generate_feed(output_path, posts)
+      layouts['feed'].write(
+        File.join(output_path, 'feed.atom'),
+        posts: posts.slice(0, 10)
+      )
     end
 
     def prepare_output_directory
