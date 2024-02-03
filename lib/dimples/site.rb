@@ -27,23 +27,21 @@ module Dimples
       copy_assets
     end
 
-    private
-
     def posts
       @posts ||= Dir.glob(File.join(@config[:sources][:posts], '**', '*.markdown')).map do |path|
-        Dimples::Post.new(path, @config)
+        Dimples::Sources::Post.new(self, path)
       end.sort_by!(&:date).reverse!
     end
 
     def pages
       @pages ||= Dir.glob(File.join(@config[:sources][:pages], '**', '*.erb')).map do |path|
-        Dimples::Page.new(path, @config)
+        Dimples::Sources::Page.new(self, path)
       end
     end
 
     def layouts
       @layouts ||= Dir.glob(File.join(@config[:sources][:layouts], '**', '*.erb')).to_h do |path|
-        [File.basename(path, '.erb'), Dimples::Layout.new(path, @config)]
+        [File.basename(path, '.erb'), Dimples::Sources::Layout.new(self, path)]
       end
     end
 
@@ -58,66 +56,36 @@ module Dimples
       end
     end
 
-    def generate_posts
-      posts.each do |post|
-        write_item(post)
-      end
+    def metadata
+      @metadata ||= { posts: posts, categories: categories }
+    end
 
-      Pager.paginate('/interviews/', posts, @config) do |pagination|
-        path = File.join(@config[:output][:root], pagination[:urls][:current_page])
-        write_item(layouts['posts'], output_path: path, metadata: { pagination: pagination })
-      end
+    private
+
+    def generate_posts
+      posts.each(&:write)
+      Pager.paginate(self, '/interviews/', posts)
+
+      layouts['feed'].write(
+        File.join(@config[:output][:root], 'feed.atom'),
+        posts: posts.slice(0, 10)
+      )
     end
 
     def generate_categories
       categories.each do |category, posts|
-        Pager.paginate("/categories/#{category}/", posts, @config) do |pagination|
-          path = File.join(@config[:output][:root], pagination[:urls][:current_page])
-          metadata = { title: category.capitalize, category: category, pagination: pagination }
+        metadata = { title: category.capitalize, category: category }
+        Pager.paginate(self, "/categories/#{category}/", posts, metadata)
 
-          write_item(layouts['posts'], output_path: path, metadata: metadata)
-        end
+        layouts['feed'].write(
+          File.join(@config[:output][:root], 'categories', category, 'feed.atom'),
+          posts: posts.slice(0, 10)
+        )
       end
     end
 
     def generate_pages
-      pages.each do |page|
-        write_item(page)
-      end
-    end
-
-    def write_item(item, output_path: nil, metadata: {})
-      output_path ||= item.output_directory
-
-      FileUtils.mkdir_p(output_path) unless File.directory?(output_path)
-
-      contents = render_item(item, metadata: metadata)
-      File.write(File.join(output_path, item.filename), contents)
-    end
-
-    def render_item(item, body: nil, metadata: {})
-      metadata = item.metadata.merge(metadata)
-      output = item.template.render(metadata_context(metadata)) { body }
-      return output unless item.layout && layouts[item.layout]
-
-      render_item(layouts[item.layout], body: output, metadata: metadata)
-    rescue StandardError => e
-      raise "Failed to render #{item.path}: #{e}"
-    end
-
-    def metadata_context(metadata)
-      Object.new.tap do |context|
-        shared_metadata.merge(metadata).each do |key, value|
-          context.instance_variable_set("@#{key}", value)
-        end
-      end
-    end
-
-    def shared_metadata
-      @shared_metadata ||= {
-        posts: posts,
-        categories: categories
-      }
+      pages.each(&:write)
     end
 
     def prepare_output_directory

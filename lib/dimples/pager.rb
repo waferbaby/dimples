@@ -9,24 +9,30 @@ module Dimples
 
     attr_reader :current_page, :previous_page, :next_page, :page_count
 
-    def self.paginate(url, posts, config, ...)
-      new(url, posts, config).each(...)
+    def self.paginate(site, url, posts, metadata = {})
+      new(site, url, posts).paginate(metadata)
     end
 
-    def initialize(url, posts, config)
+    def initialize(site, url, posts)
+      @site = site
       @url = url
       @posts = posts
-      @per_page = config.dig(:pagination, :per_page) || PER_PAGE
-      @page_prefix = config.dig(:pagination, :page_prefix) || 'page_'
+
+      @per_page = @site.config.dig(:pagination, :per_page) || PER_PAGE
+      @page_prefix = @site.config.dig(:pagination, :page_prefix) || 'page_'
       @page_count = (posts.length.to_f / @per_page.to_i).ceil
 
       step_to(1)
     end
 
-    def each
+    def paginate(metadata)
       (1..@page_count).each do |index|
         step_to(index)
-        yield metadata if block_given?
+
+        @site.layouts['posts'].write(
+          File.join(@site.config[:output][:root], current_page_url, 'index.html'),
+          metadata.merge(pagination: self.metadata, url: current_page_url)
+        )
       end
     end
 

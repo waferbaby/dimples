@@ -20,16 +20,17 @@ module Dimples
         @contents = matches.post_match.strip
       end
 
-      def write(output_directory = nil, metadata = {})
-        output_directory ||= self.output_directory
-
+      def write(output_path = nil, metadata = {})
         metadata[:site] ||= @site
         metadata[context_key] ||= self
 
         output = render(metadata)
 
-        FileUtils.mkdir_p(output_directory) unless File.directory?(output_directory)
-        File.write(File.join(output_directory, filename), output)
+        output_path = File.join(output_directory, filename) if output_path.nil?
+        output_dir = File.dirname(output_path)
+
+        FileUtils.mkdir_p(output_dir) unless File.directory?(output_dir)
+        File.write(output_path, output)
       end
 
       def render(metadata = {}, body = nil)

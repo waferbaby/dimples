@@ -13,8 +13,8 @@ module Dimples
     def initialize(options = {})
       @options = Config.defaults
 
-      options.each do |key, value|
-        @options[key].merge!(value)
+      options&.each do |key, value|
+        @options[key]&.merge!(value)
       end
 
       %i[sources output].each do |type|
