@@ -1,10 +1,17 @@
+# frozen_string_literal: true
+
 module Dimples
+  # A class representing metadata passed into a template for rendering.
   class Metadata
+    attr_reader :keys
+
     def initialize(source)
       source.each do |key, value|
-        self.class.send(:attr_accessor, key)
+        self.class.send(:attr_reader, key)
         instance_variable_set("@#{key}", build(value))
       end
+
+      @keys = source.keys
     end
 
     def build(item)
