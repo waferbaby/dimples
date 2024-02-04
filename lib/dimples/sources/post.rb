@@ -17,10 +17,6 @@ module Dimples
 
       private
 
-      def context_key
-        :post
-      end
-
       def default_metadata
         super.tap do |defaults|
           defaults[:layout] = 'post'
