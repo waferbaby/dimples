@@ -15,17 +15,22 @@ module Dimples
         @metadata = default_metadata
         @contents = File.read(@path)
 
-        matches = @contents.match(FRONT_MATTER_PATTERN)
+        parse_metadata(@contents)
+      end
+
+      def parse_metadata(contents)
+        matches = contents.match(FRONT_MATTER_PATTERN)
         return unless matches
 
         @metadata.merge!(YAML.safe_load(matches[1], symbolize_names: true, permitted_classes: [Date]))
         @contents = matches.post_match.strip
+
+        @metadata.each_key do |key|
+          self.class.send(:define_method, key.to_sym) { @metadata[key] }
+        end
       end
 
       def write(output_path = nil, metadata = {})
-        metadata[:site] ||= @site
-        metadata[context_key] ||= self
-
         output = render(metadata)
 
         output_path = File.join(output_directory, filename) if output_path.nil?
@@ -35,24 +40,13 @@ module Dimples
         File.write(output_path, output)
       end
 
-      def render(metadata = {}, body = nil)
-        output = template.render(context(metadata)) { body }
+      def render(render_metadata = {}, body = nil)
+        render_metadata[:page] ||= metadata
+
+        output = template.render(Metadata.new(render_metadata)) { body }
         return output unless @metadata[:layout] && @site.layouts[@metadata[:layout]]
 
-        @site.layouts[@metadata[:layout]].render(metadata, output)
-      end
-
-      def context(metadata)
-        Object.new.tap do |context|
-          metadata.each { |key, variable| context.instance_variable_set("@#{key}", variable) }
-        end
-      end
-
-      def default_metadata
-        {
-          layout: nil,
-          filename: 'index.html'
-        }
+        @site.layouts[@metadata[:layout]].render(render_metadata, output)
       end
 
       def output_directory
@@ -69,16 +63,11 @@ module Dimples
 
       private
 
-      def context_key
-        :page
-      end
-
-      def method_missing(method_name, *_args)
-        @metadata[method_name] if @metadata.key?(method_name)
-      end
-
-      def respond_to_missing?(method_name, include_private)
-        @metadata.key?(method_name) || super
+      def default_metadata
+        {
+          layout: nil,
+          filename: 'index.html'
+        }
       end
     end
   end
