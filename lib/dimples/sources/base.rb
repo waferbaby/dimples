@@ -41,6 +41,7 @@ module Dimples
       end
 
       def render(render_metadata = {}, body = nil)
+        render_metadata[:site] ||= @site.metadata
         render_metadata[:page] ||= metadata
 
         output = template.render(Metadata.new(render_metadata)) { body }
