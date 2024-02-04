@@ -3,6 +3,7 @@
 require 'fileutils'
 require 'tilt'
 require 'date'
+require 'yaml'
 
 module Dimples
   # A class representing a single generated website.
@@ -57,7 +58,7 @@ module Dimples
     end
 
     def metadata
-      @metadata ||= { posts: posts, categories: categories }
+      @metadata ||= Metadata.new(posts: posts, categories: categories)
     end
 
     private
