@@ -29,7 +29,7 @@ module Dimples
       (1..@page_count).each do |index|
         step_to(index)
 
-        @site.layouts['posts'].write(
+        @site.layouts['posts']&.write(
           File.join(@site.config[:output][:root], current_page_url, 'index.html'),
           metadata.merge(pagination: self.metadata, url: current_page_url)
         )
