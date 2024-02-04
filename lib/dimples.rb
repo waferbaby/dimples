@@ -3,6 +3,7 @@
 $LOAD_PATH.unshift(__dir__)
 
 require 'dimples/config'
+require 'dimples/metadata'
 require 'dimples/pager'
 require 'dimples/site'
 
