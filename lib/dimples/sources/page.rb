@@ -12,7 +12,7 @@ module Dimples
       end
 
       def url
-        @metadata[:url] || super.tap do |url|
+        super.tap do |url|
           url.concat(filename) unless filename == 'index.html'
         end
       end

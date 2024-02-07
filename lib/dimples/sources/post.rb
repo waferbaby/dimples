@@ -8,7 +8,11 @@ module Dimples
         @output_directory ||= File.dirname(@path).gsub(
           @site.config[:sources][:posts],
           @site.config[:output][:posts]
-        ).concat("/#{@metadata[:slug]}/")
+        ).concat("/#{slug}/")
+      end
+
+      def slug
+        File.basename(@path)
       end
 
       def template

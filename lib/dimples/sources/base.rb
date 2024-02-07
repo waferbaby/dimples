@@ -31,10 +31,12 @@ module Dimples
       end
 
       def write(output_path = nil, metadata = {})
-        output = render(metadata)
-
         output_path = File.join(output_directory, filename) if output_path.nil?
         output_dir = File.dirname(output_path)
+
+        @metadata[:url] = url_for(output_dir)
+
+        output = render(metadata)
 
         FileUtils.mkdir_p(output_dir) unless File.directory?(output_dir)
         File.write(output_path, output)
@@ -54,8 +56,8 @@ module Dimples
         @site.config[:output][:root]
       end
 
-      def url
-        @metadata[:url] || output_directory.gsub(@site.config[:output][:root], '')
+      def url_for(path)
+        path.gsub(@site.config[:output][:root], '').concat('/')
       end
 
       def template
