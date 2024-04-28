@@ -16,6 +16,7 @@ module Dimples
         @contents = File.read(@path)
 
         parse_metadata(@contents)
+        assign_metadata
       end
 
       def parse_metadata(contents)
@@ -24,7 +25,9 @@ module Dimples
 
         @metadata.merge!(YAML.safe_load(matches[1], symbolize_names: true, permitted_classes: [Date]))
         @contents = matches.post_match.strip
+      end
 
+      def assign_metadata
         @metadata.each_key do |key|
           self.class.send(:define_method, key.to_sym) { @metadata[key] }
         end
