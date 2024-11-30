@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Dimples::Sources::Base do
   subject(:base) { described_class.new(site, file_path) }
 
