@@ -12,10 +12,8 @@ config = {}
 if File.exist?(config_path)
   config = begin
     YAML.safe_load_file(config_path, symbolize_names: true)
-  rescue YAML::Error
-    puts 'Failed to parse config - using defaults'
-  ensure
-    {}
+  rescue StandardError => e
+    puts "Failed to parse config #{e} - using defaults"
   end
 end
 
