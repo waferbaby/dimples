@@ -29,19 +29,19 @@ module Dimples
     end
 
     def posts
-      @posts ||= Dir.glob(File.join(@config[:sources][:posts], '**', '*.markdown')).map do |path|
+      @posts ||= Dir.glob(File.join(@config.source_paths[:posts], '**', '*.markdown')).map do |path|
         Dimples::Sources::Post.new(self, path)
       end.sort_by!(&:date).reverse!
     end
 
     def pages
-      @pages ||= Dir.glob(File.join(@config[:sources][:pages], '**', '*.erb')).map do |path|
+      @pages ||= Dir.glob(File.join(@config.source_paths[:pages], '**', '*.erb')).map do |path|
         Dimples::Sources::Page.new(self, path)
       end
     end
 
     def layouts
-      @layouts ||= Dir.glob(File.join(@config[:sources][:layouts], '**', '*.erb')).to_h do |path|
+      @layouts ||= Dir.glob(File.join(@config.source_paths[:layouts], '**', '*.erb')).to_h do |path|
         [File.basename(path, '.erb'), Dimples::Sources::Layout.new(self, path)]
       end
     end
@@ -65,15 +65,15 @@ module Dimples
 
     def generate_posts
       posts.each(&:write)
-      Pager.paginate(self, @config[:output][:posts].gsub(@config[:output][:root], '').concat('/'), posts)
-      generate_feed(@config[:output][:root], posts)
+      Pager.paginate(self, @config.build_paths[:posts].gsub(@config.build_paths[:root], '').concat('/'), posts)
+      generate_feed(@config.build_paths[:root], posts)
     end
 
     def generate_categories
       categories.each do |category, posts|
         metadata = { title: category.capitalize, category: category }
         Pager.paginate(self, "/categories/#{category}/", posts, metadata)
-        generate_feed(File.join(@config[:output][:root], 'categories', category), posts)
+        generate_feed(File.join(@config.build_paths[:root], 'categories', category), posts)
       end
     end
 
@@ -91,15 +91,17 @@ module Dimples
     end
 
     def prepare_output_directory
-      raise "The site directory (#{@config[:output][:root]}) already exists." if Dir.exist?(@config[:output][:root])
+      if Dir.exist?(@config.build_paths[:root])
+        raise "The site directory (#{@config.build_paths[:root]}) already exists."
+      end
 
-      Dir.mkdir(@config[:output][:root])
+      Dir.mkdir(@config.build_paths[:root])
     end
 
     def copy_assets
-      return unless Dir.exist?(@config[:sources][:static])
+      return unless Dir.exist?(@config.source_paths[:static])
 
-      FileUtils.cp_r(File.join(@config[:sources][:static], '.'), @config[:output][:root])
+      FileUtils.cp_r(File.join(@config.source_paths[:static], '.'), @config.build_paths[:root])
     end
   end
 end

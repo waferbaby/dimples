@@ -3,8 +3,6 @@
 module Dimples
   # A class for paginating a collection of posts.
   class Pager
-    PER_PAGE = 5
-
     include Enumerable
 
     attr_reader :current_page, :previous_page, :next_page, :page_count
@@ -18,8 +16,8 @@ module Dimples
       @url = url
       @posts = posts
 
-      @per_page = @site.config.dig(:pagination, :per_page) || PER_PAGE
-      @page_prefix = @site.config.dig(:pagination, :page_prefix) || 'page_'
+      @per_page = @site.config.pagination[:per_page]
+      @page_prefix = @site.config.pagination[:page_prefix]
       @page_count = (posts.length.to_f / @per_page.to_i).ceil
 
       step_to(1)
@@ -30,7 +28,7 @@ module Dimples
         step_to(index)
 
         @site.layouts['posts']&.write(
-          File.join(@site.config[:output][:root], current_page_url, 'index.html'),
+          File.join(@site.config.build_paths[:root], current_page_url, 'index.html'),
           metadata.merge(pagination: self.metadata, url: current_page_url)
         )
       end

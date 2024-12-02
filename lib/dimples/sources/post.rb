@@ -6,8 +6,8 @@ module Dimples
     class Post < Base
       def output_directory
         @output_directory ||= File.dirname(@path).gsub(
-          @site.config[:sources][:posts],
-          @site.config[:output][:posts]
+          @site.config.source_paths[:posts],
+          @site.config.build_paths[:posts]
         ).concat("/#{slug}/")
       end
 

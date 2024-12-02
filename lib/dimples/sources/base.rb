@@ -56,11 +56,11 @@ module Dimples
       end
 
       def output_directory
-        @site.config[:output][:root]
+        @site.config.build_paths[:root]
       end
 
       def url_for(path)
-        path.gsub(@site.config[:output][:root], '').concat('/')
+        path.gsub(@site.config.build_paths[:root], '').concat('/')
       end
 
       def template

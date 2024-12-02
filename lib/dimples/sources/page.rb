@@ -6,8 +6,8 @@ module Dimples
     class Page < Base
       def output_directory
         @output_directory ||= File.dirname(@path).gsub(
-          @site.config[:sources][:pages],
-          @site.config[:output][:root]
+          @site.config.source_paths[:pages],
+          @site.config.build_paths[:root]
         ).concat('/')
       end
 
