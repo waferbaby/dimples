@@ -3,31 +3,31 @@
 module Dimples
   # Configuration settings for a site.
   class Config
+    SOURCE_PATHS = { pages: 'pages', posts: 'posts', layouts: 'layouts', static: 'static' }.freeze
+
+    attr_accessor :source_paths, :build_paths, :pagination
+
     def self.defaults
       {
-        sources: { root: '.', posts: './posts', pages: './pages', layouts: './layouts', static: './static' },
-        output: { root: './site', posts: './site/posts', categories: './site/categories' }
+        build: './site',
+        pathnames: { posts: 'posts', categories: 'categories' },
+        pagination: { page_prefix: 'page_', per_page: 5 }
       }
     end
 
     def initialize(options = {})
-      @options = Config.defaults
+      options = Config.defaults.merge(options)
 
-      options&.each do |key, value|
-        @options[key]&.merge!(value)
-      end
-
-      %i[sources output].each do |type|
-        @options[type].each { |key, value| @options[type][key] = File.expand_path(value) }
-      end
+      @source_paths = expand_paths(File.expand_path(Dir.pwd), SOURCE_PATHS.dup)
+      @build_paths = expand_paths(File.expand_path(options[:build]), options[:pathnames])
+      @pagination = options[:pagination]
     end
 
-    def dig(*args)
-      @options.dig(*args)
-    end
+    def expand_paths(root, paths)
+      root = File.expand_path(root)
 
-    def [](key)
-      @options[key]
+      paths.transform_values! { |value| File.expand_path(File.join(root, value)) }
+      paths.tap { |expanded_paths| expanded_paths[:root] = root }
     end
   end
 end
