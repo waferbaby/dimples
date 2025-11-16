@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 describe Dimples::Sources::Base do
-  subject(:base) { described_class.new(site, file_path) }
+  subject(:base) { described_class.new(site:, path: file_path) }
 
   let(:site) { double }
-  let(:file_path) { File.join(Dir.pwd, 'spec', 'fixtures', 'pages', 'index.markdown') }
+  let(:file_path) { File.join(Dir.pwd, 'spec', 'fixtures', 'pages', 'index.erb') }
 
   describe '#parse_metadata' do
     it 'correctly parses the contents' do
