@@ -18,7 +18,7 @@ if File.exist?(config_path)
 end
 
 begin
-  Dimples::Site.generate(config)
+  Dimples::Site.generate(config:)
 rescue StandardError => e
   puts "Error generating site: #{e}"
 end
