@@ -8,7 +8,7 @@ module Dimples
 
       attr_accessor :path, :metadata, :contents
 
-      def initialize(site, path)
+      def initialize(site:, path:)
         @site = site
         @path = File.expand_path(path)
 
@@ -33,7 +33,7 @@ module Dimples
         end
       end
 
-      def write(output_path = nil, metadata = {})
+      def write(output_path: nil, metadata: {}, include_json: false)
         output_path = File.join(output_directory, filename) if output_path.nil?
         output_dir = File.dirname(output_path)
 
@@ -45,14 +45,14 @@ module Dimples
         File.write(output_path, output)
       end
 
-      def render(render_metadata = {}, body = nil)
-        render_metadata[:site] ||= @site.metadata
-        render_metadata[:page] ||= metadata
+      def render(context: {}, body: nil)
+        context[:site] ||= @site.metadata
+        context[:page] ||= metadata
 
-        output = template.render(Metadata.new(render_metadata)) { body }
+        output = template.render(Metadata.new(context)) { body }
         return output unless @metadata[:layout] && @site.layouts[@metadata[:layout]]
 
-        @site.layouts[@metadata[:layout]].render(render_metadata, output)
+        @site.layouts[@metadata[:layout]].render(context:, body: output)
       end
 
       def output_directory

@@ -10,11 +10,11 @@ module Dimples
   class Site
     attr_accessor :config
 
-    def self.generate(config = {})
-      new(config).generate
+    def self.generate(config: {})
+      new(config:).generate
     end
 
-    def initialize(config = {})
+    def initialize(config: {})
       @config = Config.new(config)
     end
 
@@ -30,19 +30,19 @@ module Dimples
 
     def posts
       @posts ||= Dir.glob(File.join(@config.source_paths[:posts], '**', '*.markdown')).map do |path|
-        Dimples::Sources::Post.new(self, path)
+        Dimples::Sources::Post.new(site: self, path:)
       end.sort_by!(&:date).reverse!
     end
 
     def pages
       @pages ||= Dir.glob(File.join(@config.source_paths[:pages], '**', '*.erb')).map do |path|
-        Dimples::Sources::Page.new(self, path)
+        Dimples::Sources::Page.new(site: self, path:)
       end
     end
 
     def layouts
       @layouts ||= Dir.glob(File.join(@config.source_paths[:layouts], '**', '*.erb')).to_h do |path|
-        [File.basename(path, '.erb'), Dimples::Sources::Layout.new(self, path)]
+        [File.basename(path, '.erb'), Dimples::Sources::Layout.new(site: self, path:)]
       end
     end
 
@@ -64,29 +64,42 @@ module Dimples
     private
 
     def generate_posts
-      posts.each(&:write)
-      Pager.paginate(self, @config.build_paths[:posts].gsub(@config.build_paths[:root], '').concat('/'), posts)
-      generate_feed(@config.build_paths[:root], posts)
+      posts.each { |post| post.write(generate_json: @config.generate_json) }
+
+      Pager.paginate(
+        site: self,
+        url: @config.build_paths[:posts].gsub(@config.build_paths[:root], '').concat('/'),
+        posts:
+      )
+
+      generate_feed(output_path: @config.build_paths[:root], posts:)
     end
 
     def generate_categories
       categories.each do |category, posts|
         metadata = { title: category.capitalize, category: category }
-        Pager.paginate(self, "/categories/#{category}/", posts, metadata)
-        generate_feed(File.join(@config.build_paths[:root], 'categories', category), posts)
+
+        Pager.paginate(
+          site: self,
+          url: "/categories/#{category}/",
+          posts:,
+          metadata:
+        )
+
+        generate_feed(output_path: File.join(@config.build_paths[:root], 'categories', category), posts:)
       end
     end
 
     def generate_pages
-      pages.each(&:write)
+      pages.each { |page| page.write(generate_json: @config.generate_json) }
     end
 
-    def generate_feed(output_path, posts)
+    def generate_feed(output_path:, posts:)
       return if layouts['feed'].nil?
 
       layouts['feed'].write(
-        File.join(output_path, 'feed.atom'),
-        posts: posts.slice(0, 10)
+        output_path: File.join(output_path, 'feed.atom'),
+        metadata: { posts: posts.slice(0, 10) }
       )
     end
 
