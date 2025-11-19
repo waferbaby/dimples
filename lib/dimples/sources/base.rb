@@ -11,23 +11,20 @@ module Dimples
       def initialize(site:, path:)
         @site = site
         @path = File.expand_path(path)
-
-        @metadata = default_metadata
         @contents = File.read(@path)
 
         parse_metadata(@contents)
-        assign_metadata
       end
 
       def parse_metadata(contents)
+        @metadata = default_metadata
+
         matches = contents.match(FRONT_MATTER_PATTERN)
         return unless matches
 
         @metadata.merge!(YAML.safe_load(matches[1], symbolize_names: true, permitted_classes: [Date]))
         @contents = matches.post_match.strip
-      end
 
-      def assign_metadata
         @metadata.each_key do |key|
           self.class.send(:define_method, key.to_sym) { @metadata[key] }
         end
