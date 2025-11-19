@@ -29,8 +29,7 @@ module Dimples
 
         @site.layouts['posts']&.write(
           output_path: File.join(@site.config.build_paths[:root], current_page_url, 'index.html'),
-          metadata: metadata.merge(pagination: self.metadata, url: current_page_url),
-          include_json: site.config[:include_json]
+          metadata: metadata.merge(pagination: self.metadata, url: current_page_url)
         )
       end
     end
