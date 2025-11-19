@@ -64,7 +64,7 @@ module Dimples
     private
 
     def generate_posts
-      posts.each { |post| post.write(generate_json: @config.generate_json) }
+      posts.each { |post| generate_post(post) }
 
       Pager.paginate(
         site: self,
@@ -73,6 +73,18 @@ module Dimples
       )
 
       generate_feed(output_path: @config.build_paths[:root], posts:)
+    end
+
+    def generate_post(post)
+      post.write
+    end
+
+    def generate_pages
+      pages.each { |page| generate_page(page) }
+    end
+
+    def generate_page(page)
+      page.write
     end
 
     def generate_categories
@@ -88,10 +100,6 @@ module Dimples
 
         generate_feed(output_path: File.join(@config.build_paths[:root], 'categories', category), posts:)
       end
-    end
-
-    def generate_pages
-      pages.each { |page| page.write(generate_json: @config.generate_json) }
     end
 
     def generate_feed(output_path:, posts:)
