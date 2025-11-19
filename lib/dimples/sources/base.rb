@@ -33,13 +33,13 @@ module Dimples
         end
       end
 
-      def write(output_path: nil, metadata: {}, include_json: false)
+      def write(output_path: nil, metadata: {})
         output_path = File.join(output_directory, filename) if output_path.nil?
         output_dir = File.dirname(output_path)
 
         @metadata[:url] = url_for(output_dir)
 
-        output = render(metadata)
+        output = render(context: metadata)
 
         FileUtils.mkdir_p(output_dir) unless File.directory?(output_dir)
         File.write(output_path, output)
