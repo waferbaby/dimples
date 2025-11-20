@@ -6,7 +6,7 @@ module Dimples
     class Base
       FRONT_MATTER_PATTERN = /^(-{3}\n.*?\n?)^(-{3}*$\n?)/m
 
-      attr_accessor :path, :metadata, :contents
+      attr_accessor :path, :metadata, :contents, :rendered_contents
 
       def initialize(site:, path:)
         @site = site
@@ -46,10 +46,10 @@ module Dimples
         context[:site] ||= @site.metadata
         context[:page] ||= metadata
 
-        output = template.render(Metadata.new(context)) { body }
-        return output unless @metadata[:layout] && @site.layouts[@metadata[:layout]]
+        @rendered_contents = template.render(Metadata.new(context)) { body }
+        return @rendered_contents unless @metadata[:layout] && @site.layouts[@metadata[:layout]]
 
-        @site.layouts[@metadata[:layout]].render(context:, body: output)
+        @site.layouts[@metadata[:layout]].render(context:, body: @rendered_contents)
       end
 
       def output_directory
