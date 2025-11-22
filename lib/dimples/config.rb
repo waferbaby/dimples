@@ -5,14 +5,15 @@ module Dimples
   class Config
     SOURCE_PATHS = { pages: 'pages', posts: 'posts', layouts: 'layouts', static: 'static' }.freeze
 
-    attr_accessor :source_paths, :build_paths, :pagination
+    attr_accessor :source_paths, :build_paths, :pagination, :generation
 
     def self.defaults
       {
         build: './site',
         source: Dir.pwd,
         pathnames: { posts: 'posts', categories: 'categories' },
-        pagination: { page_prefix: 'page_', per_page: 5 }
+        pagination: { page_prefix: 'page_', per_page: 5 },
+        generation: { sitemap: false, api: false }
       }
     end
 
@@ -22,6 +23,7 @@ module Dimples
       @source_paths = expand_paths(File.expand_path(options[:source]), SOURCE_PATHS.dup)
       @build_paths = expand_paths(File.expand_path(options[:build]), options[:pathnames])
       @pagination = options[:pagination]
+      @generation = options[:generation]
     end
 
     def expand_paths(root, paths)
