@@ -13,21 +13,17 @@ module Dimples
         @path = File.expand_path(path)
         @contents = File.read(@path)
 
+        @metadata = default_metadata
+
         parse_metadata(@contents)
       end
 
       def parse_metadata(contents)
-        @metadata = default_metadata
-
         matches = contents.match(FRONT_MATTER_PATTERN)
         return unless matches
 
         @metadata.merge!(YAML.safe_load(matches[1], symbolize_names: true, permitted_classes: [Date]))
         @contents = matches.post_match.strip
-
-        @metadata.each_key do |key|
-          self.class.send(:define_method, key.to_sym) { @metadata[key] }
-        end
       end
 
       def write(output_path: nil, metadata: {})
@@ -71,6 +67,16 @@ module Dimples
           layout: nil,
           filename: 'index.html'
         }
+      end
+
+      def method_missing(method_name, *args, &block)
+        return @metadata[method_name] if @metadata.key?(method_name)
+
+        super
+      end
+
+      def respond_to_missing?(method_name, include_private = false)
+        @metadata.key?(method_name) || super
       end
     end
   end
