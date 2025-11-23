@@ -2,7 +2,7 @@
 
 module Dimples
   module Sources
-    # A base class representing a source file with frontmatter metadata that can be rendered.
+    # A base class representing a source file (with optional frontmatter metadata) that can be rendered to a file.
     class Base
       FRONT_MATTER_PATTERN = /^(-{3}\n.*?\n?)^(-{3}*$\n?)/m
 
@@ -14,6 +14,7 @@ module Dimples
         @contents = File.read(@path)
 
         @metadata = default_metadata
+        @metadata[:url] = url_for(output_directory)
 
         parse_metadata(@contents)
       end
@@ -27,14 +28,14 @@ module Dimples
       end
 
       def write(output_path: nil, metadata: {})
-        output_path = File.join(output_directory, filename) if output_path.nil?
-        output_dir = File.dirname(output_path)
+        output_path       = File.join(output_directory, @metadata[:filename]) if output_path.nil?
+        parent_directory  = File.dirname(output_path)
 
-        @metadata[:url] = url_for(output_dir)
+        @metadata[:url] = url_for(parent_directory)
 
         output = render(context: metadata)
 
-        FileUtils.mkdir_p(output_dir) unless File.directory?(output_dir)
+        FileUtils.mkdir_p(parent_directory) unless File.directory?(parent_directory)
         File.write(output_path, output)
       end
 
@@ -72,7 +73,7 @@ module Dimples
       def method_missing(method_name, *args, &block)
         return @metadata[method_name] if @metadata.key?(method_name)
 
-        super
+        nil
       end
 
       def respond_to_missing?(method_name, include_private = false)
