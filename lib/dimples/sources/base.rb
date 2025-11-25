@@ -14,8 +14,6 @@ module Dimples
         @contents = File.read(@path)
 
         @metadata = default_metadata
-        @metadata[:url] = url_for(output_directory)
-
         parse_metadata(@contents)
       end
 
@@ -27,11 +25,9 @@ module Dimples
         @contents = matches.post_match.strip
       end
 
-      def write(output_path: nil, metadata: {})
-        output_path       = File.join(output_directory, @metadata[:filename]) if output_path.nil?
+      def write(metadata: {})
+        output_path       = File.join(output_directory, filename)
         parent_directory  = File.dirname(output_path)
-
-        @metadata[:url] = url_for(parent_directory)
 
         output = render(context: metadata)
 
@@ -50,11 +46,11 @@ module Dimples
       end
 
       def output_directory
-        @site.config.build_paths[:root]
+        @output_directory ||= @site.config.build_paths[:root]
       end
 
-      def url_for(path)
-        path.gsub(@site.config.build_paths[:root], '').concat('/')
+      def url
+        @path.gsub(@site.config.build_paths[:root], '').concat('/')
       end
 
       def template
@@ -66,7 +62,7 @@ module Dimples
       def default_metadata
         {
           layout: nil,
-          filename: 'index.html'
+          filename: 'index.html',
         }
       end
 
