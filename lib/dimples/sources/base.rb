@@ -8,10 +8,15 @@ module Dimples
 
       attr_accessor :path, :metadata, :contents, :rendered_contents
 
-      def initialize(site:, path:)
+      def initialize(site:, path: nil)
         @site = site
-        @path = File.expand_path(path)
-        @contents = File.read(@path)
+
+        if path.nil?
+          @contents = ""
+        else
+          @path = File.expand_path(path)
+          @contents = File.read(@path)
+        end
 
         @metadata = default_metadata
         parse_metadata(@contents)
@@ -25,8 +30,8 @@ module Dimples
         @contents = matches.post_match.strip
       end
 
-      def write(metadata: {})
-        output_path       = File.join(output_directory, filename)
+      def write(output_path: nil, metadata: {})
+        output_path = File.join(output_directory, filename) if output_path.nil?
         parent_directory  = File.dirname(output_path)
 
         output = render(context: metadata)
@@ -50,6 +55,8 @@ module Dimples
       end
 
       def url
+        return nil if @path.nil?
+
         @path.gsub(@site.config.build_paths[:root], '').concat('/')
       end
 
