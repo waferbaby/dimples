@@ -8,7 +8,7 @@ module Dimples
     attr_reader :current_page, :previous_page, :next_page, :page_count
 
     def self.paginate(site:, url:, posts:, metadata: {})
-      new(site:, url:, posts:).paginate(metadata)
+      new(site: site, url: url, posts: posts).paginate(metadata)
     end
 
     def initialize(site:, url:, posts:)
