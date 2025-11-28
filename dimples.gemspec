@@ -22,9 +22,9 @@ Gem::Specification.new do |s|
   s.files = Dir['lib/**/*']
   s.require_path = 'lib'
 
-  s.add_runtime_dependency 'erb', '~> 4.0'
-  s.add_runtime_dependency 'redcarpet', '~> 3.6'
-  s.add_runtime_dependency 'tilt', '~> 2.3'
+  s.add_dependency 'erb', '~> 4.0'
+  s.add_dependency 'redcarpet', '~> 3.6'
+  s.add_dependency 'tilt', '~> 2.3'
 
   s.metadata['rubygems_mfa_required'] = 'true'
 end
