@@ -4,22 +4,24 @@ require 'fileutils'
 require 'tmpdir'
 
 describe Dimples::Site do
-  subject(:site) { described_class.new(config:) }
+  subject(:site) { described_class.new(config: config) }
 
-  let(:config) { {
-    source: File.join(File.dirname(__dir__), 'fixtures'),
-    build: File.join(Dir.tmpdir, "dimples-test-site-#{Time.now.to_i}")
-  } }
+  let(:config) do
+    {
+      source: File.join(File.dirname(__dir__), 'fixtures'),
+      build: File.join(Dir.tmpdir, "dimples-test-site-#{Time.now.to_i}")
+    }
+  end
 
   describe '#posts' do
     it 'builds a list of post objects' do
-      expect(site.posts.count).to eql(2)
+      expect(site.posts.count).to be(2)
     end
   end
 
   describe '#pages' do
     it 'builds a list of page objects' do
-      expect(site.pages.count).to eql(1)
+      expect(site.pages.count).to be(1)
     end
   end
 
@@ -40,7 +42,7 @@ describe Dimples::Site do
     context 'when the target directory does not exist' do
       it 'creates the directory' do
         site.send(:prepare_output_directory)
-        expect(Dir.exist?(site.config.build_paths[:root])).to eql(true)
+        expect(Dir.exist?(site.config.build_paths[:root])).to be(true)
       end
     end
 
