@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module Dimples
-  module Sources
+  module Entries
     # A single page on a site.
-    class Page < Base
+    class Page < File
       def output_directory
         @output_directory ||= File.dirname(@path).gsub(
           @site.config.source_paths[:pages],
@@ -13,10 +13,6 @@ module Dimples
 
       def url
         output_directory.tap { |url| url.concat(filename) unless filename == 'index.html' }
-      end
-
-      def template
-        @template ||= Tilt::ERBTemplate.new { @contents }
       end
 
       private

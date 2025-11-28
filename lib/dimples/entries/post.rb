@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
 module Dimples
-  module Sources
+  module Entries
     # A page from a site with a date.
-    class Post < Base
+    class Post < File
       def output_directory
-        @output_directory ||= File.dirname(@path).gsub(
+        @output_directory ||= ::File.dirname(@path).gsub(
           @site.config.source_paths[:posts],
           @site.config.build_paths[:posts]
         ).concat("/#{slug}/")
       end
 
       def slug
-        File.basename(@path)
+        ::File.basename(@path)
       end
 
       def template
@@ -24,8 +24,8 @@ module Dimples
       def default_metadata
         super.tap do |defaults|
           defaults[:layout] = 'post'
-          defaults[:slug] = File.basename(@path, '.markdown')
-          defaults[:date] = File.birthtime(@path)
+          defaults[:slug] = ::File.basename(@path, '.markdown')
+          defaults[:date] = ::File.birthtime(@path)
           defaults[:categories] = []
         end
       end

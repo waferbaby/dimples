@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module Dimples
-  module Sources
+  module Entries
     # A class representing a dynamic source entry
-    class Entry
+    class Base
       FRONT_MATTER_PATTERN = /^(-{3}\n.*?\n?)^(-{3}*$\n?)/m
 
       attr_accessor :metadata, :contents, :rendered_contents
