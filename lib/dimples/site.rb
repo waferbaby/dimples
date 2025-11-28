@@ -11,7 +11,7 @@ module Dimples
     attr_accessor :config
 
     def self.generate(config: {})
-      new(config:).generate
+      new(config: config).generate
     end
 
     def initialize(config: {})
@@ -30,19 +30,19 @@ module Dimples
 
     def posts
       @posts ||= Dir.glob(File.join(@config.source_paths[:posts], '**', '*.markdown')).map do |path|
-        Dimples::Sources::Post.new(site: self, path:)
+        Dimples::Entries::Post.new(site: self, path: path)
       end.sort_by!(&:date).reverse!
     end
 
     def pages
       @pages ||= Dir.glob(File.join(@config.source_paths[:pages], '**', '*.erb')).map do |path|
-        Dimples::Sources::Page.new(site: self, path:)
+        Dimples::Entries::Page.new(site: self, path: path)
       end
     end
 
     def layouts
       @layouts ||= Dir.glob(File.join(@config.source_paths[:layouts], '**', '*.erb')).to_h do |path|
-        [File.basename(path, '.erb'), Dimples::Sources::Layout.new(site: self, path:)]
+        [File.basename(path, '.erb'), Dimples::Entries::Layout.new(site: self, path: path)]
       end
     end
 
@@ -69,10 +69,10 @@ module Dimples
       Pager.paginate(
         site: self,
         url: @config.build_paths[:posts].gsub(@config.build_paths[:root], '').concat('/'),
-        posts:
+        posts: posts
       )
 
-      generate_feed(output_path: @config.build_paths[:root], posts:)
+      generate_feed(output_path: @config.build_paths[:root], posts: posts)
     end
 
     def generate_post(post)
@@ -94,11 +94,11 @@ module Dimples
         Pager.paginate(
           site: self,
           url: "/categories/#{category}/",
-          posts:,
-          metadata:
+          posts: posts,
+          metadata: metadata
         )
 
-        generate_feed(output_path: File.join(@config.build_paths[:root], 'categories', category), posts:)
+        generate_feed(output_path: File.join(@config.build_paths[:root], 'categories', category), posts: posts)
       end
     end
 
