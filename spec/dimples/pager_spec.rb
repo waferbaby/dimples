@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 describe Dimples::Pager do
-  subject(:pager) { Dimples::Pager.new(site:, url:, posts:) }
+  subject(:pager) { described_class.new(site: site, url: url, posts: posts) }
 
   let(:site) { double }
   let(:config) { double }
-  let(:url) { "https://dimples.test/" }
+  let(:url) { 'https://dimples.test/' }
   let(:posts) { [double, double, double] }
 
   before do
@@ -16,33 +16,27 @@ describe Dimples::Pager do
   describe '#step_to' do
     before { pager.step_to(page) }
 
-    context 'for page 1' do
+    context 'when at page 1' do
       let(:page) { 1 }
 
       it 'builds the correct context' do
-        expect(pager.previous_page).to be_nil
-        expect(pager.current_page).to eql(1)
-        expect(pager.next_page).to eql(2)
+        expect([pager.previous_page, pager.current_page, pager.next_page]).to eq([nil, 1, 2])
       end
     end
 
-    context 'for page 2' do
+    context 'when at page 2' do
       let(:page) { 2 }
 
       it 'builds the correct context' do
-        expect(pager.previous_page).to eql(1)
-        expect(pager.current_page).to eql(2)
-        expect(pager.next_page).to eql(3)
+        expect([pager.previous_page, pager.current_page, pager.next_page]).to eq([1, 2, 3])
       end
     end
 
-    context 'for page 3' do
+    context 'when at page 3' do
       let(:page) { 3 }
 
       it 'builds the correct context' do
-        expect(pager.previous_page).to eql(2)
-        expect(pager.current_page).to eql(3)
-        expect(pager.next_page).to be_nil
+        expect([pager.previous_page, pager.current_page, pager.next_page]).to eq([2, 3, nil])
       end
     end
   end
