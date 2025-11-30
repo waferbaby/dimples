@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'fileutils'
-require 'tmpdir'
 
 describe Dimples::Site do
   subject(:site) { described_class.new(config: config) }
