@@ -4,3 +4,4 @@ require 'simplecov'
 SimpleCov.start
 
 require 'dimples'
+require 'tmpdir'
