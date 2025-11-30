@@ -28,11 +28,11 @@ module Dimples
       end
 
       def write(output_path:, metadata: {})
-        parent_directory = File.dirname(output_path)
+        parent_directory = ::File.dirname(output_path)
         output = render(context: metadata)
 
-        FileUtils.mkdir_p(parent_directory) unless File.directory?(parent_directory)
-        File.write(output_path, output)
+        FileUtils.mkdir_p(parent_directory) unless ::File.directory?(parent_directory)
+        ::File.write(output_path, output)
       end
 
       def render(context: {}, body: nil)
