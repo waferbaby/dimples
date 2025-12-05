@@ -12,7 +12,7 @@ module Dimples
       end
 
       def slug
-        ::File.basename(@path)
+        ::File.basename(@path, '.markdown')
       end
 
       def template
