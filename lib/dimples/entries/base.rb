@@ -47,9 +47,11 @@ module Dimples
         context[:page] ||= @metadata.to_h
 
         @rendered_contents = template.render(Metadata.new(context)) { body }
-        return @rendered_contents unless @metadata[:layout] && @site.layouts[@metadata[:layout]]
 
-        @site.layouts[@metadata[:layout]].render(context: context, body: @rendered_contents)
+        layout = @site.layouts[@metadata[:layout].to_sym] if @metadata[:layout]
+        return @rendered_contents if layout.nil?
+
+        layout.render(context: context, body: @rendered_contents)
       end
 
       def output_directory
