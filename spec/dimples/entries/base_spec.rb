@@ -4,11 +4,18 @@ describe Dimples::Entries::Base do
   subject(:base) { described_class.new(site: site, contents: contents) }
 
   let(:site) { double }
-  let(:contents) { "HEY!\n\nI am content!" }
+  let(:body) { "HEY!\n\nI am content!" }
+  let(:contents) { body }
+  let(:layouts) { {} }
+
+  before do
+    allow(site).to receive(:metadata).and_return({})
+    allow(site).to receive(:layouts).and_return(layouts)
+  end
 
   describe '#parse_metadata' do
     it 'correctly parses the contents' do
-      expect(base.metadata).to eql({ filename: 'index.html', layout: nil })
+      expect(base.metadata.to_h).to eql({ filename: 'index.html', layout: nil })
     end
   end
 
@@ -30,26 +37,20 @@ describe Dimples::Entries::Base do
     end
   end
 
-  describe '#method_missing' do
-    context 'with a key that matches a metadata key' do
-      let(:contents) do
-        <<~METADATA
-          ---
-          sporks: 12
-          ---
-
-          I love sporks!
-        METADATA
-      end
-
-      it 'returns the corresponding value' do
-        expect(base.sporks).to be(12)
+  describe '#render' do
+    context 'with default params' do
+      it 'renders the expected output' do
+        expect(base.render).to eql(contents)
       end
     end
 
-    context 'with a key that is not in the metadata' do
-      it 'returns a nil value' do
-        expect(base.spoons).to be_nil
+    context 'with a layout' do
+      let(:layouts) { { test: Dimples::Entries::Base.new(site: site, contents: template) } }
+      let(:template) { "<em><%= yield %></em>" }
+      let(:contents) { "---\nlayout: test\n---\n\n#{body}"}
+
+      it 'renders with the layout around its contents' do
+        expect(base.render).to eql("<em>#{body}</em>")
       end
     end
   end
