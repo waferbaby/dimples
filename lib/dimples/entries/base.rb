@@ -1,12 +1,17 @@
 # frozen_string_literal: true
 
+require 'forwardable'
+
 module Dimples
   module Entries
     # A class representing a dynamic source entry
     class Base
+      include Forwardable
+
       FRONT_MATTER_PATTERN = /^(-{3}\n.*?\n?)^(-{3}*$\n?)/m
 
-      attr_accessor :metadata, :contents, :rendered_contents
+      attr_accessor :contents, :rendered_contents
+      attr_reader :metadata
 
       def initialize(site:, contents:)
         @site = site
@@ -15,16 +20,18 @@ module Dimples
       end
 
       def parse_metadata(contents)
-        @metadata = default_metadata
+        metadata = default_metadata
 
         matches = contents.match(FRONT_MATTER_PATTERN)
-        unless matches
+        if matches
+          metadata.merge!(YAML.safe_load(matches[1], symbolize_names: true, permitted_classes: [Date]))
+          @contents = matches.post_match.strip
+        else
           @contents = contents
-          return
         end
 
-        @metadata.merge!(YAML.safe_load(matches[1], symbolize_names: true, permitted_classes: [Date]))
-        @contents = matches.post_match.strip
+        @metadata = Metadata.new(metadata)
+        @metadata.each_key { |key| def_delegator :@metadata, key.to_sym }
       end
 
       def write(output_path:, metadata: {})
@@ -36,8 +43,8 @@ module Dimples
       end
 
       def render(context: {}, body: nil)
-        context[:site] ||= @site.metadata
-        context[:page] ||= metadata
+        context[:site] ||= @site.metadata.to_h
+        context[:page] ||= @metadata.to_h
 
         @rendered_contents = template.render(Metadata.new(context)) { body }
         return @rendered_contents unless @metadata[:layout] && @site.layouts[@metadata[:layout]]
@@ -60,16 +67,6 @@ module Dimples
           layout: nil,
           filename: 'index.html'
         }
-      end
-
-      def method_missing(method_name, *_args)
-        return @metadata[method_name] if @metadata.key?(method_name)
-
-        nil
-      end
-
-      def respond_to_missing?(method_name, include_private = false)
-        @metadata.key?(method_name) || super
       end
     end
   end
