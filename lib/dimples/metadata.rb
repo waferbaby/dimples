@@ -10,13 +10,19 @@ module Dimples
     def initialize(source = {})
       @data = {}
 
-      source.each do |key, value|
-        @data[key] = build(value)
-      end
+      source.each { |key, value| self[key] = value }
     end
 
-    def keys
-      @data.keys
+    def [](key)
+      @data[key]
+    end
+
+    def []=(key, value)
+      @data[key] = build(value)
+    end
+
+    def to_h
+      @data
     end
 
     def each_key(&block)
