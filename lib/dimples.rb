@@ -8,7 +8,6 @@ require 'dimples/pager'
 require 'dimples/site'
 
 require 'dimples/entries/base'
-require 'dimples/entries/file'
 require 'dimples/entries/page'
 require 'dimples/entries/post'
 require 'dimples/entries/layout'

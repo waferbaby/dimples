@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'forwardable'
+require 'pathname'
 
 module Dimples
   module Entries
@@ -10,11 +11,19 @@ module Dimples
 
       FRONT_MATTER_PATTERN = /^(-{3}\n.*?\n?)^(-{3}*$\n?)/m
 
-      attr_accessor :contents, :rendered_contents
+      attr_accessor :path, :contents, :rendered_contents
       attr_reader :metadata
 
-      def initialize(site:, contents:)
+      def initialize(site:, source:)
         @site = site
+
+        contents = case source
+        when Pathname
+          @path = File.expand_path(source)
+          File.read(@path)
+        when String
+          source
+        end
 
         parse_metadata(contents)
       end
@@ -34,12 +43,14 @@ module Dimples
         @metadata.each_key { |key| def_delegator :@metadata, key.to_sym }
       end
 
-      def write(output_path:, metadata: {})
-        parent_directory = ::File.dirname(output_path)
+      def write(output_path: nil, metadata: {})
+        output_path = File.join(output_directory, filename) if output_path.nil?
+
+        parent_directory = File.dirname(output_path)
         output = render(context: metadata)
 
-        FileUtils.mkdir_p(parent_directory) unless ::File.directory?(parent_directory)
-        ::File.write(output_path, output)
+        FileUtils.mkdir_p(parent_directory) unless File.directory?(parent_directory)
+        File.write(output_path, output)
       end
 
       def render(context: {}, body: nil)

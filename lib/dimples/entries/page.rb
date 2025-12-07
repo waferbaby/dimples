@@ -3,7 +3,11 @@
 module Dimples
   module Entries
     # A single page on a site.
-    class Page < File
+    class Page < Base
+      def initialize(site:, path:)
+        super(site: site, source: Pathname.new(path))
+      end
+
       def output_directory
         @output_directory ||= File.dirname(@path).gsub(
           @site.config.source_paths[:pages],
