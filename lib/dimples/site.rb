@@ -72,7 +72,7 @@ module Dimples
         posts: posts
       )
 
-      generate_feed(output_path: @config.build_paths[:root], posts: posts)
+      generate_feed(output_path: @config.build_paths[:root], posts: posts) if @config.generation[:main_feed]
     end
 
     def generate_post(post)
@@ -98,7 +98,9 @@ module Dimples
           metadata: metadata
         )
 
-        generate_feed(output_path: File.join(@config.build_paths[:root], 'categories', category), posts: posts)
+        if @config.generation[:category_feeds]
+          generate_feed(output_path: File.join(@config.build_paths[:root], 'categories', category), posts: posts)
+        end
       end
     end
 
