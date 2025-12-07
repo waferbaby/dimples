@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 describe Dimples::Entries::Base do
-  subject(:base) { described_class.new(site: site, contents: contents) }
+  subject(:base) { described_class.new(site: site, source: contents) }
 
   let(:site) { double }
   let(:body) { "HEY!\n\nI am content!" }
@@ -45,7 +45,7 @@ describe Dimples::Entries::Base do
     end
 
     context 'with a layout' do
-      let(:layouts) { { test: Dimples::Entries::Base.new(site: site, contents: template) } }
+      let(:layouts) { { test: Dimples::Entries::Base.new(site: site, source: template) } }
       let(:template) { "<em><%= yield %></em>" }
       let(:contents) { "---\nlayout: test\n---\n\n#{body}"}
 
