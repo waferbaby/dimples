@@ -19,9 +19,25 @@ module Dimples
       @data[key]
     end
 
+    def each(&block)
+      @data.each(&block)
+    end
+
     def each_key(&block)
       @data.keys.each(&block)
     end
+
+    def method_missing(method_name, *_args)
+      return @data[method_name] if @data.key?(method_name)
+
+      nil
+    end
+
+    def respond_to_missing?(method_name, include_private = false)
+      @data.key?(method_name) || super
+    end
+
+    private
 
     def build(item)
       case item
