@@ -7,8 +7,8 @@ module Dimples
 
     attr_reader :current_page, :previous_page, :next_page, :page_count
 
-    def self.paginate(site:, url:, posts:, metadata: {})
-      new(site: site, url: url, posts: posts).paginate(metadata)
+    def self.paginate(site:, url:, posts:, context: {})
+      new(site: site, url: url, posts: posts).paginate(context: context)
     end
 
     def initialize(site:, url:, posts:)
@@ -23,13 +23,13 @@ module Dimples
       step_to(1)
     end
 
-    def paginate(metadata)
+    def paginate(context: {})
       (1..@page_count).each do |index|
         step_to(index)
 
-        @site.layouts['posts']&.write(
+        @site.layouts[:posts]&.write(
           output_path: File.join(@site.config.build_paths[:root], current_page_url, 'index.html'),
-          metadata: metadata.merge(pagination: self.metadata, url: current_page_url)
+          context: context.merge(pagination: self.metadata, url: current_page_url)
         )
       end
     end

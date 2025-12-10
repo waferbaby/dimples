@@ -28,7 +28,7 @@ module Dimples
       def default_metadata
         super.tap do |defaults|
           defaults[:layout] = 'post'
-          defaults[:slug] = File.basename(@path, '.markdown')
+          defaults[:slug] = slug
           defaults[:date] = File.birthtime(@path)
           defaults[:categories] = []
         end

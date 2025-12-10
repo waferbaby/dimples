@@ -43,23 +43,23 @@ module Dimples
         @metadata.each_key { |key| def_delegator :@metadata, key.to_sym }
       end
 
-      def write(output_path: nil, metadata: {})
-        output_path = File.join(output_directory, filename) if output_path.nil?
+      def write(output_path: nil, context: {})
+        output_path = File.join(output_directory, @metadata[:filename]) if output_path.nil?
 
         parent_directory = File.dirname(output_path)
-        output = render(context: metadata)
+        output = render(context: context)
 
         FileUtils.mkdir_p(parent_directory) unless File.directory?(parent_directory)
         File.write(output_path, output)
       end
 
       def render(context: {}, body: nil)
-        context[:site] ||= @site.metadata.to_h
-        context[:page] ||= @metadata.to_h
+        context[:site] ||= @site.metadata
+        context[:page] ||= @metadata
 
         @rendered_contents = template.render(Metadata.new(context)) { body }
 
-        layout = @site.layouts[@metadata[:layout].to_sym] if @metadata[:layout]
+        layout = @site.layouts[@metadata.layout.to_sym] if @metadata.layout
         return @rendered_contents if layout.nil?
 
         layout.render(context: context, body: @rendered_contents)

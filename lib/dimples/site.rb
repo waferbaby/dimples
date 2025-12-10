@@ -31,7 +31,7 @@ module Dimples
     def posts
       @posts ||= Dir.glob(File.join(@config.source_paths[:posts], '**', '*.markdown')).map do |path|
         Dimples::Entries::Post.new(site: self, path: path)
-      end.sort_by!(&:date).reverse!
+      end.sort_by! { |post| post.metadata[:date] }.reverse!
     end
 
     def pages
@@ -42,14 +42,14 @@ module Dimples
 
     def layouts
       @layouts ||= Dir.glob(File.join(@config.source_paths[:layouts], '**', '*.erb')).to_h do |path|
-        [File.basename(path, '.erb'), Dimples::Entries::Layout.new(site: self, path: path)]
+        [File.basename(path, '.erb').to_sym, Dimples::Entries::Layout.new(site: self, path: path)]
       end
     end
 
     def categories
       @categories ||= {}.tap do |categories|
         posts.each do |post|
-          post.categories.each do |category|
+          post.metadata[:categories].each do |category|
             categories[category] ||= []
             categories[category].append(post)
           end
@@ -89,13 +89,13 @@ module Dimples
 
     def generate_categories
       categories.each do |category, posts|
-        metadata = { title: category.capitalize, category: category }
+        context = { title: category.capitalize, category: category }
 
         Pager.paginate(
           site: self,
           url: "/categories/#{category}/",
           posts: posts,
-          metadata: metadata
+          context: context
         )
 
         if @config.generation[:category_feeds]
@@ -109,7 +109,7 @@ module Dimples
 
       layouts['feed'].write(
         output_path: File.join(output_path, 'feed.atom'),
-        metadata: { posts: posts.slice(0, 10) }
+        context: { posts: posts.slice(0, 10) }
       )
     end
 
