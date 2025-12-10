@@ -18,12 +18,12 @@ module Dimples
         @site = site
 
         contents = case source
-        when Pathname
-          @path = File.expand_path(source)
-          File.read(@path)
-        when String
-          source
-        end
+                   when Pathname
+                     @path = File.expand_path(source)
+                     File.read(@path)
+                   when String
+                     source
+                   end
 
         parse_metadata(contents)
       end
@@ -40,7 +40,6 @@ module Dimples
         end
 
         @metadata = Metadata.new(metadata)
-        @metadata.each_key { |key| def_delegator :@metadata, key.to_sym }
       end
 
       def write(output_path: nil, context: {})
@@ -71,6 +70,14 @@ module Dimples
 
       def template
         @template ||= Tilt::ERBTemplate.new { @contents }
+      end
+
+      def method_missing(method_name, *_args)
+        @metadata.send(method_name)
+      end
+
+      def respond_to_missing?(method_name, include_private = false)
+        true
       end
 
       private
