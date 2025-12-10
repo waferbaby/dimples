@@ -105,9 +105,9 @@ module Dimples
     end
 
     def generate_feed(output_path:, posts:)
-      return if layouts['feed'].nil?
+      return if layouts[:feed].nil?
 
-      layouts['feed'].write(
+      layouts[:feed].write(
         output_path: File.join(output_path, 'feed.atom'),
         context: { posts: posts.slice(0, 10) }
       )
