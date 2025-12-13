@@ -25,12 +25,21 @@ module Dimples
 
     def initialize(options = {})
       options = Config.defaults.to_h do |key, value|
-        value.merge!(options[key]) if options[key].is_a?(Hash)
+        unless options[key].nil?
+          value = case options[key]
+                  when Hash
+                    value.merge!(options[key])
+                  else
+                    options[key]
+                  end
+        end
+
         [key, value]
       end
 
       @source_paths = expand_paths(File.expand_path(options[:source]), SOURCE_PATHS.dup)
       @build_paths = expand_paths(File.expand_path(options[:build]), options[:pathnames])
+
       @site = options[:site]
       @pagination = options[:pagination]
       @generation = options[:generation]
