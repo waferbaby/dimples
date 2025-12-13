@@ -72,11 +72,15 @@ module Dimples
         @template ||= Tilt::ERBTemplate.new { @contents }
       end
 
+      def to_h
+        @metadata.to_h.merge({ contents: contents })
+      end
+
       def method_missing(method_name, *_args)
         @metadata.send(method_name)
       end
 
-      def respond_to_missing?(method_name, include_private = false)
+      def respond_to_missing?(_method_name, _include_private = false)
         true
       end
 

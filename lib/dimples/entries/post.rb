@@ -16,11 +16,17 @@ module Dimples
       end
 
       def slug
-        File.basename(@path, '.markdown')
+        File.basename(@path, File.extname(@path))&.downcase
       end
 
       def template
         @template ||= Tilt::RedcarpetTemplate.new { @contents }
+      end
+
+      def to_h
+        super.reject { |k, _| %i[filename layout].include?(k) }.tap do |output|
+          output[:date] = output[:date].iso8601 unless output[:date].nil?
+        end
       end
 
       private
