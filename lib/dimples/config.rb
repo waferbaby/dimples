@@ -3,7 +3,12 @@
 module Dimples
   # Configuration settings for a site.
   class Config
-    SOURCE_PATHS = { pages: 'pages', posts: 'posts', layouts: 'layouts', static: 'static' }.freeze
+    SOURCE_PATHS = {
+      pages: 'pages',
+      posts: 'posts',
+      layouts: 'layouts',
+      static: 'static'
+    }.freeze
 
     attr_accessor :source_paths, :build_paths, :site, :pagination, :generation
 
@@ -11,7 +16,7 @@ module Dimples
       {
         source: Dir.pwd,
         build: './site',
-        pathnames: { posts: 'posts', categories: 'categories' },
+        pathnames: { posts: 'posts', categories: 'categories', api: 'api' },
         site: { name: nil, domain: nil },
         pagination: { page_prefix: 'page_', per_page: 5 },
         generation: { api: false, main_feed: true, category_feeds: false }
@@ -19,7 +24,10 @@ module Dimples
     end
 
     def initialize(options = {})
-      options = Config.defaults.merge(options)
+      options = Config.defaults.to_h do |key, value|
+        value.merge!(options[key]) if options[key].is_a?(Hash)
+        [key, value]
+      end
 
       @source_paths = expand_paths(File.expand_path(options[:source]), SOURCE_PATHS.dup)
       @build_paths = expand_paths(File.expand_path(options[:build]), options[:pathnames])
