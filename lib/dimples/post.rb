@@ -1,0 +1,43 @@
+# frozen_string_literal: true
+
+module Dimples
+  # A page from a site with a date.
+  class Post < Entry
+    def initialize(site:, path:)
+      super(site: site, source: Pathname.new(path))
+    end
+
+    def output_directory
+      @output_directory ||= File.dirname(@path).gsub(
+        @site.config.source_paths[:posts],
+        @site.config.build_paths[:posts]
+      ).concat("/#{slug}/")
+    end
+
+    def slug
+      File.basename(@path, File.extname(@path))&.downcase
+    end
+
+    def template
+      @template ||= Tilt::RedcarpetTemplate.new { @contents }
+    end
+
+    def to_h
+      super.reject { |k, _| %i[filename layout].include?(k) }.tap do |output|
+        output[:date] = output[:date].iso8601 unless output[:date].nil?
+        output[:url] ||= url
+      end
+    end
+
+    private
+
+    def default_metadata
+      super.tap do |defaults|
+        defaults[:layout] = 'post'
+        defaults[:slug] = slug
+        defaults[:date] = File.birthtime(@path)
+        defaults[:categories] = []
+      end
+    end
+  end
+end
