@@ -42,14 +42,22 @@ module Dimples
         @metadata = Metadata.new(metadata)
       end
 
-      def write(output_path: nil, context: {})
+      def generate(output_path: nil, context: {})
         output_path = File.join(output_directory, @metadata[:filename]) if output_path.nil?
+        write(output_path: output_path, body: render(context: context))
+      end
 
+      def write(output_path:, body:)
         parent_directory = File.dirname(output_path)
-        output = render(context: context)
 
         FileUtils.mkdir_p(parent_directory) unless File.directory?(parent_directory)
-        File.write(output_path, output)
+        File.write(output_path, body)
+      end
+
+      def url
+        @url ||= output_directory.gsub(@site.config.build_paths[:root], '').tap do |url|
+          url.concat(@metadata[:filename]) unless @metadata[:filename] == 'index.html'
+        end
       end
 
       def render(context: {}, body: nil)
