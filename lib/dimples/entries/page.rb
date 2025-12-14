@@ -15,10 +15,6 @@ module Dimples
         ).concat('/')
       end
 
-      def url
-        output_directory.tap { |url| url.concat(filename) unless filename == 'index.html' }
-      end
-
       private
 
       def default_metadata
