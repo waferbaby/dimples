@@ -26,6 +26,7 @@ module Dimples
       def to_h
         super.reject { |k, _| %i[filename layout].include?(k) }.tap do |output|
           output[:date] = output[:date].iso8601 unless output[:date].nil?
+          output[:url] ||= url
         end
       end
 
