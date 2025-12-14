@@ -27,9 +27,9 @@ module Dimples
       (1..@page_count).each do |index|
         step_to(index)
 
-        @site.layouts[:posts]&.write(
+        @site.layouts[:posts]&.generate(
           output_path: File.join(@site.config.build_paths[:root], current_page_url, 'index.html'),
-          context: context.merge(pagination: self.metadata, url: current_page_url)
+          context: context.merge(pagination: metadata, url: current_page_url)
         )
       end
     end
