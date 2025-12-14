@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-describe Dimples::Entries::Base do
+describe Dimples::Entry do
   subject(:base) { described_class.new(site: site, source: contents) }
 
   let(:site) { double }
@@ -19,13 +19,13 @@ describe Dimples::Entries::Base do
     end
   end
 
-  describe '#write' do
+  describe '#generate' do
     let(:path) { File.join(Dir.tmpdir, 'dimples-test-file') }
 
     before do
       allow(site).to receive(:metadata).and_return({})
 
-      base.write(output_path: path)
+      base.generate(output_path: path)
     end
 
     it 'create the file at the correct location' do
@@ -45,9 +45,9 @@ describe Dimples::Entries::Base do
     end
 
     context 'with a layout' do
-      let(:layouts) { { test: Dimples::Entries::Base.new(site: site, source: template) } }
-      let(:template) { "<em><%= yield %></em>" }
-      let(:contents) { "---\nlayout: test\n---\n\n#{body}"}
+      let(:layouts) { { test: Dimples::Entry.new(site: site, source: template) } }
+      let(:template) { '<em><%= yield %></em>' }
+      let(:contents) { "---\nlayout: test\n---\n\n#{body}" }
 
       it 'renders with the layout around its contents' do
         expect(base.render).to eql("<em>#{body}</em>")

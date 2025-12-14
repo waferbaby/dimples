@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-describe Dimples::Entries::Post do
+describe Dimples::Post do
   subject(:post) { described_class.new(site: site, path: path) }
 
   let(:site) { double }
