@@ -29,7 +29,7 @@ module Dimples
 
         output_directory = File.join(@site.config.build_paths[:root], current_page_url)
 
-        context.merge!(pagination: metadata, url: current_page_url)
+        context.merge!(metadata, url: current_page_url)
 
         @site.layouts[:posts]&.generate(
           output_path: File.join(output_directory, 'index.html'),
@@ -95,12 +95,14 @@ module Dimples
     def metadata
       {
         posts: posts_at(current_page),
-        current_page: @current_page,
-        page_count: @page_count,
-        post_count: @posts.count,
-        previous_page: @previous_page,
-        next_page: @next_page,
-        urls: urls
+        pagination: {
+          current_page: @current_page,
+          page_count: @page_count,
+          post_count: @posts.count,
+          previous_page: @previous_page,
+          next_page: @next_page,
+          urls: urls
+        }
       }
     end
   end
