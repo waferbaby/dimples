@@ -16,10 +16,10 @@ module Dimples
       {
         source: Dir.pwd,
         build: './site',
-        pathnames: { posts: 'posts', categories: 'categories', api: 'api' },
+        pathnames: { posts: 'posts', categories: 'categories' },
         site: { name: nil, domain: nil },
         pagination: { page_prefix: 'page_', per_page: 5 },
-        generation: { api: false, main_feed: true, category_feeds: false }
+        generation: { main_feed: true, category_feeds: false }
       }
     end
 
