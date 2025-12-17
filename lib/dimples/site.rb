@@ -30,19 +30,19 @@ module Dimples
 
     def posts
       @posts ||= Dir.glob(File.join(@config.source_paths[:posts], '**', '*.markdown')).map do |path|
-        Dimples::Entries::Post.new(site: self, path: path)
+        Dimples::Post.new(site: self, path: path)
       end.sort_by! { |post| post.metadata[:date] }.reverse!
     end
 
     def pages
       @pages ||= Dir.glob(File.join(@config.source_paths[:pages], '**', '*.erb')).map do |path|
-        Dimples::Entries::Page.new(site: self, path: path)
+        Dimples::Page.new(site: self, path: path)
       end
     end
 
     def layouts
       @layouts ||= Dir.glob(File.join(@config.source_paths[:layouts], '**', '*.erb')).to_h do |path|
-        [File.basename(path, '.erb').to_sym, Dimples::Entries::Layout.new(site: self, path: path)]
+        [File.basename(path, '.erb').to_sym, Dimples::Layout.new(site: self, path: path)]
       end
     end
 
@@ -76,7 +76,7 @@ module Dimples
     end
 
     def generate_post(post)
-      post.write
+      post.generate
     end
 
     def generate_pages
@@ -84,7 +84,7 @@ module Dimples
     end
 
     def generate_page(page)
-      page.write
+      page.generate
     end
 
     def generate_categories
@@ -107,7 +107,7 @@ module Dimples
     def generate_feed(output_path:, posts:)
       return if layouts[:feed].nil?
 
-      layouts[:feed].write(
+      layouts[:feed].generate(
         output_path: File.join(output_path, 'feed.atom'),
         context: { posts: posts.slice(0, 10) }
       )
