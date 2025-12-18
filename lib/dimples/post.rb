@@ -22,13 +22,6 @@ module Dimples
       @template ||= Tilt::RedcarpetTemplate.new { @contents }
     end
 
-    def to_h
-      super.reject { |k, _| %i[filename layout].include?(k) }.tap do |output|
-        output[:date] = output[:date].iso8601 unless output[:date].nil?
-        output[:url] ||= url
-      end
-    end
-
     private
 
     def default_metadata
