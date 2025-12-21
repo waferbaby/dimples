@@ -15,6 +15,10 @@ module Dimples
       @data.keys
     end
 
+    def merge(hash)
+      @data.merge(hash)
+    end
+
     def [](key)
       @data[key]
     end
