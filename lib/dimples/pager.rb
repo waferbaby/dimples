@@ -27,13 +27,11 @@ module Dimples
       (1..@page_count).each do |index|
         step_to(index)
 
-        output_directory = File.join(@site.config.build_paths[:root], current_page_url)
-
-        context.merge!(metadata, url: current_page_url)
+        output_directory = File.join(@site.config.build_paths[:root], current_page_path)
 
         @site.layouts[:posts]&.generate(
           output_path: File.join(output_directory, 'index.html'),
-          context: context
+          context: metadata.merge(context, url: current_page_url)
         )
 
         yield(output_directory, context) if block_given?
@@ -58,6 +56,10 @@ module Dimples
 
     def next_page?
       @current_page + 1 <= @page_count
+    end
+
+    def current_page_path
+      @current_page == 1 ? @url : File.join(@url, "page_#{@current_page}")
     end
 
     def current_page_url
