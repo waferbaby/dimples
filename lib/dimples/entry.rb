@@ -61,7 +61,7 @@ module Dimples
 
     def render(context: {}, body: nil)
       context[:site] ||= @site.metadata
-      context[:page] ||= @metadata
+      context[:page] ||= @metadata.merge(context)
 
       @rendered_contents = template.render(Metadata.new(context)) { body }
 
