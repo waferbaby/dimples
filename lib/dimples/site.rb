@@ -58,7 +58,7 @@ module Dimples
     end
 
     def metadata
-      @metadata ||= Metadata.new(posts: posts, categories: categories)
+      @metadata ||= Metadata.new(@config.site.merge(posts: posts, categories: categories.merge))
     end
 
     private

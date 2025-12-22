@@ -17,7 +17,7 @@ module Dimples
         source: Dir.pwd,
         build: './site',
         pathnames: { posts: 'posts', categories: 'categories' },
-        site: { name: nil, domain: nil },
+        site: { name: nil, domain: nil, summary: nil },
         pagination: { page_prefix: 'page_', per_page: 5 },
         generation: { main_feed: true, category_feeds: false }
       }
